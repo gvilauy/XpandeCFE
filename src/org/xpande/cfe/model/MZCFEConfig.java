@@ -30,7 +30,23 @@ public class MZCFEConfig extends X_Z_CFE_Config {
      */
     public static MZCFEConfig getDefault(Properties ctx, String trxName){
 
-        MZCFEConfig model = new Query(ctx, I_Z_CFE_Config.Table_Name, "", trxName).first();
+        MZCFEConfig model = new Query(ctx, I_Z_CFE_Config.Table_Name, "", trxName).setOnlyActiveRecords(true).first();
+
+        return model;
+    }
+
+    /***
+     * Obtiene y retorna configuracion para envío de CFE de un determinado documento recibido.
+     * Xpande. Created by Gabriel Vila on 9/22/17.
+     * @param cDocTypeID : ID del documento a considerar.
+     * @return
+     */
+    public MZCFEConfigDocSend getConfigDocumentCFE(int cDocTypeID){
+
+        String whereClause = X_Z_CFE_ConfigDocSend.COLUMNNAME_Z_CFE_Config_ID + " =" + this.get_ID() +
+                " AND " + X_Z_CFE_ConfigDocSend.COLUMNNAME_C_DocType_ID + " =" + cDocTypeID;
+
+        MZCFEConfigDocSend model = new Query(getCtx(), I_Z_CFE_ConfigDocSend.Table_Name, whereClause, get_TrxName()).setOnlyActiveRecords(true).first();
 
         return model;
     }
