@@ -31,7 +31,7 @@ public class X_Z_CFE_ConfigDocSend extends PO implements I_Z_CFE_ConfigDocSend, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20170904L;
+	private static final long serialVersionUID = 20181029L;
 
     /** Standard Constructor */
     public X_Z_CFE_ConfigDocSend (Properties ctx, int Z_CFE_ConfigDocSend_ID, String trxName)
@@ -241,9 +241,9 @@ public class X_Z_CFE_ConfigDocSend extends PO implements I_Z_CFE_ConfigDocSend, 
 		return ii.intValue();
 	}
 
-	public org.xpande.cfe.model.I_Z_CFE_ConfigDocDGI getZ_CFE_ConfigDocDGI() throws RuntimeException
+	public I_Z_CFE_ConfigDocDGI getZ_CFE_ConfigDocDGI() throws RuntimeException
     {
-		return (org.xpande.cfe.model.I_Z_CFE_ConfigDocDGI)MTable.get(getCtx(), org.xpande.cfe.model.I_Z_CFE_ConfigDocDGI.Table_Name)
+		return (I_Z_CFE_ConfigDocDGI)MTable.get(getCtx(), I_Z_CFE_ConfigDocDGI.Table_Name)
 			.getPO(getZ_CFE_ConfigDocDGI_ID(), get_TrxName());	}
 
 	/** Set Z_CFE_ConfigDocDGI_ID.
@@ -286,9 +286,9 @@ public class X_Z_CFE_ConfigDocSend extends PO implements I_Z_CFE_ConfigDocSend, 
 		return ii.intValue();
 	}
 
-	public org.xpande.cfe.model.I_Z_CFE_Config getZ_CFE_Config() throws RuntimeException
+	public I_Z_CFE_Config getZ_CFE_Config() throws RuntimeException
     {
-		return (org.xpande.cfe.model.I_Z_CFE_Config)MTable.get(getCtx(), org.xpande.cfe.model.I_Z_CFE_Config.Table_Name)
+		return (I_Z_CFE_Config)MTable.get(getCtx(), I_Z_CFE_Config.Table_Name)
 			.getPO(getZ_CFE_Config_ID(), get_TrxName());	}
 
 	/** Set Z_CFE_Config ID.
@@ -306,6 +306,31 @@ public class X_Z_CFE_ConfigDocSend extends PO implements I_Z_CFE_ConfigDocSend, 
 	public int getZ_CFE_Config_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_Z_CFE_Config_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public I_Z_CFE_VendorOrg getZ_CFE_VendorOrg() throws RuntimeException
+    {
+		return (I_Z_CFE_VendorOrg)MTable.get(getCtx(), I_Z_CFE_VendorOrg.Table_Name)
+			.getPO(getZ_CFE_VendorOrg_ID(), get_TrxName());	}
+
+	/** Set Z_CFE_VendorOrg ID.
+		@param Z_CFE_VendorOrg_ID Z_CFE_VendorOrg ID	  */
+	public void setZ_CFE_VendorOrg_ID (int Z_CFE_VendorOrg_ID)
+	{
+		if (Z_CFE_VendorOrg_ID < 1) 
+			set_Value (COLUMNNAME_Z_CFE_VendorOrg_ID, null);
+		else 
+			set_Value (COLUMNNAME_Z_CFE_VendorOrg_ID, Integer.valueOf(Z_CFE_VendorOrg_ID));
+	}
+
+	/** Get Z_CFE_VendorOrg ID.
+		@return Z_CFE_VendorOrg ID	  */
+	public int getZ_CFE_VendorOrg_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_Z_CFE_VendorOrg_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();

@@ -223,7 +223,7 @@ public interface I_Z_CFE_ConfigDocSend
 	/** Get Z_CFE_ConfigDocDGI_ID	  */
 	public int getZ_CFE_ConfigDocDGI_ID();
 
-	public org.xpande.cfe.model.I_Z_CFE_ConfigDocDGI getZ_CFE_ConfigDocDGI() throws RuntimeException;
+	public I_Z_CFE_ConfigDocDGI getZ_CFE_ConfigDocDGI() throws RuntimeException;
 
     /** Column name Z_CFE_ConfigDocSend_ID */
     public static final String COLUMNNAME_Z_CFE_ConfigDocSend_ID = "Z_CFE_ConfigDocSend_ID";
@@ -243,5 +243,16 @@ public interface I_Z_CFE_ConfigDocSend
 	/** Get Z_CFE_Config ID	  */
 	public int getZ_CFE_Config_ID();
 
-	public org.xpande.cfe.model.I_Z_CFE_Config getZ_CFE_Config() throws RuntimeException;
+	public I_Z_CFE_Config getZ_CFE_Config() throws RuntimeException;
+
+    /** Column name Z_CFE_VendorOrg_ID */
+    public static final String COLUMNNAME_Z_CFE_VendorOrg_ID = "Z_CFE_VendorOrg_ID";
+
+	/** Set Z_CFE_VendorOrg ID	  */
+	public void setZ_CFE_VendorOrg_ID(int Z_CFE_VendorOrg_ID);
+
+	/** Get Z_CFE_VendorOrg ID	  */
+	public int getZ_CFE_VendorOrg_ID();
+
+	public I_Z_CFE_VendorOrg getZ_CFE_VendorOrg() throws RuntimeException;
 }
