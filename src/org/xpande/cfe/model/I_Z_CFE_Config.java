@@ -92,6 +92,32 @@ public interface I_Z_CFE_Config
 	  */
 	public boolean isActive();
 
+    /** Column name TaxBasico_ID */
+    public static final String COLUMNNAME_TaxBasico_ID = "TaxBasico_ID";
+
+	/** Set TaxBasico_ID.
+	  * ID de Impuesto Básico por Defecto
+	  */
+	public void setTaxBasico_ID(int TaxBasico_ID);
+
+	/** Get TaxBasico_ID.
+	  * ID de Impuesto Básico por Defecto
+	  */
+	public int getTaxBasico_ID();
+
+    /** Column name TaxMinimo_ID */
+    public static final String COLUMNNAME_TaxMinimo_ID = "TaxMinimo_ID";
+
+	/** Set TaxMinimo_ID.
+	  * ID de Impuesto Tasa Mínimo por Defecto
+	  */
+	public void setTaxMinimo_ID(int TaxMinimo_ID);
+
+	/** Get TaxMinimo_ID.
+	  * ID de Impuesto Tasa Mínimo por Defecto
+	  */
+	public int getTaxMinimo_ID();
+
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
 

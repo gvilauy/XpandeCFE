@@ -63,6 +63,19 @@ public interface I_Z_CFE_ConfigDocSend
 	  */
 	public int getAD_Org_ID();
 
+    /** Column name AD_OrgTrx_ID */
+    public static final String COLUMNNAME_AD_OrgTrx_ID = "AD_OrgTrx_ID";
+
+	/** Set Trx Organization.
+	  * Performing or initiating organization
+	  */
+	public void setAD_OrgTrx_ID(int AD_OrgTrx_ID);
+
+	/** Get Trx Organization.
+	  * Performing or initiating organization
+	  */
+	public int getAD_OrgTrx_ID();
+
     /** Column name C_DocType_ID */
     public static final String COLUMNNAME_C_DocType_ID = "C_DocType_ID";
 
@@ -198,6 +211,19 @@ public interface I_Z_CFE_ConfigDocSend
 	  */
 	public int getNumeroHasta();
 
+    /** Column name TipoEntidadCFE */
+    public static final String COLUMNNAME_TipoEntidadCFE = "TipoEntidadCFE";
+
+	/** Set TipoEntidadCFE.
+	  * Tipo de entidad a procesar en CFE
+	  */
+	public void setTipoEntidadCFE(String TipoEntidadCFE);
+
+	/** Get TipoEntidadCFE.
+	  * Tipo de entidad a procesar en CFE
+	  */
+	public String getTipoEntidadCFE();
+
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
 
@@ -245,14 +271,14 @@ public interface I_Z_CFE_ConfigDocSend
 
 	public I_Z_CFE_Config getZ_CFE_Config() throws RuntimeException;
 
-    /** Column name Z_CFE_VendorOrg_ID */
-    public static final String COLUMNNAME_Z_CFE_VendorOrg_ID = "Z_CFE_VendorOrg_ID";
+    /** Column name Z_CFE_Vendor_ID */
+    public static final String COLUMNNAME_Z_CFE_Vendor_ID = "Z_CFE_Vendor_ID";
 
-	/** Set Z_CFE_VendorOrg ID	  */
-	public void setZ_CFE_VendorOrg_ID(int Z_CFE_VendorOrg_ID);
+	/** Set Z_CFE_Vendor ID	  */
+	public void setZ_CFE_Vendor_ID(int Z_CFE_Vendor_ID);
 
-	/** Get Z_CFE_VendorOrg ID	  */
-	public int getZ_CFE_VendorOrg_ID();
+	/** Get Z_CFE_Vendor ID	  */
+	public int getZ_CFE_Vendor_ID();
 
-	public I_Z_CFE_VendorOrg getZ_CFE_VendorOrg() throws RuntimeException;
+	public I_Z_CFE_Vendor getZ_CFE_Vendor() throws RuntimeException;
 }

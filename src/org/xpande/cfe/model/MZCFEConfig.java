@@ -36,15 +36,17 @@ public class MZCFEConfig extends X_Z_CFE_Config {
     }
 
     /***
-     * Obtiene y retorna configuracion para envío de CFE de un determinado documento recibido.
-     * Xpande. Created by Gabriel Vila on 9/22/17.
+     * Obtiene y retorna configuracion para envío de CFE de un determinado documento y organización recibidos.
+     * Xpande. Created by Gabriel Vila on 10/30/18.
+     * @param adOrgID
      * @param cDocTypeID : ID del documento a considerar.
      * @return
      */
-    public MZCFEConfigDocSend getConfigDocumentCFE(int cDocTypeID){
+    public MZCFEConfigDocSend getConfigDocumentoCFE(int adOrgID, int cDocTypeID){
 
         String whereClause = X_Z_CFE_ConfigDocSend.COLUMNNAME_Z_CFE_Config_ID + " =" + this.get_ID() +
-                " AND " + X_Z_CFE_ConfigDocSend.COLUMNNAME_C_DocType_ID + " =" + cDocTypeID;
+                " AND " + X_Z_CFE_ConfigDocSend.COLUMNNAME_C_DocType_ID + " =" + cDocTypeID +
+                " AND " + X_Z_CFE_ConfigDocSend.COLUMNNAME_AD_OrgTrx_ID + " =" + adOrgID;
 
         MZCFEConfigDocSend model = new Query(getCtx(), I_Z_CFE_ConfigDocSend.Table_Name, whereClause, get_TrxName()).setOnlyActiveRecords(true).first();
 

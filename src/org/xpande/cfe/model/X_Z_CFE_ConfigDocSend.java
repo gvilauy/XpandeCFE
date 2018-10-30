@@ -31,7 +31,7 @@ public class X_Z_CFE_ConfigDocSend extends PO implements I_Z_CFE_ConfigDocSend, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20181029L;
+	private static final long serialVersionUID = 20181030L;
 
     /** Standard Constructor */
     public X_Z_CFE_ConfigDocSend (Properties ctx, int Z_CFE_ConfigDocSend_ID, String trxName)
@@ -80,6 +80,29 @@ public class X_Z_CFE_ConfigDocSend extends PO implements I_Z_CFE_ConfigDocSend, 
         .append(get_ID()).append("]");
       return sb.toString();
     }
+
+	/** Set Trx Organization.
+		@param AD_OrgTrx_ID 
+		Performing or initiating organization
+	  */
+	public void setAD_OrgTrx_ID (int AD_OrgTrx_ID)
+	{
+		if (AD_OrgTrx_ID < 1) 
+			set_Value (COLUMNNAME_AD_OrgTrx_ID, null);
+		else 
+			set_Value (COLUMNNAME_AD_OrgTrx_ID, Integer.valueOf(AD_OrgTrx_ID));
+	}
+
+	/** Get Trx Organization.
+		@return Performing or initiating organization
+	  */
+	public int getAD_OrgTrx_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_AD_OrgTrx_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
 
 	public I_C_DocType getC_DocType() throws RuntimeException
     {
@@ -241,6 +264,32 @@ public class X_Z_CFE_ConfigDocSend extends PO implements I_Z_CFE_ConfigDocSend, 
 		return ii.intValue();
 	}
 
+	/** TipoEntidadCFE AD_Reference_ID=1000045 */
+	public static final int TIPOENTIDADCFE_AD_Reference_ID=1000045;
+	/** INOUT = INOUT */
+	public static final String TIPOENTIDADCFE_INOUT = "INOUT";
+	/** INVOICE = INVOICE */
+	public static final String TIPOENTIDADCFE_INVOICE = "INVOICE";
+	/** RESGUARDO = RESGUARDO */
+	public static final String TIPOENTIDADCFE_RESGUARDO = "RESGUARDO";
+	/** Set TipoEntidadCFE.
+		@param TipoEntidadCFE 
+		Tipo de entidad a procesar en CFE
+	  */
+	public void setTipoEntidadCFE (String TipoEntidadCFE)
+	{
+
+		set_Value (COLUMNNAME_TipoEntidadCFE, TipoEntidadCFE);
+	}
+
+	/** Get TipoEntidadCFE.
+		@return Tipo de entidad a procesar en CFE
+	  */
+	public String getTipoEntidadCFE () 
+	{
+		return (String)get_Value(COLUMNNAME_TipoEntidadCFE);
+	}
+
 	public I_Z_CFE_ConfigDocDGI getZ_CFE_ConfigDocDGI() throws RuntimeException
     {
 		return (I_Z_CFE_ConfigDocDGI)MTable.get(getCtx(), I_Z_CFE_ConfigDocDGI.Table_Name)
@@ -311,26 +360,26 @@ public class X_Z_CFE_ConfigDocSend extends PO implements I_Z_CFE_ConfigDocSend, 
 		return ii.intValue();
 	}
 
-	public I_Z_CFE_VendorOrg getZ_CFE_VendorOrg() throws RuntimeException
+	public I_Z_CFE_Vendor getZ_CFE_Vendor() throws RuntimeException
     {
-		return (I_Z_CFE_VendorOrg)MTable.get(getCtx(), I_Z_CFE_VendorOrg.Table_Name)
-			.getPO(getZ_CFE_VendorOrg_ID(), get_TrxName());	}
+		return (I_Z_CFE_Vendor)MTable.get(getCtx(), I_Z_CFE_Vendor.Table_Name)
+			.getPO(getZ_CFE_Vendor_ID(), get_TrxName());	}
 
-	/** Set Z_CFE_VendorOrg ID.
-		@param Z_CFE_VendorOrg_ID Z_CFE_VendorOrg ID	  */
-	public void setZ_CFE_VendorOrg_ID (int Z_CFE_VendorOrg_ID)
+	/** Set Z_CFE_Vendor ID.
+		@param Z_CFE_Vendor_ID Z_CFE_Vendor ID	  */
+	public void setZ_CFE_Vendor_ID (int Z_CFE_Vendor_ID)
 	{
-		if (Z_CFE_VendorOrg_ID < 1) 
-			set_Value (COLUMNNAME_Z_CFE_VendorOrg_ID, null);
+		if (Z_CFE_Vendor_ID < 1) 
+			set_Value (COLUMNNAME_Z_CFE_Vendor_ID, null);
 		else 
-			set_Value (COLUMNNAME_Z_CFE_VendorOrg_ID, Integer.valueOf(Z_CFE_VendorOrg_ID));
+			set_Value (COLUMNNAME_Z_CFE_Vendor_ID, Integer.valueOf(Z_CFE_Vendor_ID));
 	}
 
-	/** Get Z_CFE_VendorOrg ID.
-		@return Z_CFE_VendorOrg ID	  */
-	public int getZ_CFE_VendorOrg_ID () 
+	/** Get Z_CFE_Vendor ID.
+		@return Z_CFE_Vendor ID	  */
+	public int getZ_CFE_Vendor_ID () 
 	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_Z_CFE_VendorOrg_ID);
+		Integer ii = (Integer)get_Value(COLUMNNAME_Z_CFE_Vendor_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();

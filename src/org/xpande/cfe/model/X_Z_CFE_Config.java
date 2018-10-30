@@ -30,7 +30,7 @@ public class X_Z_CFE_Config extends PO implements I_Z_CFE_Config, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20170904L;
+	private static final long serialVersionUID = 20181030L;
 
     /** Standard Constructor */
     public X_Z_CFE_Config (Properties ctx, int Z_CFE_Config_ID, String trxName)
@@ -70,6 +70,52 @@ public class X_Z_CFE_Config extends PO implements I_Z_CFE_Config, I_Persistent
         .append(get_ID()).append("]");
       return sb.toString();
     }
+
+	/** Set TaxBasico_ID.
+		@param TaxBasico_ID 
+		ID de Impuesto Básico por Defecto
+	  */
+	public void setTaxBasico_ID (int TaxBasico_ID)
+	{
+		if (TaxBasico_ID < 1) 
+			set_Value (COLUMNNAME_TaxBasico_ID, null);
+		else 
+			set_Value (COLUMNNAME_TaxBasico_ID, Integer.valueOf(TaxBasico_ID));
+	}
+
+	/** Get TaxBasico_ID.
+		@return ID de Impuesto Básico por Defecto
+	  */
+	public int getTaxBasico_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_TaxBasico_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set TaxMinimo_ID.
+		@param TaxMinimo_ID 
+		ID de Impuesto Tasa Mínimo por Defecto
+	  */
+	public void setTaxMinimo_ID (int TaxMinimo_ID)
+	{
+		if (TaxMinimo_ID < 1) 
+			set_Value (COLUMNNAME_TaxMinimo_ID, null);
+		else 
+			set_Value (COLUMNNAME_TaxMinimo_ID, Integer.valueOf(TaxMinimo_ID));
+	}
+
+	/** Get TaxMinimo_ID.
+		@return ID de Impuesto Tasa Mínimo por Defecto
+	  */
+	public int getTaxMinimo_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_TaxMinimo_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
 
 	/** Set Search Key.
 		@param Value 
