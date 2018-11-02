@@ -27,6 +27,6 @@ public abstract class HandlerCFE {
     abstract protected String executeInvoice() throws Exception;
     abstract protected String executeResguardo() throws Exception;
     abstract protected String executeInOut() throws Exception;
-    abstract protected String send(MZCFEVendorOrg vendorOrg) throws Exception;
+    abstract protected String send(MZCFEVendorOrg vendorOrg, int cDocType, String documentNo) throws Exception;
 
 }

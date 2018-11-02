@@ -30,7 +30,7 @@ public class X_Z_CFE_VendorOrg extends PO implements I_Z_CFE_VendorOrg, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20181029L;
+	private static final long serialVersionUID = 20181102L;
 
     /** Standard Constructor */
     public X_Z_CFE_VendorOrg (Properties ctx, int Z_CFE_VendorOrg_ID, String trxName)
@@ -93,6 +93,91 @@ public class X_Z_CFE_VendorOrg extends PO implements I_Z_CFE_VendorOrg, I_Persis
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set namespaceURL.
+		@param namespaceURL 
+		Atributo para comunicaciones con WS
+	  */
+	public void setnamespaceURL (String namespaceURL)
+	{
+		set_Value (COLUMNNAME_namespaceURL, namespaceURL);
+	}
+
+	/** Get namespaceURL.
+		@return Atributo para comunicaciones con WS
+	  */
+	public String getnamespaceURL () 
+	{
+		return (String)get_Value(COLUMNNAME_namespaceURL);
+	}
+
+	/** Set OperationName.
+		@param OperationName 
+		Atributo para comunicaciones por WS
+	  */
+	public void setOperationName (String OperationName)
+	{
+		set_Value (COLUMNNAME_OperationName, OperationName);
+	}
+
+	/** Get OperationName.
+		@return Atributo para comunicaciones por WS
+	  */
+	public String getOperationName () 
+	{
+		return (String)get_Value(COLUMNNAME_OperationName);
+	}
+
+	/** Set SOAPActionURI.
+		@param SOAPActionURI 
+		Atributo para comunicaciones con WS
+	  */
+	public void setSOAPActionURI (String SOAPActionURI)
+	{
+		set_Value (COLUMNNAME_SOAPActionURI, SOAPActionURI);
+	}
+
+	/** Get SOAPActionURI.
+		@return Atributo para comunicaciones con WS
+	  */
+	public String getSOAPActionURI () 
+	{
+		return (String)get_Value(COLUMNNAME_SOAPActionURI);
+	}
+
+	/** Set TargetEndpointAddress.
+		@param TargetEndpointAddress 
+		Atributo para comunnicación por WS
+	  */
+	public void setTargetEndpointAddress (String TargetEndpointAddress)
+	{
+		set_Value (COLUMNNAME_TargetEndpointAddress, TargetEndpointAddress);
+	}
+
+	/** Get TargetEndpointAddress.
+		@return Atributo para comunnicación por WS
+	  */
+	public String getTargetEndpointAddress () 
+	{
+		return (String)get_Value(COLUMNNAME_TargetEndpointAddress);
+	}
+
+	/** Set Immutable Universally Unique Identifier.
+		@param UUID 
+		Immutable Universally Unique Identifier
+	  */
+	public void setUUID (String UUID)
+	{
+		set_Value (COLUMNNAME_UUID, UUID);
+	}
+
+	/** Get Immutable Universally Unique Identifier.
+		@return Immutable Universally Unique Identifier
+	  */
+	public String getUUID () 
+	{
+		return (String)get_Value(COLUMNNAME_UUID);
 	}
 
 	public I_Z_CFE_Vendor getZ_CFE_Vendor() throws RuntimeException

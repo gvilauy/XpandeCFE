@@ -32,7 +32,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
     }
 
     @Override
-    protected String send(MZCFEVendorOrg vendorOrg) throws Exception {
+    protected String send(MZCFEVendorOrg vendorOrg, int cDocType, String documentNo) throws Exception {
         return null;
     }
 }

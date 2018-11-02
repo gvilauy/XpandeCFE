@@ -105,6 +105,58 @@ public interface I_Z_CFE_VendorOrg
 	  */
 	public boolean isActive();
 
+    /** Column name namespaceURL */
+    public static final String COLUMNNAME_namespaceURL = "namespaceURL";
+
+	/** Set namespaceURL.
+	  * Atributo para comunicaciones con WS
+	  */
+	public void setnamespaceURL(String namespaceURL);
+
+	/** Get namespaceURL.
+	  * Atributo para comunicaciones con WS
+	  */
+	public String getnamespaceURL();
+
+    /** Column name OperationName */
+    public static final String COLUMNNAME_OperationName = "OperationName";
+
+	/** Set OperationName.
+	  * Atributo para comunicaciones por WS
+	  */
+	public void setOperationName(String OperationName);
+
+	/** Get OperationName.
+	  * Atributo para comunicaciones por WS
+	  */
+	public String getOperationName();
+
+    /** Column name SOAPActionURI */
+    public static final String COLUMNNAME_SOAPActionURI = "SOAPActionURI";
+
+	/** Set SOAPActionURI.
+	  * Atributo para comunicaciones con WS
+	  */
+	public void setSOAPActionURI(String SOAPActionURI);
+
+	/** Get SOAPActionURI.
+	  * Atributo para comunicaciones con WS
+	  */
+	public String getSOAPActionURI();
+
+    /** Column name TargetEndpointAddress */
+    public static final String COLUMNNAME_TargetEndpointAddress = "TargetEndpointAddress";
+
+	/** Set TargetEndpointAddress.
+	  * Atributo para comunnicación por WS
+	  */
+	public void setTargetEndpointAddress(String TargetEndpointAddress);
+
+	/** Get TargetEndpointAddress.
+	  * Atributo para comunnicación por WS
+	  */
+	public String getTargetEndpointAddress();
+
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
 
@@ -120,6 +172,19 @@ public interface I_Z_CFE_VendorOrg
 	  * User who updated this records
 	  */
 	public int getUpdatedBy();
+
+    /** Column name UUID */
+    public static final String COLUMNNAME_UUID = "UUID";
+
+	/** Set Immutable Universally Unique Identifier.
+	  * Immutable Universally Unique Identifier
+	  */
+	public void setUUID(String UUID);
+
+	/** Get Immutable Universally Unique Identifier.
+	  * Immutable Universally Unique Identifier
+	  */
+	public String getUUID();
 
     /** Column name Z_CFE_Vendor_ID */
     public static final String COLUMNNAME_Z_CFE_Vendor_ID = "Z_CFE_Vendor_ID";
