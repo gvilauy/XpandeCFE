@@ -258,12 +258,12 @@ public class HandlerCFESisteco extends HandlerCFE {
 
             // Instancio modelos de referencia para Tasa Básico y Tasa Minimo.
             MTax ivaBasico = new MTax(this.ctx, cfeConfig.getTaxBasico_ID(), null);
-            if ((ivaBasico == null) || (ivaBasico.get_ID() > 0)){
+            if ((ivaBasico == null) || (ivaBasico.get_ID() <= 0)){
                 throw new AdempiereException("Falta indicar Tasa de Impuesto Básico en Configuración CFE");
             }
 
             MTax ivaMinimo = new MTax(this.ctx, cfeConfig.getTaxMinimo_ID(), null);
-            if ((ivaMinimo == null) || (ivaMinimo.get_ID() > 0)){
+            if ((ivaMinimo == null) || (ivaMinimo.get_ID() <= 0)){
                 throw new AdempiereException("Falta indicar Tasa de Impuesto Mínimo en Configuración CFE");
             }
 
@@ -390,12 +390,12 @@ public class HandlerCFESisteco extends HandlerCFE {
 
             // Instancio modelos de referencia para Tasa Básico y Tasa Minimo.
             MTax ivaBasico = new MTax(this.ctx, cfeConfig.getTaxBasico_ID(), null);
-            if ((ivaBasico == null) || (ivaBasico.get_ID() > 0)){
+            if ((ivaBasico == null) || (ivaBasico.get_ID() <= 0)){
                 throw new AdempiereException("Falta indicar Tasa de Impuesto Básico en Configuración CFE");
             }
 
             MTax ivaMinimo = new MTax(this.ctx, cfeConfig.getTaxMinimo_ID(), null);
-            if ((ivaMinimo == null) || (ivaMinimo.get_ID() > 0)){
+            if ((ivaMinimo == null) || (ivaMinimo.get_ID() <= 0)){
                 throw new AdempiereException("Falta indicar Tasa de Impuesto Mínimo en Configuración CFE");
             }
 
@@ -513,7 +513,7 @@ public class HandlerCFESisteco extends HandlerCFE {
      */
     private ReceptorFact setReceptor_eFactura() {
 
-        ReceptorFact receptor = null;
+        ReceptorFact receptor = new ReceptorFact();
 
         try{
 
