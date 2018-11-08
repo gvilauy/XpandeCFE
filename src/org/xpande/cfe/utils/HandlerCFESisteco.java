@@ -11,7 +11,6 @@ import org.apache.axis.encoding.XMLType;
 import org.compiere.model.*;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
-import org.compiere.util.MiniBrowser;
 import org.eevolution.model.X_C_TaxGroup;
 import org.xpande.cfe.model.*;
 
@@ -37,6 +36,7 @@ import java.util.List;
 import java.util.Properties;
 
 /**
+ * Manejador de facturación electrónica con el proveedor SISTECO.
  * Product: Adempiere ERP & CRM Smart Business Solution. Localization : Uruguay - Xpande
  * Xpande. Created by Gabriel Vila on 10/30/18.
  */
@@ -606,7 +606,8 @@ public class HandlerCFESisteco extends HandlerCFE {
     }
 
     @Override
-    protected String send(MZCFEVendorOrg vendorOrg, int cDocType, String documentNo) throws Exception {
+    protected String
+    send(MZCFEVendorOrg vendorOrg, int cDocType, String documentNo) throws Exception {
 
         String message = null;
 
