@@ -507,6 +507,117 @@ public class HandlerCFESisteco extends HandlerCFE {
 
 
     /***
+     * Obtiene y setea información de Totales para el envío de CFE.
+     * Xpande. Created by Gabriel Vila on 10/30/18.
+     * @return
+     */
+    private TotalesResg setTotalesResguardo() {
+
+        String sql = "";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        TotalesResg totales = new TotalesResg();
+
+        try{
+
+            MDocType doc = new MDocType(this.ctx, this.model.get_ValueAsInt("C_DocType_ID"), null);
+
+            // Instancio configurador de CFE
+            MZCFEConfig cfeConfig = (MZCFEConfig) this.configDocSend.getZ_CFE_Config();
+
+            MCurrency currency = new MCurrency(this.ctx, this.model.get_ValueAsInt("C_Currency_ID"), null);
+            if ((currency == null) || (currency.get_ID() <= 0)){
+                throw new AdempiereException("Falta indicar Moneda del Documento");
+            }
+
+            totales.setTpoMoneda(TipMonType.valueOf(currency.getISO_Code()));
+
+            // Si moneda no es Pesos Uruguayos, debo informar la tasa de cambio
+            if (currency.get_ID() != 142){
+                BigDecimal currencyRate = (BigDecimal) this.model.get_Value("DivideRate");
+                if (currencyRate == null){
+                    Timestamp dateInvoiced = (Timestamp) this.model.get_Value("DateInvoiced");
+                    if (dateInvoiced != null){
+                        currencyRate = MConversionRate.getRate(currency.get_ID(), 142, dateInvoiced, 0, model.getAD_Client_ID(), 0);
+                    }
+                }
+                if ((currencyRate == null) || (currencyRate.compareTo(Env.ZERO) <= 0)){
+                    throw new AdempiereException("No se obtuvo Tasa de Cambio para Fecha y Moneda de este Documento");
+                }
+
+                totales.setTpoCambio(currencyRate.setScale(3, BigDecimal.ROUND_HALF_UP));
+            }
+
+            // Inicializo montos antes de setearlos
+            totales.setMntTotRetenido(Env.ZERO);
+            totales.setCantLinDet(0);
+
+            BigDecimal amtTotal = Env.ZERO;
+            List<TotalesResg.RetencPercep> listRetPerc = totales.getRetencPercep();
+
+            sql = " SELECT ret.Z_RetencionSocio_ID, ret.codigodgi, ret.emitiedgi, SUM(resl.amtretencion) total"
+                    + " FROM Z_ResguardoSocio res"
+                    + " INNER JOIN Z_ResguardoSocioRet resl ON res.Z_ResguardoSocio_ID = resl.Z_ResguardoSocio_ID"
+                    + " INNER JOIN Z_RetencionSocio ret ON resl.Z_RetencionSocio_ID = ret.Z_RetencionSocio_ID"
+                    + " WHERE res.Z_ResguardoSocio_ID = " + this.model.get_ID()
+                    + " GROUP BY ret.Z_RetencionSocio_ID, ret.codigodgi, ret.emitiedgi";
+
+            pstmt = DB.prepareStatement(sql, this.trxName);
+            rs = pstmt.executeQuery();
+
+            while(rs.next()){
+
+                boolean isDgi = rs.getString("emitieDGI").equalsIgnoreCase("Y") ? true : false;;
+                String codigo = rs.getString("codigodgi");
+                BigDecimal montoSum = rs.getBigDecimal("total");
+
+                if (montoSum != null) {
+                    montoSum = montoSum.setScale(2, RoundingMode.HALF_UP);
+                }
+
+                // Valido que si no es una retenci�n de DGI, el codigo de retenci�n debe estar entre 9999001 y 9999999
+                if (!isDgi) {
+                    int intCod = 0;
+                    try {
+                        intCod = Integer.valueOf(codigo);
+                    } catch (Exception e) { /* Si lanza excepci�n, queda en 0 */ }
+                    if (intCod < 9999001 || intCod > 9999999) {
+                        throw new AdempiereException("CFEMessages.TOTALES_127_OUTOFRANGE");
+                    }
+                }
+
+                TotalesResg.RetencPercep retPerc = new TotalesResg.RetencPercep();
+
+                // Contra-Resguardo, doy vuelta el signo.
+                if (doc.getDocBaseType().equalsIgnoreCase("RGC")) {
+                    montoSum = montoSum.negate();
+                }
+
+                retPerc.setCodRet(codigo);
+                retPerc.setValRetPerc(montoSum);
+
+                amtTotal = amtTotal.add(montoSum);
+                listRetPerc.add(retPerc);
+            }
+
+            totales.setMntTotRetenido(amtTotal);
+            totales.setCantLinDet(listRetPerc.size());
+
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+        finally {
+            DB.close(rs, pstmt);
+            rs = null; pstmt = null;
+        }
+
+        return totales;
+    }
+
+
+    /***
      * Obtiene y retorna información del Receptor para comprobantes CFE del tipo eFactura.
      * Xpande. Created by Gabriel Vila on 10/30/18.
      * @return
@@ -582,12 +693,40 @@ public class HandlerCFESisteco extends HandlerCFE {
 
         try{
 
+            MZCFEConfigDocDGI docDGI = (MZCFEConfigDocDGI) this.configDocSend.getZ_CFE_ConfigDocDGI();
+            if ((docDGI == null) || (docDGI.get_ID() <= 0)){
+                return "Falta indicar documento de DGI para configuración de envío de este documento - organización - proveedor de CFE";
+            }
+
+            // Obtengo datos del Emisor
+            Emisor emisor = this.setEmisor(this.configDocSend.getAD_OrgTrx_ID());
+
+            // Obtengo totales
+            TotalesResg totales = this.setTotalesResguardo();
+
+            // Obtengo datos del Receptor
+//            ReceptorResg receptor = this.setReceptor_Resguardo();
+
+            // Obtengo deatos del encabezado
+//            message = this.setEncabezado_Resguardo(docDGI, emisor, receptor, totales);
+            if (message != null) return message;
+
+            // Obtengo datos de las lineas
+//            message = this.setDetalle_Resguardo();
+            if (message != null) return message;
+
+            // Datos de CAE
+//            message = this.setCAE_Resguardo();
+            if (message != null) return message;
+
+
         }
         catch (Exception e){
             throw new AdempiereException(e);
         }
 
         return message;
+
     }
 
     @Override
@@ -631,11 +770,14 @@ public class HandlerCFESisteco extends HandlerCFE {
             }
 
             xml = xml
+                    .replace("<CFE version=\"1.0\" xmlns:ns0=\"http://cfe.dgi.gub.uy\">", "<ns0:CFE version=\"1.0\">")
                     .replace("<CFE xmlns:ns0=\"http://cfe.dgi.gub.uy\" version=\"1.0\">", "<ns0:CFE version=\"1.0\">")
                     .replace("</CFE>","</ns0:CFE>")
                     .replace("<CFE_Adenda ", "<ns0:CFE_Adenda xmlns:ns0=\"http://cfe.dgi.gub.uy\"")
                     .replace("</CFE_Adenda>", "</ns0:CFE_Adenda>")
-                    .replace("xmlns:ns0=\"http://cfe.dgi.gub.uy\"xmlns:ns2=\"http://www.w3.org/2000/09/xmldsig#\"", "xmlns:ns0=\"http://cfe.dgi.gub.uy\" xmlns:ns2=\"http://www.w3.org/2000/09/xmldsig#\"");
+                    .replace("xmlns:ns0=\"http://cfe.dgi.gub.uy\"xmlns:ns2=\"http://www.w3.org/2000/09/xmldsig#\"", "xmlns:ns0=\"http://cfe.dgi.gub.uy\" xmlns:ns2=\"http://www.w3.org/2000/09/xmldsig#\"")
+                    .replace("<Adenda", "<ns0:Adenda")
+                    .replace("</Adenda>", "</ns0:Adenda>");
 
             PrintWriter pw = new PrintWriter(file);
             pw.println(xml);
@@ -688,6 +830,8 @@ public class HandlerCFESisteco extends HandlerCFE {
                 cfeRespuesta.setCFE_CAE_ID(cfeDtoSisteco.getCaeId());
                 cfeRespuesta.setCFE_NroInicial_CAE(cfeDtoSisteco.getdNro());
                 cfeRespuesta.setCFE_NroFinal_CAE(cfeDtoSisteco.gethNro());
+                cfeRespuesta.setAD_OrgTrx_ID(this.model.getAD_Org_ID());
+                cfeRespuesta.setZ_CFE_Vendor_ID(this.configDocSend.getZ_CFE_Vendor_ID());
             }
             cfeRespuesta.saveEx();
 
@@ -719,7 +863,7 @@ public class HandlerCFESisteco extends HandlerCFE {
             emisor.setRznSoc(org.getDescription());
             emisor.setRUCEmisor(orgInfo.getTaxID());
             emisor.setCorreoEmisor(orgInfo.getEMail());
-            emisor.setCdgDGISucur(BigInteger.valueOf(1));
+            emisor.setCdgDGISucur(BigInteger.valueOf(1)); // 1 - Covadonga, 2 - Planeta.
 
             MWarehouse warehouse = MWarehouse.get(this.ctx, orgInfo.getM_Warehouse_ID());
             emisor.setEmiSucursal(warehouse.getName());
@@ -755,9 +899,6 @@ public class HandlerCFESisteco extends HandlerCFE {
 
             MInvoice invoice = (MInvoice) this.model;
 
-            // ADENDA
-            this.empresasType.setAdenda(invoice.getDescription());
-
             CFEDefType.EFact eFactura = new CFEDefType.EFact();
             CFEDefType.EFact.Encabezado eFactEncabezado = new CFEDefType.EFact.Encabezado();
             this.defType.setEFact(eFactura);
@@ -778,7 +919,9 @@ public class HandlerCFESisteco extends HandlerCFE {
 
             this.defType.setVersion("1.0");
 
-            eFactEncabezado.setEmisor(emisor);
+            // Sisteco no requiere emisor.
+            //eFactEncabezado.setEmisor(emisor);
+
             eFactEncabezado.setReceptor(receptor);
             eFactEncabezado.setTotales(totales);
 
@@ -813,6 +956,12 @@ public class HandlerCFESisteco extends HandlerCFE {
                         DatatypeConstants.FIELD_UNDEFINED);
                 idDoc.setFchVenc(xgCalDueDate);
             }
+
+            // ADENDA
+            this.empresasType.setAdenda(invoice.getDescription());
+
+            // Firma
+            this.defType.getEFact().setTmstFirma(null);
 
         }
         catch (Exception e){

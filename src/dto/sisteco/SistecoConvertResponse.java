@@ -40,6 +40,7 @@ public class SistecoConvertResponse {
 			ret.setDescripcion(getStringVal(rootNode, "Descripcion"));
 			ret.setTipoCFE(getIntegerVal(rootNode, "TipoCFE"));
 			ret.setMro(getBigDecimalVal(rootNode, "Mro"));
+			ret.setSerie(getStringVal(rootNode, "Serie"));
 			try {
 				ret.setTmstFirma(new Timestamp(getXMLGregorianCalendar(rootNode, "TmstFirma").toGregorianCalendar().getTimeInMillis()));
 			} catch (Exception e) { }
@@ -47,7 +48,7 @@ public class SistecoConvertResponse {
 			ret.setResolucion(getIntegerVal(rootNode, "Resolucion"));
 			ret.setAnioResolucion(getIntegerVal(rootNode, "AnioResolucion"));
 			ret.setUrlDocumentoDGI(getStringVal(rootNode, "UrlDocumentoDGI"));
-			ret.setCaeId(getBigDecimalVal(rootNode, "CAE_ID"));
+			ret.setCaeId(getStringVal(rootNode, "CAE_ID"));
 			ret.setdNro(getBigDecimalVal(rootNode, "DNro"));
 			ret.sethNro(getBigDecimalVal(rootNode, "HNro"));
 			try {

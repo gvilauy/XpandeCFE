@@ -14,7 +14,7 @@ public class SistecoResponseDTO {
 	private int resolucion;
 	private int anioResolucion;
 	private String urlDocumentoDGI;
-	private BigDecimal caeId;
+	private String caeId;
 	private BigDecimal dNro;
 	private BigDecimal hNro;
 	private Timestamp fecVenc;
@@ -78,10 +78,10 @@ public class SistecoResponseDTO {
 	public void setUrlDocumentoDGI(String urlDocumentoDGI) {
 		this.urlDocumentoDGI = urlDocumentoDGI;
 	}
-	public BigDecimal getCaeId() {
+	public String getCaeId() {
 		return caeId;
 	}
-	public void setCaeId(BigDecimal caeId) {
+	public void setCaeId(String caeId) {
 		this.caeId = caeId;
 	}
 	public BigDecimal getdNro() {
