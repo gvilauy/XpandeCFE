@@ -155,6 +155,34 @@ public class HandlerCFESisteco extends HandlerCFE {
 
 
     /***
+     * Setea datos del CAE de un resguardo electrónico.
+     * Xpande. Created by Gabriel Vila on 11/15/18.
+     * @return
+     */
+    private String setCAE_Resguardo() {
+
+        String message = null;
+
+        try{
+
+            CAEDataType caeDataType = new CAEDataType();
+            this.defType.getEResg().setCAEData(caeDataType);
+
+            caeDataType.setCAEID(new BigDecimal(this.configDocSend.getNumeroCAE()).toBigInteger());
+            caeDataType.setDNro(new BigDecimal(this.configDocSend.getNumeroDesde()).toBigInteger());
+            caeDataType.setHNro(new BigDecimal(this.configDocSend.getNumeroHasta()).toBigInteger());
+            caeDataType.setFecVenc(TS_to_XmlGregorianCalendar_OnlyDate(this.configDocSend.getDueDate(), false));
+
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+
+        return message;
+
+    }
+
+    /***
      * Setea referencia de Nota de Credito de documentos de eFactura.
      * Xpande. Created by Gabriel Vila on 11/1/18.
      * @return
@@ -576,17 +604,6 @@ public class HandlerCFESisteco extends HandlerCFE {
                     montoSum = montoSum.setScale(2, RoundingMode.HALF_UP);
                 }
 
-                // Valido que si no es una retenci�n de DGI, el codigo de retenci�n debe estar entre 9999001 y 9999999
-                if (!isDgi) {
-                    int intCod = 0;
-                    try {
-                        intCod = Integer.valueOf(codigo);
-                    } catch (Exception e) { /* Si lanza excepci�n, queda en 0 */ }
-                    if (intCod < 9999001 || intCod > 9999999) {
-                        throw new AdempiereException("CFEMessages.TOTALES_127_OUTOFRANGE");
-                    }
-                }
-
                 TotalesResg.RetencPercep retPerc = new TotalesResg.RetencPercep();
 
                 // Contra-Resguardo, doy vuelta el signo.
@@ -614,6 +631,136 @@ public class HandlerCFESisteco extends HandlerCFE {
         }
 
         return totales;
+    }
+
+
+    /***
+     * Setea datos del cabezal de un resguardo electrónico.
+     * @param docDGI
+     * @param emisor
+     * @param receptor
+     * @param totales
+     * @return
+     */
+    private String setEncabezado_Resguardo(MZCFEConfigDocDGI docDGI, Emisor emisor, ReceptorResg receptor, TotalesResg totales) {
+
+        String message = null;
+
+        try{
+
+            CFEDefType.EResg eResguardo = new CFEDefType.EResg();
+            CFEDefType.EResg.Encabezado eResgEncabezado = new CFEDefType.EResg.Encabezado();
+            this.defType.setEResg(eResguardo);
+            eResguardo.setEncabezado(eResgEncabezado);
+
+            eResguardo.setTmstFirma(null);
+
+            IdDocResg idDoc = new IdDocResg();
+            eResgEncabezado.setIdDoc(idDoc);
+            idDoc.setTipoCFE(BigInteger.valueOf(Long.parseLong(docDGI.getCodigoDGI())));
+            idDoc.setSerie(configDocSend.getDocumentSerie().trim());
+
+            String cfeNumero = this.model.get_ValueAsString("DocumentNo").replaceAll("[^0-9]", "");
+            cfeNumero = org.apache.commons.lang.StringUtils.leftPad(String.valueOf(cfeNumero), 7, "0");
+            idDoc.setNro(new BigInteger(cfeNumero));
+
+            this.defType.setVersion("1.0");
+
+            // Sisteco no requiere emisor.
+            //eFactEncabezado.setEmisor(emisor);
+
+            eResgEncabezado.setReceptor(receptor);
+            eResgEncabezado.setTotales(totales);
+
+            GregorianCalendar gcal = (GregorianCalendar) GregorianCalendar.getInstance();
+            gcal.setTime((Timestamp)this.model.get_Value("DateDoc"));
+            XMLGregorianCalendar xgCalDateDoc = DatatypeFactory.newInstance().newXMLGregorianCalendarDate(gcal.get(Calendar.YEAR),
+                    gcal.get(Calendar.MONTH)+1, gcal.get(Calendar.DAY_OF_MONTH), DatatypeConstants.FIELD_UNDEFINED);
+            idDoc.setFchEmis(xgCalDateDoc);
+
+            // ADENDA
+            this.empresasType.setAdenda(this.model.get_ValueAsString("Description"));
+
+            // Firma
+            this.defType.getEFact().setTmstFirma(null);
+
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+
+        return message;
+    }
+
+
+    /***
+     * Obtiene y setea detalle de un resguardo electrónico.
+     * Xpande. Created by Gabriel Vila on 11/15/18
+     * @return
+     */
+    private String setDetalle_Resguardo() {
+
+        String message = null;
+
+        String sql = "";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try{
+
+            // Documento
+            MDocType docType = new MDocType(this.ctx, model.get_ValueAsInt("C_DocType_ID"), null);
+
+            // Instancio configurador de CFE
+            MZCFEConfig cfeConfig = (MZCFEConfig) this.configDocSend.getZ_CFE_Config();
+
+            this.defType.getEResg().setDetalle(new CFEDefType.EResg.Detalle());
+            List<ItemResg> itemResgList = this.defType.getEResg().getDetalle().getItem();
+
+            sql = " select a.amtbase, a.amtretencion, ret.codigodgi " +
+                    "from z_resguardosocioret a " +
+                    "inner join z_retencionsocio ret on a.z_retencionsocio_id = ret.z_retencionsocio_id " +
+                    "where z_resguardosocio_id = " + model.get_ID();
+
+        	pstmt = DB.prepareStatement(sql, model.get_TrxName());
+        	rs = pstmt.executeQuery();
+
+        	int contador = 0;
+
+        	while(rs.next()){
+
+        	    contador++;
+
+                ItemResg itemResg = new ItemResg();
+
+                itemResg.setNroLinDet(contador);
+
+                // Contra-Resguardo
+                if (docType.getDocBaseType().equalsIgnoreCase("RGC")) {
+                    itemResg.setIndFact(BigInteger.valueOf(9));
+                }
+
+                List<RetPercResg> listRetPercs = itemResg.getRetencPercep();
+                RetPercResg retPersc = new RetPercResg();
+                listRetPercs.add(retPersc);
+
+                retPersc.setCodRet(rs.getString("codigodgi"));
+                retPersc.setMntSujetoaRet(rs.getBigDecimal("amtbase").setScale(2, RoundingMode.HALF_UP));
+                retPersc.setValRetPerc(rs.getBigDecimal("amtretencion").setScale(2, RoundingMode.HALF_UP));
+
+                itemResgList.add(itemResg);
+        	}
+
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+        finally {
+            DB.close(rs, pstmt);
+        	rs = null; pstmt = null;
+        }
+
+        return message;
     }
 
 
@@ -705,20 +852,23 @@ public class HandlerCFESisteco extends HandlerCFE {
             TotalesResg totales = this.setTotalesResguardo();
 
             // Obtengo datos del Receptor
-//            ReceptorResg receptor = this.setReceptor_Resguardo();
+            ReceptorResg receptor = this.setReceptor_Resguardo();
 
             // Obtengo deatos del encabezado
-//            message = this.setEncabezado_Resguardo(docDGI, emisor, receptor, totales);
+            message = this.setEncabezado_Resguardo(docDGI, emisor, receptor, totales);
             if (message != null) return message;
 
             // Obtengo datos de las lineas
-//            message = this.setDetalle_Resguardo();
+            message = this.setDetalle_Resguardo();
+            if (message != null) return message;
+
+            // Referencia cuando es Contra-Resguardo
+            message = this.setReferencia_Resguardo();
             if (message != null) return message;
 
             // Datos de CAE
-//            message = this.setCAE_Resguardo();
+            message = this.setCAE_Resguardo();
             if (message != null) return message;
-
 
         }
         catch (Exception e){
@@ -728,6 +878,145 @@ public class HandlerCFESisteco extends HandlerCFE {
         return message;
 
     }
+
+
+    /***
+     * Setea información de referencia de un contra-resguardo electrónico.
+     * Xpande. Created by Gabriel Vila on 11/15/18
+     * @return
+     */
+    private String setReferencia_Resguardo() {
+
+        String message = null;
+
+        String sql = "";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try{
+
+            // Documento
+            MDocType docType = new MDocType(this.ctx, model.get_ValueAsInt("C_DocType_ID"), null);
+
+            // Si no es Contra-Resguardo, no hago nada.
+            if (!docType.getDocBaseType().equalsIgnoreCase("RGC")) {
+                return null;
+            }
+
+            Referencia referencias = new Referencia();
+            Referencia.Referencia1 referencia = new Referencia.Referencia1();
+            referencias.getReferencia1().add(referencia);
+
+            referencia.setNroLinRef(1);
+
+            int resguardoID = this.model.get_ValueAsInt("Z_ResguardoSocio_Ref_ID");
+
+            if (resguardoID <= 0){
+                return "No se pudo obtener resguardo referenciado por este contra-resguardo.";
+            }
+
+            sql = " select documentno, datedoc " +
+                    "from z_resguardosocio " +
+                    "where z_resguardosocio_id =" + resguardoID;
+
+        	pstmt = DB.prepareStatement(sql, this.trxName);
+        	rs = pstmt.executeQuery();
+
+        	if (rs.next()){
+
+        	    referencia.setSerie(this.configDocSend.getDocumentSerie());
+                referencia.setFechaCFEref(TS_to_XmlGregorianCalendar_OnlyDate(rs.getTimestamp("datedoc"), false));
+
+                String documentNo = rs.getString("documentno");
+                documentNo = documentNo.replaceAll("[^0-9]", ""); // Expresión regular para quitar todo lo que no es número
+                documentNo = org.apache.commons.lang.StringUtils.leftPad(String.valueOf(documentNo), 7, "0");
+
+                referencia.setNroCFERef(new BigInteger(documentNo));
+        	}
+
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+        finally {
+            DB.close(rs, pstmt);
+        	rs = null; pstmt = null;
+        }
+
+
+
+        return message;
+    }
+
+
+    /***
+     * Setea información de Receptor de un Resguardo electrónico.
+     * Xpande. Created by Gabriel Vila on 11/15/18
+     * @return
+     */
+    private ReceptorResg setReceptor_Resguardo() {
+
+        ReceptorResg receptor = new ReceptorResg();
+
+        try{
+
+            MBPartner partner =  new MBPartner(this.ctx, this.model.get_ValueAsInt("C_BPartner_ID"), null);
+            MBPartnerLocation partnerLocation = new MBPartnerLocation(this.ctx, this.model.get_ValueAsInt("C_BPartner_Location_ID"), null);
+            if ((partnerLocation == null) || (partnerLocation.get_ID() <= 0)){
+                MBPartnerLocation[] locations = partner.getLocations(false);
+                if ((locations == null) || (locations.length <= 0)){
+                    throw new AdempiereException("Falta indicar Localización del Socio de Negocio de este Documento.");
+                }
+                partnerLocation = locations[0];
+            }
+            MLocation location = (MLocation) partnerLocation.getC_Location();
+            if ((location == null) || (location.get_ID() <= 0)){
+                throw new AdempiereException("Falta indicar Dirección en la Localización del Socio de Negocio de este Documento.");
+            }
+            MCountry country = (MCountry) location.getC_Country();
+            if ((country == null) || (country.get_ID() <= 0)){
+                throw new AdempiereException("Falta indicar País en la Localización del Socio de Negocio de este Documento.");
+            }
+
+            // 2 = RUT, 3 = CI, 4 = Otros
+            int tipoIdentificacion = 4;
+            X_C_TaxGroup taxGroup = (X_C_TaxGroup) partner.getC_TaxGroup();
+            if (taxGroup.getValue() != null){
+                if (taxGroup.getValue().equalsIgnoreCase("RUT")){
+                    tipoIdentificacion = 2;
+                }
+                else if (taxGroup.getValue().equalsIgnoreCase("CI")){
+                    tipoIdentificacion = 3;
+                }
+            }
+            String nroIdentificacion = partner.getTaxID();
+
+            receptor.setTipoDocRecep(tipoIdentificacion);
+            receptor.setDocRecep(nroIdentificacion);
+            receptor.setRznSocRecep(partner.getName());
+
+            // Datos geográficos
+            String direccion = location.getAddress1();
+            if (direccion != null) {
+                if (direccion.length() > 70){
+                    direccion = direccion.substring(0, 70);
+                }
+            }
+
+            receptor.setCodPaisRecep(country.getCountryCode());
+            receptor.setPaisRecep(country.getName());
+            receptor.setCiudadRecep(location.getCity());
+            receptor.setDeptoRecep(location.getRegionName());
+            receptor.setDirRecep(direccion);
+
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+
+        return receptor;
+    }
+
 
     @Override
     protected String executeInOut() throws Exception {
