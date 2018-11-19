@@ -96,6 +96,7 @@ public class ProcesadorCFE {
 
             // Envía CFE segun modelos generados previamente
             message = handlerCFE.send(vendorOrg, cDocTypeID, model.get_ValueAsString("DocumentNo"));
+            if (message != null) return message;
 
         }
         catch (Exception e){

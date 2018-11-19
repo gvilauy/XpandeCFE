@@ -30,7 +30,7 @@ public class X_Z_CFE_VendorOrg extends PO implements I_Z_CFE_VendorOrg, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20181102L;
+	private static final long serialVersionUID = 20181118L;
 
     /** Standard Constructor */
     public X_Z_CFE_VendorOrg (Properties ctx, int Z_CFE_VendorOrg_ID, String trxName)
@@ -93,6 +93,57 @@ public class X_Z_CFE_VendorOrg extends PO implements I_Z_CFE_VendorOrg, I_Persis
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set CFE_CodInteg.
+		@param CFE_CodInteg 
+		Código de integración para CFE
+	  */
+	public void setCFE_CodInteg (String CFE_CodInteg)
+	{
+		set_Value (COLUMNNAME_CFE_CodInteg, CFE_CodInteg);
+	}
+
+	/** Get CFE_CodInteg.
+		@return Código de integración para CFE
+	  */
+	public String getCFE_CodInteg () 
+	{
+		return (String)get_Value(COLUMNNAME_CFE_CodInteg);
+	}
+
+	/** Set CFE_EmpCK.
+		@param CFE_EmpCK 
+		Clave de empresa para CFE
+	  */
+	public void setCFE_EmpCK (String CFE_EmpCK)
+	{
+		set_Value (COLUMNNAME_CFE_EmpCK, CFE_EmpCK);
+	}
+
+	/** Get CFE_EmpCK.
+		@return Clave de empresa para CFE
+	  */
+	public String getCFE_EmpCK () 
+	{
+		return (String)get_Value(COLUMNNAME_CFE_EmpCK);
+	}
+
+	/** Set CFE_EmpPK.
+		@param CFE_EmpPK 
+		Clave de empresa de software para CFE
+	  */
+	public void setCFE_EmpPK (String CFE_EmpPK)
+	{
+		set_Value (COLUMNNAME_CFE_EmpPK, CFE_EmpPK);
+	}
+
+	/** Get CFE_EmpPK.
+		@return Clave de empresa de software para CFE
+	  */
+	public String getCFE_EmpPK () 
+	{
+		return (String)get_Value(COLUMNNAME_CFE_EmpPK);
 	}
 
 	/** Set namespaceURL.

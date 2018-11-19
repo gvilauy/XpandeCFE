@@ -76,6 +76,45 @@ public interface I_Z_CFE_VendorOrg
 	  */
 	public int getAD_OrgTrx_ID();
 
+    /** Column name CFE_CodInteg */
+    public static final String COLUMNNAME_CFE_CodInteg = "CFE_CodInteg";
+
+	/** Set CFE_CodInteg.
+	  * Código de integración para CFE
+	  */
+	public void setCFE_CodInteg(String CFE_CodInteg);
+
+	/** Get CFE_CodInteg.
+	  * Código de integración para CFE
+	  */
+	public String getCFE_CodInteg();
+
+    /** Column name CFE_EmpCK */
+    public static final String COLUMNNAME_CFE_EmpCK = "CFE_EmpCK";
+
+	/** Set CFE_EmpCK.
+	  * Clave de empresa para CFE
+	  */
+	public void setCFE_EmpCK(String CFE_EmpCK);
+
+	/** Get CFE_EmpCK.
+	  * Clave de empresa para CFE
+	  */
+	public String getCFE_EmpCK();
+
+    /** Column name CFE_EmpPK */
+    public static final String COLUMNNAME_CFE_EmpPK = "CFE_EmpPK";
+
+	/** Set CFE_EmpPK.
+	  * Clave de empresa de software para CFE
+	  */
+	public void setCFE_EmpPK(String CFE_EmpPK);
+
+	/** Get CFE_EmpPK.
+	  * Clave de empresa de software para CFE
+	  */
+	public String getCFE_EmpPK();
+
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
 
