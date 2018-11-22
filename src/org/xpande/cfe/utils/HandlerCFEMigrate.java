@@ -8,7 +8,6 @@ import dto.migrate.ListaCFERetornoType.CFE.Erros.ErrosItem;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.*;
-import org.compiere.sqlj.PaymentTerm;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.eevolution.model.X_C_TaxGroup;
@@ -749,9 +748,9 @@ public class HandlerCFEMigrate extends HandlerCFE {
 
             Service service = new Service();
             Call call = (Call) service.createCall();
-            call.setTargetEndpointAddress(new java.net.URL("http://app.invoicy.com.uy/InvoiCy/aws_emissionfactura.aspx"));
-            call.setOperationName("Execute");
-            call.setSOAPActionURI("Gxaction/AWS_EMISSIONFACTURA.Execute");
+            call.setTargetEndpointAddress(new java.net.URL(vendorOrg.getTargetEndpointAddress()));
+            call.setOperationName(vendorOrg.getOperationName());
+            call.setSOAPActionURI(vendorOrg.getSOAPActionURI());
             call.addParameter(new QName("Gx", "Xmlrecepcao"), XMLType.XSD_STRING, ParameterMode.IN);
             call.setReturnType(XMLType.XSD_STRING);
 
@@ -781,36 +780,45 @@ public class HandlerCFEMigrate extends HandlerCFE {
             encRetCfeType.setNroLinRetorno(getBigIntegerVal(cabElement, "NroLinRetorno"));
             encRetCfeType.setMsgCod(getIntegerVal(cabElement, "MsgCod"));
 
-            List<ListaCFERetornoType.CFE> listaCfeRet = cfeRetorno.getListaCFE().getCFE();
-            for (ListaCFERetornoType.CFE cfeRet : listaCfeRet) {
+            ListaCFERetornoType cfeRetornoTypes = new ListaCFERetornoType();
+            cfeRetorno.setListaCFE(cfeRetornoTypes);
 
-                if (cfeRet.getCFEStatus().intValue() == 3) {
-                    String errDescRet = "";
-                    if (cfeRet.getErros() != null && cfeRet.getErros().getErrosItem() != null) {
-                        ArrayList<ErrosItem> invoicyErrorDescriptions = (ArrayList<ErrosItem>) cfeRet.getErros().getErrosItem();
-                        for (ListaCFERetornoType.CFE.Erros.ErrosItem err : invoicyErrorDescriptions) {
-                            errDescRet += " - " + err.getCFEErrCod() + "_" + err.getCFEErrDesc();
+            loadCfeResponses(rootNode.getChild("ListaCFE").getChildren(), cfeRetornoTypes);
+
+
+            if (cfeRetorno.getListaCFE() != null){
+
+                List<ListaCFERetornoType.CFE> listaCfeRet = cfeRetorno.getListaCFE().getCFE();
+                for (ListaCFERetornoType.CFE cfeRet : listaCfeRet) {
+
+                    if (cfeRet.getCFEStatus().intValue() == 3) {
+                        String errDescRet = "";
+                        if (cfeRet.getErros() != null && cfeRet.getErros().getErrosItem() != null) {
+                            ArrayList<ErrosItem> invoicyErrorDescriptions = (ArrayList<ErrosItem>) cfeRet.getErros().getErrosItem();
+                            for (ListaCFERetornoType.CFE.Erros.ErrosItem err : invoicyErrorDescriptions) {
+                                errDescRet += " - " + err.getCFEErrCod() + "_" + err.getCFEErrDesc();
+                            }
                         }
+                        throw new AdempiereException("CFE Rechazado: " + errDescRet);
                     }
-                    throw new AdempiereException("CFE Rechazado: " + errDescRet);
+
+                    MZCFERespuestaProvider cfeRespuesta = new MZCFERespuestaProvider(this.ctx, 0, this.trxName);
+                    cfeRespuesta.setAD_Table_ID(model.get_Table_ID());
+                    cfeRespuesta.setRecord_ID(model.get_ID());
+                    cfeRespuesta.setC_DocType_ID(model.get_ValueAsInt("C_DocType_ID"));
+                    cfeRespuesta.setDocumentNoRef(model.get_ValueAsString("DocumentNo"));
+
+                    cfeRespuesta.setCFE_Status(cfeRet.getCFEStatus().toString());
+                    cfeRespuesta.setCFE_Descripcion(cfeRet.getCFEMsgDsc());
+                    cfeRespuesta.setCFE_Tipo(new BigDecimal(cfeRet.getCFETipo().intValue()));
+                    cfeRespuesta.setCFE_Serie(cfeRet.getCFESerie());
+                    cfeRespuesta.setCFE_Numero(new BigDecimal(cfeRet.getCFENro().intValue()));
+                    cfeRespuesta.setCFE_Resolucion(cfeRet.getCFEEstadoAcuse().toString());
+                    cfeRespuesta.setCFE_URL_DGI(cfeRet.getCFEQrCode());
+                    cfeRespuesta.saveEx();
                 }
 
-                MZCFERespuestaProvider cfeRespuesta = new MZCFERespuestaProvider(this.ctx, 0, this.trxName);
-                cfeRespuesta.setAD_Table_ID(model.get_Table_ID());
-                cfeRespuesta.setRecord_ID(model.get_ID());
-                cfeRespuesta.setC_DocType_ID(model.get_ValueAsInt("C_DocType_ID"));
-                cfeRespuesta.setDocumentNoRef(model.get_ValueAsString("DocumentNo"));
-
-                cfeRespuesta.setCFE_Status(cfeRet.getCFEStatus().toString());
-                cfeRespuesta.setCFE_Descripcion(cfeRet.getCFEMsgDsc());
-                cfeRespuesta.setCFE_Tipo(new BigDecimal(cfeRet.getCFETipo().intValue()));
-                cfeRespuesta.setCFE_Serie(cfeRet.getCFESerie());
-                cfeRespuesta.setCFE_Numero(new BigDecimal(cfeRet.getCFENro().intValue()));
-                cfeRespuesta.setCFE_Resolucion(cfeRet.getCFEEstadoAcuse().toString());
-                cfeRespuesta.setCFE_URL_DGI(cfeRet.getCFEQrCode());
-                cfeRespuesta.saveEx();
             }
-
         }
         catch (Exception e) {
             throw new AdempiereException(e);
@@ -1067,22 +1075,28 @@ public class HandlerCFEMigrate extends HandlerCFE {
             }
             String nroIdentificacion = partner.getTaxID();
 
-            receptor.setRcpTipoDocRecep(tipoIdentificacion);
-            receptor.setRcpDocRecep(nroIdentificacion);
-            receptor.setRcpRznSocRecep(partner.getName());
+            //receptor.setRcpTipoDocRecep(tipoIdentificacion);
 
-            // Datos geográficos
-            String direccion = location.getAddress1();
-            if (direccion != null) {
-                if (direccion.length() > 70){
-                    direccion = direccion.substring(0, 70);
+            // Si es un cliente con identificación (NO ES OTROS)
+            if (tipoIdentificacion != 4){
+
+                receptor.setRcpTipoDocRecep(tipoIdentificacion);
+                receptor.setRcpDocRecep(nroIdentificacion);
+                receptor.setRcpRznSocRecep(partner.getName());
+
+                // Datos geográficos
+                String direccion = location.getAddress1();
+                if (direccion != null) {
+                    if (direccion.length() > 70){
+                        direccion = direccion.substring(0, 70);
+                    }
                 }
-            }
 
-            receptor.setRcpCodPaisRecep(country.getCountryCode());
-            receptor.setRcpCiudadRecep(location.getCity());
-            receptor.setRcpDeptoRecep(location.getRegionName());
-            receptor.setRcpDirRecep(direccion);
+                receptor.setRcpCodPaisRecep(country.getCountryCode());
+                receptor.setRcpCiudadRecep(location.getCity());
+                receptor.setRcpDeptoRecep(location.getRegionName());
+                receptor.setRcpDirRecep(direccion);
+            }
 
         }
         catch (Exception e){
@@ -1109,6 +1123,11 @@ public class HandlerCFEMigrate extends HandlerCFE {
         try{
 
             MInvoice invoice = (MInvoice) this.model;
+
+            // Emisor, receptor y totales
+            this.cfeInvoiCyType.setEmisor(emisor);
+            this.cfeInvoiCyType.setReceptor(receptor);
+            this.cfeInvoiCyType.setTotales(totales);
 
             CFEInvoiCyType.IdDoc idDoc = new CFEInvoiCyType.IdDoc();
             this.cfeInvoiCyType.setIdDoc(idDoc);
@@ -1147,7 +1166,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
                 }
             }
 
-            Timestamp dueDate = PaymentTerm.invoiceDueDate(invoice.get_ID());
+            Timestamp dueDate = ProcesadorCFE.getPaymentTermDueDate(this.ctx, invoice.getC_PaymentTerm_ID(), invoice.getDateInvoiced(), null);
             if (dueDate != null) {
                 GregorianCalendar gcalDue = (GregorianCalendar) GregorianCalendar.getInstance();
                 gcalDue.setTime(dueDate);
@@ -1190,6 +1209,11 @@ public class HandlerCFEMigrate extends HandlerCFE {
 
             MInvoice invoice = (MInvoice) this.model;
 
+            // Emisor, receptor y totales
+            this.cfeInvoiCyType.setEmisor(emisor);
+            this.cfeInvoiCyType.setReceptor(receptor);
+            this.cfeInvoiCyType.setTotales(totales);
+
             CFEInvoiCyType.IdDoc idDoc = new CFEInvoiCyType.IdDoc();
             this.cfeInvoiCyType.setIdDoc(idDoc);
             idDoc.setCFETipoCFE(BigInteger.valueOf(Long.parseLong(docDGI.getCodigoDGI())));
@@ -1227,7 +1251,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
                 }
             }
 
-            Timestamp dueDate = PaymentTerm.invoiceDueDate(invoice.get_ID());
+            Timestamp dueDate = ProcesadorCFE.getPaymentTermDueDate(this.ctx, invoice.getC_PaymentTerm_ID(), invoice.getDateInvoiced(), null);
             if (dueDate != null) {
                 GregorianCalendar gcalDue = (GregorianCalendar) GregorianCalendar.getInstance();
                 gcalDue.setTime(dueDate);
@@ -1277,6 +1301,107 @@ public class HandlerCFEMigrate extends HandlerCFE {
 
     private static String getStringVal(Element element, String name) {
         return element.getChildText(name);
+    }
+
+    private static BigDecimal getBigDecimalVal(Element element, String name) {
+        String val = element.getChildText(name);
+        BigDecimal ret = null;
+        try {
+            ret = BigDecimal.valueOf(Integer.valueOf(val));
+        } catch (Exception e) {
+            ret = null;
+        }
+        return ret;
+    }
+
+    private static Integer getIntegerVal(Element element, String name, Integer defaultValue) {
+        Integer ret = getIntegerVal(element, name);
+        return ret != null ? ret : defaultValue;
+    }
+
+    private static Long getLongVal(Element element, String name) {
+        String val = element.getChildText(name);
+        Long ret = null;
+        try {
+            ret = Long.valueOf(val);
+        } catch (Exception e) {
+            ret = null;
+        }
+
+        return ret;
+    }
+
+    private static XMLGregorianCalendar getXMLGregorianCalendar(Element element, String name) {
+
+        try {
+            GregorianCalendar gcal = new GregorianCalendar();
+            XMLGregorianCalendar xgcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal);
+
+            xgcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(element.getChildText(name));
+
+            return xgcal;
+        } catch (Exception e) { }
+
+
+        return null;
+    }
+
+    private static void loadCfeResponses(List<Element> cfeResponses, ListaCFERetornoType objCfeResponses) {
+
+        try{
+
+            for (Element cfeResponse : cfeResponses) {
+                ListaCFERetornoType.CFE objCfeResponse = new ListaCFERetornoType.CFE();
+                objCfeResponses.getCFE().add(objCfeResponse);
+
+                objCfeResponse.setCFETipo(getBigIntegerVal(cfeResponse, "CFETipo"));
+                objCfeResponse.setCFESerie(getStringVal(cfeResponse, "CFESerie"));
+                objCfeResponse.setCFENro(getBigIntegerVal(cfeResponse, "CFENro"));
+                objCfeResponse.setCFEStatus(getBigIntegerVal(cfeResponse, "CFEStatus"));
+                objCfeResponse.setCFEEstadoAcuse(getBigIntegerVal(cfeResponse, "CFEEstadoAcuse"));
+                objCfeResponse.setCFEMsgCod(getIntegerVal(cfeResponse, "CFEMsgCod"));
+                objCfeResponse.setCFEMsgDsc(getStringVal(cfeResponse, "CFEMsgDsc"));
+                objCfeResponse.setCFERepImpressa(getStringVal(cfeResponse, "CFERepImpressa"));
+                objCfeResponse.setCFENumReferencia(getBigIntegerVal(cfeResponse, "CFENumReferencia"));
+                objCfeResponse.setCFECodigoSeguridad(getStringVal(cfeResponse, "CFECodigoSeguridad"));
+                objCfeResponse.setCFEQrCode(getStringVal(cfeResponse, "CFEQrCode"));
+
+                ListaCFERetornoType.CFE.CFEDatosAvanzados objCfeDatosAvanzados = new ListaCFERetornoType.CFE.CFEDatosAvanzados();
+                objCfeResponse.setCFEDatosAvanzados(objCfeDatosAvanzados);
+                Element cfeDatosAvanzados = cfeResponse.getChild("CFEDatosAvanzados");
+
+                if (cfeDatosAvanzados != null) {
+                    objCfeDatosAvanzados.setCFEHASH(getStringVal(cfeDatosAvanzados, "CFEHASH"));
+                    objCfeDatosAvanzados.setCFEFchHorFirma(getXMLGregorianCalendar(cfeDatosAvanzados, "CFEFchHorFirma"));
+                    objCfeDatosAvanzados.setCFECAEId(getLongVal(cfeDatosAvanzados, "CFECAEId"));
+                    objCfeDatosAvanzados.setCFECAENroIni(getBigIntegerVal(cfeDatosAvanzados, "CFECAENroIni"));
+                    objCfeDatosAvanzados.setCFECAENroFin(getBigIntegerVal(cfeDatosAvanzados, "CFECAENroFin"));
+                    objCfeDatosAvanzados.setCFECAEFchVenc(getXMLGregorianCalendar(cfeDatosAvanzados, "CFECAEFchVenc"));
+                    objCfeDatosAvanzados.setCFERUTEmisor(getStringVal(cfeDatosAvanzados, "CFERUTEmisor"));
+                    objCfeDatosAvanzados.setCFETotMntPagar(getBigDecimalVal(cfeDatosAvanzados, "CFETotMntPagar"));
+                    objCfeDatosAvanzados.setNumResAutorizadora(getBigIntegerVal(cfeDatosAvanzados, "NumResAutorizadora"));
+                    objCfeDatosAvanzados.setAnoResAutorizadora(getBigIntegerVal(cfeDatosAvanzados, "AnoResAutorizadora"));
+                    objCfeDatosAvanzados.setDireccionInvoiCyWeb(getStringVal(cfeDatosAvanzados, "DireccionInvoiCyWeb"));
+                    objCfeDatosAvanzados.setCodBarAbtPrimera(getStringVal(cfeDatosAvanzados, "CodBarAbtPrimera"));
+                    objCfeDatosAvanzados.setCodBarAbtSegunda(getStringVal(cfeDatosAvanzados, "CodBarAbtSegunda"));
+                }
+
+
+                objCfeResponse.setErros(new ListaCFERetornoType.CFE.Erros());
+                List<ErrosItem> objCfeErros = objCfeResponse.getErros().getErrosItem();
+                for (Element cfeErros : cfeResponse.getChild("Erros").getChildren()) {
+                    ErrosItem objErrosItem = new ErrosItem();
+                    objCfeErros.add(objErrosItem);
+                    objErrosItem.setCFEErrCod(getIntegerVal(cfeErros, "CFEErrCod", 0));
+                    objErrosItem.setCFEErrDesc(getStringVal(cfeErros, "CFEErrDesc"));
+                }
+            }
+
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+
     }
 
 }

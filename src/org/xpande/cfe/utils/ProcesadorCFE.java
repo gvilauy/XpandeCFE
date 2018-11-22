@@ -6,8 +6,12 @@ import org.compiere.model.MInOut;
 import org.compiere.model.MInvoice;
 import org.compiere.model.PO;
 import org.compiere.process.SvrProcess;
+import org.compiere.util.DB;
 import org.xpande.cfe.model.*;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Properties;
 
 /**
@@ -104,6 +108,47 @@ public class ProcesadorCFE {
         }
 
         return message;
+    }
+
+
+    /***
+     * Metodo que obtiene y retorna fecha de vencimiento según termino de pago y fecha de documento.
+     * Xpande. Created by Gabriel Vila on 11/22/18
+     * @param ctx
+     * @param paymentTermID
+     * @param docDate
+     * @param trxName
+     * @return
+     */
+    public static Timestamp getPaymentTermDueDate(Properties ctx, int paymentTermID, Timestamp docDate, String trxName){
+
+        Timestamp dueDate = docDate;
+
+        String sql = "";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try{
+            sql = " select paymenttermduedate(" + paymentTermID + ",?)" ;
+
+        	pstmt = DB.prepareStatement(sql, trxName);
+        	pstmt.setTimestamp(1, docDate);
+        	rs = pstmt.executeQuery();
+
+        	if(rs.next()){
+                dueDate = rs.getTimestamp(1);
+        	}
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+        finally {
+            DB.close(rs, pstmt);
+        	rs = null; pstmt = null;
+        }
+
+        return dueDate;
+
     }
 
 }

@@ -1236,7 +1236,7 @@ public class HandlerCFESisteco extends HandlerCFE {
                 }
             }
 
-            Timestamp dueDate = (Timestamp) this.model.get_Value("DueDate");
+            Timestamp dueDate = ProcesadorCFE.getPaymentTermDueDate(this.ctx, invoice.getC_PaymentTerm_ID(), invoice.getDateInvoiced(), null);
             if (dueDate != null) {
                 GregorianCalendar gcalDue = (GregorianCalendar) GregorianCalendar.getInstance();
                 gcalDue.setTime(dueDate);
