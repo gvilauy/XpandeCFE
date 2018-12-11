@@ -682,7 +682,7 @@ public class HandlerCFESisteco extends HandlerCFE {
             this.empresasType.setAdenda(this.model.get_ValueAsString("Description"));
 
             // Firma
-            this.defType.getEFact().setTmstFirma(null);
+            this.defType.getEResg().setTmstFirma(null);
 
         }
         catch (Exception e){
