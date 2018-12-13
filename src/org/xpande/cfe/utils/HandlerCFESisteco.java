@@ -1064,7 +1064,8 @@ public class HandlerCFESisteco extends HandlerCFE {
                     .replace("</CFE>","</ns0:CFE>")
                     .replace("<CFE_Adenda ", "<ns0:CFE_Adenda xmlns:ns0=\"http://cfe.dgi.gub.uy\"")
                     .replace("</CFE_Adenda>", "</ns0:CFE_Adenda>")
-                    .replace("xmlns:ns0=\"http://cfe.dgi.gub.uy\"xmlns:ns2=\"http://www.w3.org/2000/09/xmldsig#\"", "xmlns:ns0=\"http://cfe.dgi.gub.uy\" xmlns:ns2=\"http://www.w3.org/2000/09/xmldsig#\"")
+                    .replace(" xmlns:ns0=\"http://cfe.dgi.gub.uy\"xmlns:ns2=\"http://www.w3.org/2000/09/xmldsig#\"", " xmlns:ns0=\"http://cfe.dgi.gub.uy\" xmlns:ns2=\"http://www.w3.org/2000/09/xmldsig#\"")
+                    .replace(" xmlns:ns0=\"http://cfe.dgi.gub.uy\"xmlns:ns2=\"http://www.w3.org/2001/04/xmlenc#\"", " xmlns:ns0=\"http://cfe.dgi.gub.uy\" xmlns:ns2=\"http://www.w3.org/2001/04/xmldsig#\"")
                     .replace("<Adenda", "<ns0:Adenda")
                     .replace("</Adenda>", "</ns0:Adenda>");
 
@@ -1102,7 +1103,7 @@ public class HandlerCFESisteco extends HandlerCFE {
 
 
             MZCFERespuestaProvider cfeRespuesta = new MZCFERespuestaProvider(this.ctx, 0, this.trxName);
-            cfeRespuesta.setAD_Table_ID(I_C_Invoice.Table_ID);
+            cfeRespuesta.setAD_Table_ID(this.model.get_Table_ID());
             cfeRespuesta.setRecord_ID(this.model.get_ID());
             cfeRespuesta.setC_DocType_ID(cDocType);
             cfeRespuesta.setDocumentNoRef(documentNo);
