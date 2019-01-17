@@ -1121,6 +1121,7 @@ public class HandlerCFESisteco extends HandlerCFE {
                 cfeRespuesta.setCFE_NroInicial_CAE(cfeDtoSisteco.getdNro());
                 cfeRespuesta.setCFE_NroFinal_CAE(cfeDtoSisteco.gethNro());
                 cfeRespuesta.setAD_OrgTrx_ID(this.model.getAD_Org_ID());
+                cfeRespuesta.setCFE_Vencimiento_CAE(cfeDtoSisteco.getFecVenc());
                 cfeRespuesta.setZ_CFE_Vendor_ID(this.configDocSend.getZ_CFE_Vendor_ID());
             }
             cfeRespuesta.saveEx();
