@@ -815,6 +815,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
                     cfeRespuesta.setCFE_Numero(new BigDecimal(cfeRet.getCFENro().intValue()));
                     cfeRespuesta.setCFE_Resolucion(cfeRet.getCFEEstadoAcuse().toString());
                     cfeRespuesta.setCFE_URL_DGI(cfeRet.getCFEQrCode());
+                    cfeRespuesta.setCFE_DigitoVerificador(cfeRet.getCFECodigoSeguridad());
                     cfeRespuesta.saveEx();
                 }
 
