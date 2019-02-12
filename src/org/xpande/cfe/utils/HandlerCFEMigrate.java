@@ -113,6 +113,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
                 if (message != null) return message;
 
                 // Si el Documento se corresponde con una nota de crédito o nota de débito, debo setear datos de las facturas referenciadas
+                this.cfeInvoiCyType.setReferencia(new CFEInvoiCyType.Referencia());
                 if ((docDGI.getValue().equalsIgnoreCase("E-FACTURA NC")) || (docDGI.getValue().equalsIgnoreCase("E-FACTURA CTAAJE NC"))
                             || (docDGI.getValue().equalsIgnoreCase("E-FACTURA ND")) || (docDGI.getValue().equalsIgnoreCase("E-FACTURA CTAAJE ND"))){
 
@@ -135,6 +136,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
                 if (message != null) return message;
 
                 // Si el Documento se corresponde con una nota de crédito o nota de débito, debo setear datos de las facturas referenciadas
+                this.cfeInvoiCyType.setReferencia(new CFEInvoiCyType.Referencia());
                 if ((docDGI.getValue().equalsIgnoreCase("E-TICKET NC")) || (docDGI.getValue().equalsIgnoreCase("E-TICKET CTAAJE NC"))
                         || (docDGI.getValue().equalsIgnoreCase("E-TICKET ND")) || (docDGI.getValue().equalsIgnoreCase("E-TICKET CTAAJE ND"))){
 
