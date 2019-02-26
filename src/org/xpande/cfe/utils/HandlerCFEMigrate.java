@@ -273,6 +273,51 @@ public class HandlerCFEMigrate extends HandlerCFE {
                 }
             }
 
+
+            // Busco referencia de facturas en las lineas de esta nota de credito
+            sql = " select distinct inv.c_invoice_id, inv.c_doctypetarget_id, inv.documentno " +
+                    " from c_invoiceline linv " +
+                    " inner join c_invoice inv on linv.c_invoice_id = inv.c_invoice_id " +
+                    " where linv.c_invoiceline_id in " +
+                    " (select ref_invoiceline_id from c_invoiceline " +
+                    " where c_invoice_id =" + model.get_ID() +
+                    " and ref_invoiceline_id > 0)";
+
+            pstmt = DB.prepareStatement(sql, this.trxName);
+            rs = pstmt.executeQuery();
+
+            int contador = 0;
+
+            while(rs.next()){
+
+                contador++;
+
+                MDocType docRef = new MDocType(this.ctx, rs.getInt("c_doctypetarget_id"), null);
+
+                // Obtengo configuracion de envío de CFE para documento referenciado, si no tengo aviso.
+                MZCFEConfigDocSend configDocRefSend = ((MZCFEConfig) this.configDocSend.getZ_CFE_Config()).getConfigDocumentoCFE(model.getAD_Org_ID(), docRef.get_ID());
+                if ((configDocRefSend == null) || (configDocRefSend.get_ID() <= 0)){
+                    return "No se obtuvo codigo DGI para documento : " + docRef.getName();
+                }
+                MZCFEConfigDocDGI docDGI = (MZCFEConfigDocDGI) configDocRefSend.getZ_CFE_ConfigDocDGI();
+
+
+                CFEInvoiCyType.Referencia.ReferenciaItem refItem = new CFEInvoiCyType.Referencia.ReferenciaItem();
+                refItems.add(refItem);
+
+                refItem.setRefNroLinRef(contador);
+                refItem.setRefTpoDocRef(BigInteger.valueOf(Long.parseLong(docDGI.getCodigoDGI())));
+                refItem.setRefSerie(configDocRefSend.getDocumentSerie().trim());
+                refItem.setRefIndGlobal(BigInteger.valueOf(1));
+
+                String documentNo = rs.getString("documentno").trim();
+                documentNo = documentNo.replaceAll("[^0-9]", "");
+                documentNo = org.apache.commons.lang.StringUtils.leftPad(String.valueOf(documentNo), 7, "0");
+                refItem.setRefNroCFERef(new BigInteger(documentNo));
+            }
+
+
+            /*
             // Busco referencia de facturas en tabla
             sql = " select C_Invoice_To_ID from Z_InvoiceRef where C_Invoice_ID =" + this.model.get_ID();
 
@@ -308,6 +353,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
                 documentNo = org.apache.commons.lang.StringUtils.leftPad(String.valueOf(documentNo), 7, "0");
                 refItem.setRefNroCFERef(new BigInteger(documentNo));
             }
+            */
 
         }
         catch (Exception e){
