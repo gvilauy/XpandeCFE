@@ -1,5 +1,6 @@
 package org.xpande.cfe.model;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.Query;
 
 import java.sql.ResultSet;
@@ -51,6 +52,32 @@ public class MZCFEConfig extends X_Z_CFE_Config {
         MZCFEConfigDocSend model = new Query(getCtx(), I_Z_CFE_ConfigDocSend.Table_Name, whereClause, get_TrxName()).setOnlyActiveRecords(true).first();
 
         return model;
+    }
+
+
+    /***
+     * Retorna si un determinado documento - organización, esta parametrizado para enviarse o no como CFE.
+     * @param adOrgID
+     * @param cDocTypeID
+     * @return
+     */
+    public boolean isDocSendCFE(int adOrgID, int cDocTypeID) {
+
+        boolean result = false;
+
+        try{
+
+            MZCFEConfigDocSend docSend = this.getConfigDocumentoCFE(adOrgID, cDocTypeID);
+            if ((docSend != null) && (docSend.get_ID() > 0)){
+                result = true;
+            }
+
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+
+        return result;
     }
 
 }
