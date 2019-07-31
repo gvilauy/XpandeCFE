@@ -95,8 +95,12 @@ public class HandlerCFESisteco extends HandlerCFE {
                 message = this.setDetalleInvoice_eFactura();
                 if (message != null) return message;
 
-                // Si el Documento se corresponde con una nota de crédito, debo setear datos de las facturas referenciadas
-                if ((docDGI.getValue().equalsIgnoreCase("E-FACTURA NC")) || (docDGI.getValue().equalsIgnoreCase("E-FACTURA CTAAJE NC"))){
+                // Si el Documento se corresponde con una nota de crédito o nota de débito, debo setear datos de las facturas referenciadas
+                if ((docDGI.getValue().equalsIgnoreCase("E-FACTURA NC"))
+                        || (docDGI.getValue().equalsIgnoreCase("E-FACTURA ND"))
+                        || (docDGI.getValue().equalsIgnoreCase("E-FACTURA CTAAJE ND"))
+                        || (docDGI.getValue().equalsIgnoreCase("E-FACTURA CTAAJE NC"))){
+
                     message = this.setReferencia_eFactura();
                     if (message != null) return message;
                 }
@@ -183,7 +187,7 @@ public class HandlerCFESisteco extends HandlerCFE {
     }
 
     /***
-     * Setea referencia de Nota de Credito de documentos de eFactura.
+     * Setea referencia de Nota de Credito y Débito de documentos de eFactura.
      * Xpande. Created by Gabriel Vila on 11/1/18.
      * @return
      */
