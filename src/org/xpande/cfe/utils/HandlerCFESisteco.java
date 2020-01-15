@@ -114,8 +114,29 @@ public class HandlerCFESisteco extends HandlerCFE {
                     || (docDGI.getValue().equalsIgnoreCase("E-TICKET ND")) || (docDGI.getValue().equalsIgnoreCase("E-TICKET CTAAJE"))
                     || (docDGI.getValue().equalsIgnoreCase("E-TICKET CTAAJE NC")) || (docDGI.getValue().equalsIgnoreCase("E-TICKET CTAAJE ND"))){
 
+                // Obtengo datos del Receptor
+                ReceptorTck receptor = this.setReceptor_eTicket();
+
                 // Obtengo deatos del encabezado
-                message = this.setEncabezado_eTicket(docDGI);
+                message = this.setEncabezado_eTicket(docDGI, emisor, receptor, totales);
+                if (message != null) return message;
+
+                // Obtengo datos de las lineas
+                message = this.setDetalleInvoice_eTicket();
+                if (message != null) return message;
+
+                // Si el Documento se corresponde con una nota de crédito o nota de débito, debo setear datos de las facturas referenciadas
+                if ((docDGI.getValue().equalsIgnoreCase("E-TICKET NC"))
+                        || (docDGI.getValue().equalsIgnoreCase("E-TICKET ND"))
+                        || (docDGI.getValue().equalsIgnoreCase("E-TICKET CTAAJE ND"))
+                        || (docDGI.getValue().equalsIgnoreCase("E-TICKET CTAAJE NC"))){
+
+                    message = this.setReferencia_eTicket();
+                    if (message != null) return message;
+                }
+
+                // Datos de CAE
+                message = this.setCAE_eTicket();
                 if (message != null) return message;
 
             }
@@ -157,6 +178,33 @@ public class HandlerCFESisteco extends HandlerCFE {
 
     }
 
+    /***
+     * Setea datos del CAE para documentos de la familia eTicket.
+     * Xpande. Created by Gabriel Vila on 1/15/20.
+     * @return
+     */
+    private String setCAE_eTicket() {
+
+        String message = null;
+
+        try{
+
+            CAEDataType caeDataType = new CAEDataType();
+            this.defType.getETck().setCAEData(caeDataType);
+
+            caeDataType.setCAEID(new BigDecimal(this.configDocSend.getNumeroCAE()).toBigInteger());
+            caeDataType.setDNro(new BigDecimal(this.configDocSend.getNumeroDesde()).toBigInteger());
+            caeDataType.setHNro(new BigDecimal(this.configDocSend.getNumeroHasta()).toBigInteger());
+            caeDataType.setFecVenc(TS_to_XmlGregorianCalendar_OnlyDate(this.configDocSend.getDueDate(), false));
+
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+
+        return message;
+
+    }
 
     /***
      * Setea datos del CAE de un resguardo electrónico.
@@ -266,26 +314,80 @@ public class HandlerCFESisteco extends HandlerCFE {
                 documentNo = org.apache.commons.lang.StringUtils.leftPad(String.valueOf(documentNo), 7, "0");
                 referencia.setNroCFERef(new BigInteger(documentNo));
             }
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+        finally {
+            DB.close(rs, pstmt);
+        	rs = null; pstmt = null;
+        }
 
+        return message;
+    }
 
-            /*
-            // Busco referencia de facturas en tabla
-            sql = " select C_Invoice_To_ID from Z_InvoiceRef where C_Invoice_ID =" + this.model.get_ID();
+    /***
+     * Setea referencia de Nota de Credito y Débito de documentos de eTicket.
+     * Xpande. Created by Gabriel Vila on 1/15/20.
+     * @return
+     */
+    private String setReferencia_eTicket() {
 
-        	pstmt = DB.prepareStatement(sql, this.trxName);
-        	rs = pstmt.executeQuery();
+        String message = null;
 
-        	int contador = 0;
+        String sql = "";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
 
-        	while(rs.next()){
+        try{
 
-        	    contador++;
+            Referencia referenciasList = new Referencia();
+            this.defType.getETck().setReferencia(referenciasList);
 
-        	    MInvoice invoiceRef = new MInvoice(this.ctx, rs.getInt("C_Invoice_To_ID"), this.trxName);
-                MDocType docRef = (MDocType) invoiceRef.getC_DocTypeTarget();
+            // Intancio modelo de nota de credito
+            MInvoice invoice = (MInvoice) this.model;
+
+            // Si utilizo el campo texto manual para indicar REFERENCIA de Nota de Credito, envío este dato y salgo.
+            if (invoice.get_ValueAsString("ReferenciaCFE") != null){
+                String referenciaCFE = invoice.get_ValueAsString("ReferenciaCFE").trim();
+                if (!referenciaCFE.equalsIgnoreCase("")){
+
+                    if (referenciaCFE.length() > 90){
+                        referenciaCFE = referenciaCFE.substring(0, 89);
+                    }
+
+                    Referencia.Referencia1 referencia = new Referencia.Referencia1();
+                    referenciasList.getReferencia1().add(referencia);
+                    referencia.setNroLinRef(1);
+                    referencia.setIndGlobal(BigInteger.valueOf(1));
+                    referencia.setRazonRef(referenciaCFE);
+
+                    return message;
+                }
+            }
+
+            // Busco referencia de facturas en las lineas de esta nota de credito
+            sql = " select distinct inv.c_invoice_id, inv.c_doctypetarget_id, inv.documentno " +
+                    " from c_invoiceline linv " +
+                    " inner join c_invoice inv on linv.c_invoice_id = inv.c_invoice_id " +
+                    " where linv.c_invoiceline_id in " +
+                    " (select ref_invoiceline_id from c_invoiceline " +
+                    " where c_invoice_id =" + model.get_ID() +
+                    " and ref_invoiceline_id > 0)";
+
+            pstmt = DB.prepareStatement(sql, this.trxName);
+            rs = pstmt.executeQuery();
+
+            int contador = 0;
+
+            while(rs.next()){
+
+                contador++;
+
+                MDocType docRef = new MDocType(this.ctx, rs.getInt("c_doctypetarget_id"), null);
 
                 // Obtengo configuracion de envío de CFE para documento referenciado, si no tengo aviso.
-                MZCFEConfigDocSend configDocRefSend = ((MZCFEConfig) this.configDocSend.getZ_CFE_Config()).getConfigDocumentoCFE(invoiceRef.getAD_Org_ID(), docRef.get_ID());
+                MZCFEConfigDocSend configDocRefSend = ((MZCFEConfig) this.configDocSend.getZ_CFE_Config()).getConfigDocumentoCFE(model.getAD_Org_ID(), docRef.get_ID());
                 if ((configDocRefSend == null) || (configDocRefSend.get_ID() <= 0)){
                     return "No se obtuvo codigo DGI para documento : " + docRef.getName();
                 }
@@ -299,11 +401,12 @@ public class HandlerCFESisteco extends HandlerCFE {
                 referencia.setSerie(configDocRefSend.getDocumentSerie().trim());
                 referencia.setIndGlobal(BigInteger.valueOf(1));
 
-                String documentNo = invoiceRef.getDocumentNo().replaceAll("[^0-9]", "");
+                String documentNo = rs.getString("documentno").trim();
+                documentNo = documentNo.replaceAll("[^0-9]", "");
                 documentNo = org.apache.commons.lang.StringUtils.leftPad(String.valueOf(documentNo), 7, "0");
                 referencia.setNroCFERef(new BigInteger(documentNo));
-        	}
-        	*/
+            }
+
 
         }
         catch (Exception e){
@@ -311,12 +414,11 @@ public class HandlerCFESisteco extends HandlerCFE {
         }
         finally {
             DB.close(rs, pstmt);
-        	rs = null; pstmt = null;
+            rs = null; pstmt = null;
         }
 
         return message;
     }
-
 
     /***
      * Obtiene y setea datos de lineas del Documento.
@@ -345,6 +447,137 @@ public class HandlerCFESisteco extends HandlerCFE {
 
             this.defType.getEFact().setDetalle(new CFEDefType.EFact.Detalle());
             List<ItemDetFact> lineas = this.defType.getEFact().getDetalle().getItem();
+
+            // Instancio modelo de cabezal de invoice
+            MInvoice invoice = (MInvoice) this.model;
+
+            // Instancio modelo de Lista de Precios
+            MPriceList priceList = (MPriceList) invoice.getM_PriceList();
+            if ((priceList == null) || (priceList.get_ID() <= 0)){
+                return "Falta indicar Lista de Precios del Documento";
+            }
+
+            int position = 1;
+
+            // Obtengo y recorro lineas de factura
+            MInvoiceLine[] invoiceLines = invoice.getLines(true);
+            for (int i = 0; i < invoiceLines.length; i++) {
+
+                MInvoiceLine invoiceLine = invoiceLines[i];
+
+                // Datos del producto o cargo utilizado en esta linea
+                String codigoLinea ="", nombreLinea = "", descLinea = "";
+                if (invoiceLine.getM_Product_ID() > 0){
+                    MProduct product = (MProduct) invoiceLine.getM_Product();
+                    codigoLinea = product.getValue();
+                    nombreLinea = product.getName();
+                    descLinea = product.getDescription();
+                }
+                else if (invoiceLine.getC_Charge_ID() > 0){
+                    MCharge charge = (MCharge) invoiceLine.getC_Charge();
+                    codigoLinea = String.valueOf(charge.get_ID());
+                    nombreLinea = charge.getName();
+                    descLinea = charge.getDescription();
+                }
+                else {
+                    return "Falta indicar Producto o Cargo en una de las lineas del Documento.";
+                }
+
+                ItemDetFact detalleItem = new ItemDetFact();
+                lineas.add(detalleItem);
+                detalleItem.setNroLinDet(position++);
+                ItemDetFact.CodItem codItem = null;
+
+                // Codigo del producto
+                if (codigoLinea != null) {
+                    codItem = new ItemDetFact.CodItem();
+                    codItem.setTpoCod("INT1");
+                    codItem.setCod(codigoLinea);
+                    detalleItem.getCodItem().add(codItem);
+                }
+
+                // Codigo de barras en caso de tenerlo en la linea de factura
+                if (invoiceLine.get_ValueAsString("UPC") != null) {
+                    codItem = new ItemDetFact.CodItem();
+                    codItem.setTpoCod("EAN");
+                    codItem.setCod(invoiceLine.get_ValueAsString("UPC"));
+                    detalleItem.getCodItem().add(codItem);
+                }
+
+                MTax tax = (MTax) invoiceLine.getC_Tax();
+
+                if (tax.getRate().compareTo(ivaMinimo.getRate()) == 0) {
+
+                    detalleItem.setIndFact(BigInteger.valueOf(2));
+                }
+                else if (tax.getRate().compareTo(ivaBasico.getRate()) == 0) {
+
+                    detalleItem.setIndFact(BigInteger.valueOf(3));
+                }
+                else if (tax.getRate().compareTo(Env.ZERO) == 0) {
+
+                    detalleItem.setIndFact(BigInteger.valueOf(1));
+                }
+                else{
+                    return "Tasa de impuesto en linea del Documento, no parametrizada para DGI";
+                }
+
+                detalleItem.setIndAgenteResp(null);
+                detalleItem.setNomItem(nombreLinea);
+                detalleItem.setDscItem(descLinea);
+                detalleItem.setCantidad(invoiceLine.getQtyEntered());
+
+                MUOM uom = (MUOM) invoiceLine.getC_UOM();
+                detalleItem.setUniMed(uom.getUOMSymbol());
+
+                BigDecimal precioUnitario = invoiceLine.getPriceEntered().setScale(6, RoundingMode.HALF_UP).abs();
+                detalleItem.setPrecioUnitario(precioUnitario);
+                detalleItem.setRecargoPct(Env.ZERO);
+                detalleItem.setRecargoMnt(Env.ZERO);
+
+                if (priceList.isTaxIncluded()) {
+                    detalleItem.setMontoItem(invoiceLine.getLineTotalAmt().abs());
+                }
+                else {
+                    detalleItem.setMontoItem(((BigDecimal) invoiceLine.get_Value("AmtSubtotal")).abs());
+                }
+            }
+
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+
+        return message;
+    }
+
+    /***
+     * Obtiene y setea datos de lineas del Documento para eTickets.
+     * Xpande. Created by Gabriel Vila on 1/15/20.
+     * @return
+     */
+    private String setDetalleInvoice_eTicket() {
+
+        String message = null;
+
+        try{
+
+            // Instancio configurador de CFE
+            MZCFEConfig cfeConfig = (MZCFEConfig) this.configDocSend.getZ_CFE_Config();
+
+            // Instancio modelos de referencia para Tasa Básico y Tasa Minimo.
+            MTax ivaBasico = new MTax(this.ctx, cfeConfig.getTaxBasico_ID(), null);
+            if ((ivaBasico == null) || (ivaBasico.get_ID() <= 0)){
+                throw new AdempiereException("Falta indicar Tasa de Impuesto Básico en Configuración CFE");
+            }
+
+            MTax ivaMinimo = new MTax(this.ctx, cfeConfig.getTaxMinimo_ID(), null);
+            if ((ivaMinimo == null) || (ivaMinimo.get_ID() <= 0)){
+                throw new AdempiereException("Falta indicar Tasa de Impuesto Mínimo en Configuración CFE");
+            }
+
+            this.defType.getETck().setDetalle(new CFEDefType.ETck.Detalle());
+            List<ItemDetFact> lineas = this.defType.getETck().getDetalle().getItem();
 
             // Instancio modelo de cabezal de invoice
             MInvoice invoice = (MInvoice) this.model;
@@ -881,6 +1114,75 @@ public class HandlerCFESisteco extends HandlerCFE {
     }
 
 
+    /***
+     * Obtiene y retorna información del Receptor para comprobantes CFE del tipo eTicket.
+     * Xpande. Created by Gabriel Vila on 1/15/20.
+     * @return
+     */
+    private ReceptorTck setReceptor_eTicket() {
+
+        ReceptorTck receptor = new ReceptorTck();
+
+        try{
+
+            MBPartner partner =  new MBPartner(this.ctx, this.model.get_ValueAsInt("C_BPartner_ID"), null);
+            MBPartnerLocation partnerLocation = new MBPartnerLocation(this.ctx, this.model.get_ValueAsInt("C_BPartner_Location_ID"), null);
+            if ((partnerLocation == null) || (partnerLocation.get_ID() <= 0)){
+                MBPartnerLocation[] locations = partner.getLocations(false);
+                if ((locations == null) || (locations.length <= 0)){
+                    throw new AdempiereException("Falta indicar Localización del Socio de Negocio de este Documento.");
+                }
+                partnerLocation = locations[0];
+            }
+            MLocation location = (MLocation) partnerLocation.getC_Location();
+            if ((location == null) || (location.get_ID() <= 0)){
+                throw new AdempiereException("Falta indicar Dirección en la Localización del Socio de Negocio de este Documento.");
+            }
+            MCountry country = (MCountry) location.getC_Country();
+            if ((country == null) || (country.get_ID() <= 0)){
+                throw new AdempiereException("Falta indicar País en la Localización del Socio de Negocio de este Documento.");
+            }
+
+            // 2 = RUT, 3 = CI, 4 = Otros
+            int tipoIdentificacion = 4;
+            X_C_TaxGroup taxGroup = (X_C_TaxGroup) partner.getC_TaxGroup();
+            if (taxGroup.getValue() != null){
+                if (taxGroup.getValue().equalsIgnoreCase("RUT")){
+                    tipoIdentificacion = 2;
+                }
+                else if (taxGroup.getValue().equalsIgnoreCase("CI")){
+                    tipoIdentificacion = 3;
+                }
+            }
+            String nroIdentificacion = partner.getTaxID();
+
+            receptor.setTipoDocRecep(tipoIdentificacion);
+            receptor.setDocRecep(nroIdentificacion);
+            receptor.setRznSocRecep(partner.getName());
+
+            // Datos geográficos
+            String direccion = location.getAddress1();
+            if (direccion != null) {
+                if (direccion.length() > 70){
+                    direccion = direccion.substring(0, 70);
+                }
+            }
+
+            receptor.setCodPaisRecep(country.getCountryCode());
+            receptor.setPaisRecep(country.getName());
+            receptor.setCiudadRecep(location.getCity());
+            receptor.setDeptoRecep(location.getRegionName());
+            receptor.setDirRecep(direccion);
+
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+
+        return receptor;
+    }
+
+
     @Override
     protected String executeResguardo() throws Exception {
 
@@ -1310,15 +1612,77 @@ public class HandlerCFESisteco extends HandlerCFE {
         return message;
     }
 
-    private String setEncabezado_eTicket(MZCFEConfigDocDGI docDGI) {
+    private String setEncabezado_eTicket(MZCFEConfigDocDGI docDGI, Emisor emisor, ReceptorTck receptor, Totales totales) {
 
         String message = null;
 
         try{
 
+            MInvoice invoice = (MInvoice) this.model;
+
             CFEDefType.ETck eTicket = new CFEDefType.ETck();
             CFEDefType.ETck.Encabezado eTicketEncabezado = new CFEDefType.ETck.Encabezado();
-            IdDocTck idDocTck = new IdDocTck();
+            this.defType.setETck(eTicket);
+            eTicket.setEncabezado(eTicketEncabezado);
+
+            eTicket.setTmstFirma(TS_to_XmlGregorianCalendar_OnlyDate(invoice.getDateInvoiced(), true));
+            eTicket.setTmstFirma(null);
+
+            IdDocTck idDoc = new IdDocTck();
+
+            eTicketEncabezado.setIdDoc(idDoc);
+            idDoc.setTipoCFE(BigInteger.valueOf(Long.parseLong(docDGI.getCodigoDGI())));
+            idDoc.setSerie(configDocSend.getDocumentSerie().trim());
+
+            String cfeNumero = this.model.get_ValueAsString("DocumentNo").replaceAll("[^0-9]", "");
+            cfeNumero = org.apache.commons.lang.StringUtils.leftPad(String.valueOf(cfeNumero), 7, "0");
+            idDoc.setNro(new BigInteger(cfeNumero));
+
+            this.defType.setVersion("1.0");
+
+            // Sisteco no requiere emisor.
+            //eFactEncabezado.setEmisor(emisor);
+
+            eTicketEncabezado.setReceptor(receptor);
+            eTicketEncabezado.setTotales(totales);
+
+            GregorianCalendar gcal = (GregorianCalendar) GregorianCalendar.getInstance();
+            gcal.setTime((Timestamp)this.model.get_Value("DateInvoiced"));
+            XMLGregorianCalendar xgCalDateInvoiced = DatatypeFactory.newInstance().newXMLGregorianCalendarDate(gcal.get(Calendar.YEAR),
+                    gcal.get(Calendar.MONTH)+1, gcal.get(Calendar.DAY_OF_MONTH), DatatypeConstants.FIELD_UNDEFINED);
+            idDoc.setFchEmis(xgCalDateInvoiced);
+
+            idDoc.setMntBruto(new BigInteger("0"));
+            MPriceList priceList = new MPriceList(this.ctx, this.model.get_ValueAsInt("M_PriceList_ID"), null);
+            if (priceList != null && priceList.isTaxIncluded()) {
+                idDoc.setMntBruto(new BigInteger("1"));
+            }
+
+            idDoc.setFmaPago(BigInteger.valueOf(2)); // 2 = Credito, 1 = Contado
+            String payRuleType = model.get_ValueAsString("PaymentRule");
+            if (payRuleType != null){
+                if ((payRuleType.equalsIgnoreCase(X_C_Invoice.PAYMENTRULE_Cash)) || (payRuleType.equalsIgnoreCase(X_C_Invoice.PAYMENTRULE_DirectDeposit))
+                        || (payRuleType.equalsIgnoreCase(X_C_Invoice.PAYMENTRULE_DirectDebit))) {
+
+                    idDoc.setFmaPago(BigInteger.valueOf(1)); // 2 = Credito, 1 = Contado
+                }
+            }
+
+            Timestamp dueDate = ProcesadorCFE.getPaymentTermDueDate(this.ctx, invoice.getC_PaymentTerm_ID(), invoice.getDateInvoiced(), null);
+            if (dueDate != null) {
+                GregorianCalendar gcalDue = (GregorianCalendar) GregorianCalendar.getInstance();
+                gcalDue.setTime(dueDate);
+                XMLGregorianCalendar xgCalDueDate = DatatypeFactory.newInstance().newXMLGregorianCalendarDate(gcalDue.get(Calendar.YEAR),
+                        gcalDue.get(Calendar.MONTH)+1, gcalDue.get(Calendar.DAY_OF_MONTH),
+                        DatatypeConstants.FIELD_UNDEFINED);
+                idDoc.setFchVenc(xgCalDueDate);
+            }
+
+            // ADENDA
+            this.empresasType.setAdenda(invoice.getDescription());
+
+            // Firma
+            this.defType.getETck().setTmstFirma(null);
 
         }
         catch (Exception e){
