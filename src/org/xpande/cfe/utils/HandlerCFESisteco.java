@@ -1154,26 +1154,30 @@ public class HandlerCFESisteco extends HandlerCFE {
                     tipoIdentificacion = 3;
                 }
             }
-            String nroIdentificacion = partner.getTaxID();
 
-            receptor.setTipoDocRecep(tipoIdentificacion);
-            receptor.setDocRecep(nroIdentificacion);
-            receptor.setRznSocRecep(partner.getName());
+            // Si es un cliente con identificación (NO ES OTROS)
+            if (tipoIdentificacion != 4){
 
-            // Datos geográficos
-            String direccion = location.getAddress1();
-            if (direccion != null) {
-                if (direccion.length() > 70){
-                    direccion = direccion.substring(0, 70);
+                String nroIdentificacion = partner.getTaxID();
+
+                receptor.setTipoDocRecep(tipoIdentificacion);
+                receptor.setDocRecep(nroIdentificacion);
+                receptor.setRznSocRecep(partner.getName());
+
+                // Datos geográficos
+                String direccion = location.getAddress1();
+                if (direccion != null) {
+                    if (direccion.length() > 70){
+                        direccion = direccion.substring(0, 70);
+                    }
                 }
+
+                receptor.setCodPaisRecep(country.getCountryCode());
+                receptor.setPaisRecep(country.getName());
+                receptor.setCiudadRecep(location.getCity());
+                receptor.setDeptoRecep(location.getRegionName());
+                receptor.setDirRecep(direccion);
             }
-
-            receptor.setCodPaisRecep(country.getCountryCode());
-            receptor.setPaisRecep(country.getName());
-            receptor.setCiudadRecep(location.getCity());
-            receptor.setDeptoRecep(location.getRegionName());
-            receptor.setDirRecep(direccion);
-
         }
         catch (Exception e){
             throw new AdempiereException(e);
