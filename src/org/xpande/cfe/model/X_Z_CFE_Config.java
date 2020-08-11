@@ -30,7 +30,7 @@ public class X_Z_CFE_Config extends PO implements I_Z_CFE_Config, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20181030L;
+	private static final long serialVersionUID = 20200808L;
 
     /** Standard Constructor */
     public X_Z_CFE_Config (Properties ctx, int Z_CFE_Config_ID, String trxName)
@@ -70,6 +70,65 @@ public class X_Z_CFE_Config extends PO implements I_Z_CFE_Config, I_Persistent
         .append(get_ID()).append("]");
       return sb.toString();
     }
+
+	public I_AD_EMailConfig getAD_EMailConfig() throws RuntimeException
+    {
+		return (I_AD_EMailConfig)MTable.get(getCtx(), I_AD_EMailConfig.Table_Name)
+			.getPO(getAD_EMailConfig_ID(), get_TrxName());	}
+
+	/** Set EMail Configuration.
+		@param AD_EMailConfig_ID EMail Configuration	  */
+	public void setAD_EMailConfig_ID (int AD_EMailConfig_ID)
+	{
+		if (AD_EMailConfig_ID < 1) 
+			set_Value (COLUMNNAME_AD_EMailConfig_ID, null);
+		else 
+			set_Value (COLUMNNAME_AD_EMailConfig_ID, Integer.valueOf(AD_EMailConfig_ID));
+	}
+
+	/** Get EMail Configuration.
+		@return EMail Configuration	  */
+	public int getAD_EMailConfig_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_AD_EMailConfig_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set EMail Address.
+		@param EMail 
+		Electronic Mail Address
+	  */
+	public void setEMail (String EMail)
+	{
+		set_Value (COLUMNNAME_EMail, EMail);
+	}
+
+	/** Get EMail Address.
+		@return Electronic Mail Address
+	  */
+	public String getEMail () 
+	{
+		return (String)get_Value(COLUMNNAME_EMail);
+	}
+
+	/** Set EMail User Password.
+		@param EMailUserPW 
+		Password of your email user id
+	  */
+	public void setEMailUserPW (String EMailUserPW)
+	{
+		set_Value (COLUMNNAME_EMailUserPW, EMailUserPW);
+	}
+
+	/** Get EMail User Password.
+		@return Password of your email user id
+	  */
+	public String getEMailUserPW () 
+	{
+		return (String)get_Value(COLUMNNAME_EMailUserPW);
+	}
 
 	/** Set TaxBasico_ID.
 		@param TaxBasico_ID 

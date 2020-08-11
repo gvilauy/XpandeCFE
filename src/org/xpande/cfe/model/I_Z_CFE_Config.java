@@ -50,13 +50,24 @@ public interface I_Z_CFE_Config
 	  */
 	public int getAD_Client_ID();
 
+    /** Column name AD_EMailConfig_ID */
+    public static final String COLUMNNAME_AD_EMailConfig_ID = "AD_EMailConfig_ID";
+
+	/** Set EMail Configuration	  */
+	public void setAD_EMailConfig_ID (int AD_EMailConfig_ID);
+
+	/** Get EMail Configuration	  */
+	public int getAD_EMailConfig_ID();
+
+	public I_AD_EMailConfig getAD_EMailConfig() throws RuntimeException;
+
     /** Column name AD_Org_ID */
     public static final String COLUMNNAME_AD_Org_ID = "AD_Org_ID";
 
 	/** Set Organization.
 	  * Organizational entity within client
 	  */
-	public void setAD_Org_ID(int AD_Org_ID);
+	public void setAD_Org_ID (int AD_Org_ID);
 
 	/** Get Organization.
 	  * Organizational entity within client
@@ -79,13 +90,39 @@ public interface I_Z_CFE_Config
 	  */
 	public int getCreatedBy();
 
+    /** Column name EMail */
+    public static final String COLUMNNAME_EMail = "EMail";
+
+	/** Set EMail Address.
+	  * Electronic Mail Address
+	  */
+	public void setEMail (String EMail);
+
+	/** Get EMail Address.
+	  * Electronic Mail Address
+	  */
+	public String getEMail();
+
+    /** Column name EMailUserPW */
+    public static final String COLUMNNAME_EMailUserPW = "EMailUserPW";
+
+	/** Set EMail User Password.
+	  * Password of your email user id
+	  */
+	public void setEMailUserPW (String EMailUserPW);
+
+	/** Get EMail User Password.
+	  * Password of your email user id
+	  */
+	public String getEMailUserPW();
+
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";
 
 	/** Set Active.
 	  * The record is active in the system
 	  */
-	public void setIsActive(boolean IsActive);
+	public void setIsActive (boolean IsActive);
 
 	/** Get Active.
 	  * The record is active in the system
@@ -98,7 +135,7 @@ public interface I_Z_CFE_Config
 	/** Set TaxBasico_ID.
 	  * ID de Impuesto Básico por Defecto
 	  */
-	public void setTaxBasico_ID(int TaxBasico_ID);
+	public void setTaxBasico_ID (int TaxBasico_ID);
 
 	/** Get TaxBasico_ID.
 	  * ID de Impuesto Básico por Defecto
@@ -111,7 +148,7 @@ public interface I_Z_CFE_Config
 	/** Set TaxMinimo_ID.
 	  * ID de Impuesto Tasa Mínimo por Defecto
 	  */
-	public void setTaxMinimo_ID(int TaxMinimo_ID);
+	public void setTaxMinimo_ID (int TaxMinimo_ID);
 
 	/** Get TaxMinimo_ID.
 	  * ID de Impuesto Tasa Mínimo por Defecto
@@ -140,7 +177,7 @@ public interface I_Z_CFE_Config
 	/** Set Search Key.
 	  * Search key for the record in the format required - must be unique
 	  */
-	public void setValue(String Value);
+	public void setValue (String Value);
 
 	/** Get Search Key.
 	  * Search key for the record in the format required - must be unique
@@ -151,7 +188,7 @@ public interface I_Z_CFE_Config
     public static final String COLUMNNAME_Z_CFE_Config_ID = "Z_CFE_Config_ID";
 
 	/** Set Z_CFE_Config ID	  */
-	public void setZ_CFE_Config_ID(int Z_CFE_Config_ID);
+	public void setZ_CFE_Config_ID (int Z_CFE_Config_ID);
 
 	/** Get Z_CFE_Config ID	  */
 	public int getZ_CFE_Config_ID();
