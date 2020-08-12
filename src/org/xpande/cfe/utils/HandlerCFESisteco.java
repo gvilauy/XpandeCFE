@@ -2,7 +2,7 @@ package org.xpande.cfe.utils;
 
 import dto.sisteco.SistecoConvertResponse;
 import dto.sisteco.SistecoResponseDTO;
-import dto.uy.gub.dgi.cfe.*;
+import uy.gub.dgi.cfe.*;
 import org.adempiere.exceptions.AdempiereException;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
@@ -241,15 +241,13 @@ public class HandlerCFESisteco extends HandlerCFE {
      */
     private String setReferencia_eFactura() {
 
-        String message = null;
-
         String sql = "";
         PreparedStatement pstmt = null;
         ResultSet rs = null;
 
         try{
 
-            Referencia referenciasList = new Referencia();
+            Referencia1 referenciasList = new Referencia1();
             this.defType.getEFact().setReferencia(referenciasList);
 
             // Intancio modelo de nota de credito
@@ -264,13 +262,13 @@ public class HandlerCFESisteco extends HandlerCFE {
                         referenciaCFE = referenciaCFE.substring(0, 89);
                     }
 
-                    Referencia.Referencia1 referencia = new Referencia.Referencia1();
-                    referenciasList.getReferencia1().add(referencia);
+                    Referencia1.Referencia referencia = new Referencia1.Referencia();
+                    referenciasList.getReferencia().add(referencia);
                     referencia.setNroLinRef(1);
                     referencia.setIndGlobal(BigInteger.valueOf(1));
                     referencia.setRazonRef(referenciaCFE);
 
-                    return message;
+                    return null;
                 }
             }
 
@@ -301,8 +299,8 @@ public class HandlerCFESisteco extends HandlerCFE {
                 }
                 MZCFEConfigDocDGI docDGI = (MZCFEConfigDocDGI) configDocRefSend.getZ_CFE_ConfigDocDGI();
 
-                Referencia.Referencia1 referencia = new Referencia.Referencia1();
-                referenciasList.getReferencia1().add(referencia);
+                Referencia1.Referencia referencia = new Referencia1.Referencia();
+                referenciasList.getReferencia().add(referencia);
 
                 referencia.setNroLinRef(contador);
                 referencia.setTpoDocRef(BigInteger.valueOf(Long.parseLong(docDGI.getCodigoDGI())));
@@ -323,7 +321,7 @@ public class HandlerCFESisteco extends HandlerCFE {
         	rs = null; pstmt = null;
         }
 
-        return message;
+        return null;
     }
 
     /***
@@ -333,15 +331,13 @@ public class HandlerCFESisteco extends HandlerCFE {
      */
     private String setReferencia_eTicket() {
 
-        String message = null;
-
         String sql = "";
         PreparedStatement pstmt = null;
         ResultSet rs = null;
 
         try{
 
-            Referencia referenciasList = new Referencia();
+            Referencia1 referenciasList = new Referencia1();
             this.defType.getETck().setReferencia(referenciasList);
 
             // Intancio modelo de nota de credito
@@ -356,13 +352,13 @@ public class HandlerCFESisteco extends HandlerCFE {
                         referenciaCFE = referenciaCFE.substring(0, 89);
                     }
 
-                    Referencia.Referencia1 referencia = new Referencia.Referencia1();
-                    referenciasList.getReferencia1().add(referencia);
+                    Referencia1.Referencia referencia = new Referencia1.Referencia();
+                    referenciasList.getReferencia().add(referencia);
                     referencia.setNroLinRef(1);
                     referencia.setIndGlobal(BigInteger.valueOf(1));
                     referencia.setRazonRef(referenciaCFE);
 
-                    return message;
+                    return null;
                 }
             }
 
@@ -393,8 +389,8 @@ public class HandlerCFESisteco extends HandlerCFE {
                 }
                 MZCFEConfigDocDGI docDGI = (MZCFEConfigDocDGI) configDocRefSend.getZ_CFE_ConfigDocDGI();
 
-                Referencia.Referencia1 referencia = new Referencia.Referencia1();
-                referenciasList.getReferencia1().add(referencia);
+                Referencia1.Referencia referencia = new Referencia1.Referencia();
+                referenciasList.getReferencia().add(referencia);
 
                 referencia.setNroLinRef(contador);
                 referencia.setTpoDocRef(BigInteger.valueOf(Long.parseLong(docDGI.getCodigoDGI())));
@@ -417,7 +413,7 @@ public class HandlerCFESisteco extends HandlerCFE {
             rs = null; pstmt = null;
         }
 
-        return message;
+        return null;
     }
 
     /***
@@ -1241,8 +1237,6 @@ public class HandlerCFESisteco extends HandlerCFE {
      */
     private String setReferencia_Resguardo() {
 
-        String message = null;
-
         String sql = "";
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -1257,9 +1251,9 @@ public class HandlerCFESisteco extends HandlerCFE {
                 return null;
             }
 
-            Referencia referencias = new Referencia();
-            Referencia.Referencia1 referencia = new Referencia.Referencia1();
-            referencias.getReferencia1().add(referencia);
+            Referencia1 referencias = new Referencia1();
+            Referencia1.Referencia referencia = new Referencia1.Referencia();
+            referencias.getReferencia().add(referencia);
 
             referencia.setNroLinRef(1);
 
@@ -1297,9 +1291,7 @@ public class HandlerCFESisteco extends HandlerCFE {
         	rs = null; pstmt = null;
         }
 
-
-
-        return message;
+        return null;
     }
 
 

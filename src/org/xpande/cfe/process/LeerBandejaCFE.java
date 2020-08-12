@@ -1,7 +1,7 @@
 package org.xpande.cfe.process;
 
-import dto.uy.gub.dgi.cfe.CFEEmpresasType;
-import dto.uy.gub.dgi.cfe.EnvioCFEEntreEmpresas;
+import uy.gub.dgi.cfe.CFEEmpresasType;
+import uy.gub.dgi.cfe.EnvioCFEEntreEmpresas;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MEMailConfig;
 import org.compiere.process.SvrProcess;
@@ -35,10 +35,11 @@ public class LeerBandejaCFE extends SvrProcess {
     protected String doIt() throws Exception {
 
         try{
+            // Instancio configuracion de CFE
             this.cfeConfig = MZCFEConfig.getDefault(getCtx(), null);
 
+            // Leer emails, obtener archivos xmls y procesarlos
             this.getEmails();
-
         }
         catch (Exception e){
             throw new AdempiereException(e);
@@ -90,7 +91,7 @@ public class LeerBandejaCFE extends SvrProcess {
 
                             if (fileName.contains(".xml")){
                                 File fileCFEXml = new File("/tmp/" + fileName);
-                                JAXBContext jaxbContext = JAXBContext.newInstance(CFEEmpresasType.class);
+                                JAXBContext jaxbContext = JAXBContext.newInstance(EnvioCFEEntreEmpresas.class);
                                 Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
                                 EnvioCFEEntreEmpresas empresasType = null;
