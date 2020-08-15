@@ -195,7 +195,10 @@ public class LeerBandejaCFE extends SvrProcess {
             for (CFEEmpresasType empresasType: empresasTypeList){
                 CFEDefType cfeDefType = empresasType.getCFE();
 
-                String adenda = empresasType.getAdenda().toString();
+                String adenda = null;
+                if (empresasType.getAdenda() != null){
+                    adenda = empresasType.getAdenda().toString();
+                }
 
                 if (cfeDefType.getEFact() != null){
                     message = this.generateBandejaCFE_EFact(cfeDefType.getEFact(), rutReceptor, subject, emailFrom, fileName, adenda);
