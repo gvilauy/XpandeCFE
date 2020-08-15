@@ -1,5 +1,7 @@
 package org.xpande.cfe.model;
 
+import org.compiere.model.Query;
+
 import java.sql.ResultSet;
 import java.util.Properties;
 
@@ -17,4 +19,25 @@ public class MZCFEConfigDocSend extends X_Z_CFE_ConfigDocSend {
     public MZCFEConfigDocSend(Properties ctx, ResultSet rs, String trxName) {
         super(ctx, rs, trxName);
     }
+
+
+    /***
+     * Obtiene y retorna modelo segun config de doc. dgi y organización recibidos.
+     * Xpande. Created by Gabriel Vila on 8/14/20.
+     * @param ctx
+     * @param cfeConfigDocDgiID
+     * @param adOrgID
+     * @param trxName
+     * @return
+     */
+    public static MZCFEConfigDocSend getByDgiOrg(Properties ctx, int cfeConfigDocDgiID, int adOrgID, String trxName){
+
+        String whereClause = X_Z_CFE_ConfigDocSend.COLUMNNAME_Z_CFE_ConfigDocDGI_ID + " =" + cfeConfigDocDgiID +
+                " AND " + X_Z_CFE_ConfigDocSend.COLUMNNAME_AD_OrgTrx_ID + " =" + adOrgID;
+
+        MZCFEConfigDocSend model = new Query(ctx, I_Z_CFE_ConfigDocSend.Table_Name, whereClause, trxName).first();
+
+        return model;
+    }
+
 }

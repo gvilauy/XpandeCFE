@@ -33,7 +33,7 @@ public class X_Z_BandejaCFE extends PO implements I_Z_BandejaCFE, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20200813L;
+	private static final long serialVersionUID = 20200815L;
 
     /** Standard Constructor */
     public X_Z_BandejaCFE (Properties ctx, int Z_BandejaCFE_ID, String trxName)
@@ -108,6 +108,23 @@ public class X_Z_BandejaCFE extends PO implements I_Z_BandejaCFE, I_Persistent
 	public String getAddress1 () 
 	{
 		return (String)get_Value(COLUMNNAME_Address1);
+	}
+
+	/** Set AdendaCFE.
+		@param AdendaCFE 
+		Texto de Adenda en CFE
+	  */
+	public void setAdendaCFE (String AdendaCFE)
+	{
+		set_Value (COLUMNNAME_AdendaCFE, AdendaCFE);
+	}
+
+	/** Get AdendaCFE.
+		@return Texto de Adenda en CFE
+	  */
+	public String getAdendaCFE () 
+	{
+		return (String)get_Value(COLUMNNAME_AdendaCFE);
 	}
 
 	/** Set Trx Organization.
@@ -345,6 +362,23 @@ public class X_Z_BandejaCFE extends PO implements I_Z_BandejaCFE, I_Persistent
 	public Timestamp getDueDate () 
 	{
 		return (Timestamp)get_Value(COLUMNNAME_DueDate);
+	}
+
+	/** Set EMail Address.
+		@param EMail 
+		Electronic Mail Address
+	  */
+	public void setEMail (String EMail)
+	{
+		set_Value (COLUMNNAME_EMail, EMail);
+	}
+
+	/** Get EMail Address.
+		@return Electronic Mail Address
+	  */
+	public String getEMail () 
+	{
+		return (String)get_Value(COLUMNNAME_EMail);
 	}
 
 	/** Set File Name.
@@ -872,6 +906,23 @@ public class X_Z_BandejaCFE extends PO implements I_Z_BandejaCFE, I_Persistent
 	public String getSerieCFE () 
 	{
 		return (String)get_Value(COLUMNNAME_SerieCFE);
+	}
+
+	/** Set Subject.
+		@param Subject 
+		Email Message Subject
+	  */
+	public void setSubject (String Subject)
+	{
+		set_Value (COLUMNNAME_Subject, Subject);
+	}
+
+	/** Get Subject.
+		@return Email Message Subject
+	  */
+	public String getSubject () 
+	{
+		return (String)get_Value(COLUMNNAME_Subject);
 	}
 
 	/** Set TipoCFE.

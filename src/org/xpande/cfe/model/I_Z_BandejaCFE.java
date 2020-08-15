@@ -63,6 +63,19 @@ public interface I_Z_BandejaCFE
 	  */
 	public String getAddress1();
 
+    /** Column name AdendaCFE */
+    public static final String COLUMNNAME_AdendaCFE = "AdendaCFE";
+
+	/** Set AdendaCFE.
+	  * Texto de Adenda en CFE
+	  */
+	public void setAdendaCFE (String AdendaCFE);
+
+	/** Get AdendaCFE.
+	  * Texto de Adenda en CFE
+	  */
+	public String getAdendaCFE();
+
     /** Column name AD_Org_ID */
     public static final String COLUMNNAME_AD_Org_ID = "AD_Org_ID";
 
@@ -242,6 +255,19 @@ public interface I_Z_BandejaCFE
 	  * Date when the payment is due
 	  */
 	public Timestamp getDueDate();
+
+    /** Column name EMail */
+    public static final String COLUMNNAME_EMail = "EMail";
+
+	/** Set EMail Address.
+	  * Electronic Mail Address
+	  */
+	public void setEMail (String EMail);
+
+	/** Get EMail Address.
+	  * Electronic Mail Address
+	  */
+	public String getEMail();
 
     /** Column name FileName */
     public static final String COLUMNNAME_FileName = "FileName";
@@ -619,6 +645,19 @@ public interface I_Z_BandejaCFE
 	  * Serie para CFE
 	  */
 	public String getSerieCFE();
+
+    /** Column name Subject */
+    public static final String COLUMNNAME_Subject = "Subject";
+
+	/** Set Subject.
+	  * Email Message Subject
+	  */
+	public void setSubject (String Subject);
+
+	/** Get Subject.
+	  * Email Message Subject
+	  */
+	public String getSubject();
 
     /** Column name TipoCFE */
     public static final String COLUMNNAME_TipoCFE = "TipoCFE";
