@@ -1,5 +1,6 @@
 package org.xpande.cfe.process;
 
+import com.sun.mail.imap.IMAPStore;
 import org.compiere.model.*;
 import org.compiere.util.DB;
 import org.compiere.util.TimeUtil;
@@ -65,22 +66,29 @@ public class LeerBandejaCFE extends SvrProcess {
             MEMailConfig meMailConfig = (MEMailConfig) this.cfeConfig.getAD_EMailConfig();
 
             Properties properties = new Properties();
-            properties.put("mail.pop3.host", meMailConfig.getSMTPHost());
-            Session emailSession = Session.getDefaultInstance(properties);
+            //properties.put("mail.pop3.host", meMailConfig.getSMTPHost());
+            //Session emailSession = Session.getDefaultInstance(properties);
+
+            properties.put("mail.store.protocol", "imaps");
+            Session emailSession = Session.getDefaultInstance(properties, null);
 
             //2) create the POP3 store object and connect with the pop server
-            POP3Store emailStore = (POP3Store) emailSession.getStore("pop3");
-            emailStore.connect(this.cfeConfig.getEMail(), this.cfeConfig.getEMailUserPW());
+            //POP3Store emailStore = (POP3Store) emailSession.getStore("pop3");
+            //emailStore.connect(this.cfeConfig.getEMail(), this.cfeConfig.getEMailUserPW());
+
+            IMAPStore emailStore = (IMAPStore) emailSession.getStore("imaps");
+            emailStore.connect(meMailConfig.getSMTPHost(), this.cfeConfig.getEMail(), this.cfeConfig.getEMailUserPW());
 
             //3) create the folder object and open it
             Folder emailFolder = emailStore.getFolder("INBOX");
-            emailFolder.open(Folder.READ_ONLY);
+            emailFolder.open(Folder.READ_WRITE);
 
             String backupFolderName = "Backup";
             Folder backupFolder = emailStore.getFolder(backupFolderName);
             if (backupFolder == null){
                 return "No se encontró la carpeta de respaldo de correo : " + backupFolderName;
             }
+            backupFolder.open(Folder.READ_WRITE);
 
             //4) retrieve the messages from the folder in an array and print it
             Message[] messages = emailFolder.getMessages();
