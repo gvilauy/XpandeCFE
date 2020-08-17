@@ -11,6 +11,7 @@ import org.compiere.process.SvrProcess;
 
 import java.io.File;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import javax.mail.*;
@@ -42,7 +43,10 @@ public class LeerBandejaCFE extends SvrProcess {
             this.cfeConfig = MZCFEConfig.getDefault(getCtx(), null);
 
             // Leer emails, obtener archivos xmls y procesarlos
-            this.getEmails();
+            String message = this.getEmails();
+            if (message != null){
+                return "@Error@ " + message;
+            }
         }
         catch (Exception e){
             throw new AdempiereException(e);
@@ -84,22 +88,30 @@ public class LeerBandejaCFE extends SvrProcess {
             emailFolder.open(Folder.READ_WRITE);
 
             String backupFolderName = "Backup";
-            Folder backupFolder = emailStore.getFolder(backupFolderName);
-            if (backupFolder == null){
+            Folder backupFolder = emailFolder.getFolder(backupFolderName);
+            if ((backupFolder == null) || (!backupFolder.exists())){
                 return "No se encontró la carpeta de respaldo de correo : " + backupFolderName;
             }
-            backupFolder.open(Folder.READ_WRITE);
+            //backupFolder.open(Folder.READ_WRITE);
+
+            String errorFolderName = "Errores";
+            Folder errorFolder = emailFolder.getFolder(errorFolderName);
+            if ((errorFolder == null) || (!errorFolder.exists())){
+                return "No se encontró la carpeta para mails no procesados : " + errorFolderName;
+            }
+            //errorFolder.open(Folder.READ_WRITE);
 
             //4) retrieve the messages from the folder in an array and print it
             Message[] messages = emailFolder.getMessages();
+
+            List<Message> messagesProcessedList = new ArrayList<Message>();
+            List<Message> messagesErrorsList = new ArrayList<Message>();
+
             for (int i = 0; i < messages.length; i++) {
 
                 Message message = messages[i];
 
                 String contentType = message.getContentType();
-
-                // store attachment file name, separated by comma
-                String attachFiles = "";
 
                 if (contentType.contains("multipart")) {
                     // content may contain attachments
@@ -110,7 +122,6 @@ public class LeerBandejaCFE extends SvrProcess {
                         if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition())) {
                             // this part is attachment
                             String fileName = part.getFileName();
-                            attachFiles += fileName + ", ";
                             part.saveFile("/tmp/" + fileName);
 
                             if (fileName.contains(".xml")){
@@ -122,53 +133,84 @@ public class LeerBandejaCFE extends SvrProcess {
 
                                 try{
                                     cfeEntreEmpresas = (EnvioCFEEntreEmpresas) jaxbUnmarshaller.unmarshal(fileCFEXml);
+
+
+                                    // Se genera el registro en Bandeja CFE del sistema.
+                                    resultado = this.generateBandejaCFE(cfeEntreEmpresas, message.getSubject(), message.getFrom()[0].toString(), fileName);
+                                    if (resultado != null){
+                                        MZBandejaCFEError bandejaCFEError = new MZBandejaCFEError(getCtx(), 0, get_TrxName());
+                                        bandejaCFEError.set_ValueOfColumn("AD_Client_ID", this.cfeConfig.getAD_Client_ID());
+                                        bandejaCFEError.setAD_Org_ID(0);
+                                        bandejaCFEError.setDateTrx(new Timestamp(System.currentTimeMillis()));
+                                        bandejaCFEError.setSubject(message.getSubject());
+                                        bandejaCFEError.setEMail(message.getFrom()[0].toString().trim());
+                                        bandejaCFEError.setFileName(fileName);
+                                        bandejaCFEError.setErrorMsg(resultado);
+                                        bandejaCFEError.saveEx();
+
+                                        messagesErrorsList.add(message);
+                                    }
+                                    else {
+                                        messagesProcessedList.add(message);
+                                    }
                                 }
                                 catch (Exception e){
-                                    return "No se pudo procesar el archivo : " + fileName + ", " +
-                                            "Tema: " + message.getSubject() + ", " +
-                                            "Enviado por : " + message.getFrom()[0];
-                                }
+                                    MZBandejaCFEError bandejaCFEError = new MZBandejaCFEError(getCtx(), 0, get_TrxName());
+                                    bandejaCFEError.set_ValueOfColumn("AD_Client_ID", this.cfeConfig.getAD_Client_ID());
+                                    bandejaCFEError.setAD_Org_ID(0);
+                                    bandejaCFEError.setDateTrx(new Timestamp(System.currentTimeMillis()));
+                                    bandejaCFEError.setSubject(message.getSubject());
+                                    bandejaCFEError.setEMail(message.getFrom()[0].toString().trim());
+                                    bandejaCFEError.setFileName(fileName);
+                                    bandejaCFEError.setErrorMsg(e.getMessage());
+                                    bandejaCFEError.saveEx();
 
-                                // Se genera el registro en Bandeja CFE del sistema.
-                                resultado = this.generateBandejaCFE(cfeEntreEmpresas, message.getSubject(), message.getFrom()[0].toString(), fileName);
-                                if (resultado != null){
-                                    return resultado;
+                                    messagesErrorsList.add(message);
                                 }
                             }
-
                         }
                     }
-                    if (attachFiles.length() > 1) {
-                        attachFiles = attachFiles.substring(0, attachFiles.length() - 2);
-                    }
                 }
-
-                System.out.println("---------------------------------");
-                System.out.println("Email Number " + (i + 1));
-                System.out.println("Subject: " + message.getSubject());
-                System.out.println("From: " + message.getFrom()[0]);
-                System.out.println("Text: " + message.getContent().toString());
-                System.out.println("\t Attachments: " + attachFiles);
+                //message.setFlag(Flags.Flag.DELETED, true);
             }
 
+            // Copio mensajes procesados a folder de backup
+            Message[] arrMessProcessed = new Message[]{};
+            arrMessProcessed = messagesProcessedList.toArray(arrMessProcessed);
+            emailFolder.copyMessages(arrMessProcessed, backupFolder);
 
-            // Copio mensajes a folder de backup
-            emailFolder.copyMessages(messages, backupFolder);
+            // Copio mensajes no procesados a folder de errores
+            Message[] arrMessErrors = new Message[]{};
+            arrMessErrors = messagesErrorsList.toArray(arrMessErrors);
+            emailFolder.copyMessages(arrMessErrors, errorFolder);
 
+            /*
             // Elimino mensajes de Inbox para no volve a procesarlos
             for (int i = 0; i < messages.length; i++) {
                 Message message = messages[i];
                 message.setFlag(Flags.Flag.DELETED, true);
             }
+            */
 
             //5) close the store and folder objects
             if (emailFolder.isOpen()){
                 emailFolder.close(true);
             }
-
             if (backupFolder.isOpen()){
                 backupFolder.close(true);
             }
+            if (errorFolder.isOpen()){
+                errorFolder.close(true);
+            }
+
+            // Abro de nuevo inbox y borro los mensajes
+            emailFolder.open(Folder.READ_WRITE);
+            //messages = emailFolder.getMessages();
+            for (int i = 0; i < messages.length; i++) {
+                Message message = messages[i];
+                message.setFlag(Flags.Flag.DELETED, true);
+            }
+            emailFolder.close(true);
 
             emailStore.close();
         }
