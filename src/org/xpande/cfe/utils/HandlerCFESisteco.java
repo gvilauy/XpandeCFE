@@ -1587,6 +1587,13 @@ public class HandlerCFESisteco extends HandlerCFE {
             }
 
             idDoc.setFmaPago(BigInteger.valueOf(2)); // 2 = Credito, 1 = Contado
+            String formaPago = invoice.get_ValueAsString("TipoFormaPago");
+            if (formaPago != null ){
+                if (formaPago.trim().equalsIgnoreCase("CONTADO")){
+                    idDoc.setFmaPago(BigInteger.valueOf(1));
+                }
+            }
+
             String payRuleType = model.get_ValueAsString("PaymentRule");
             if (payRuleType != null){
                 if ((payRuleType.equalsIgnoreCase(X_C_Invoice.PAYMENTRULE_Cash)) || (payRuleType.equalsIgnoreCase(X_C_Invoice.PAYMENTRULE_DirectDeposit))
@@ -1667,6 +1674,13 @@ public class HandlerCFESisteco extends HandlerCFE {
             }
 
             idDoc.setFmaPago(BigInteger.valueOf(2)); // 2 = Credito, 1 = Contado
+            String formaPago = invoice.get_ValueAsString("TipoFormaPago");
+            if (formaPago != null ){
+                if (formaPago.trim().equalsIgnoreCase("CONTADO")){
+                    idDoc.setFmaPago(BigInteger.valueOf(1));
+                }
+            }
+
             String payRuleType = model.get_ValueAsString("PaymentRule");
             if (payRuleType != null){
                 if ((payRuleType.equalsIgnoreCase(X_C_Invoice.PAYMENTRULE_Cash)) || (payRuleType.equalsIgnoreCase(X_C_Invoice.PAYMENTRULE_DirectDeposit))

@@ -1218,6 +1218,13 @@ public class HandlerCFEMigrate extends HandlerCFE {
             }
 
             idDoc.setCFEFmaPago(BigInteger.valueOf(2)); // 2 = Credito, 1 = Contado
+            String formaPago = invoice.get_ValueAsString("TipoFormaPago");
+            if (formaPago != null ){
+                if (formaPago.trim().equalsIgnoreCase("CONTADO")){
+                    idDoc.setCFEFmaPago(BigInteger.valueOf(1));
+                }
+            }
+
             String payRuleType = invoice.getPaymentRule();
             if (payRuleType != null){
                 if ((payRuleType.equalsIgnoreCase(X_C_Invoice.PAYMENTRULE_Cash)) || (payRuleType.equalsIgnoreCase(X_C_Invoice.PAYMENTRULE_DirectDeposit))
@@ -1303,6 +1310,13 @@ public class HandlerCFEMigrate extends HandlerCFE {
             }
 
             idDoc.setCFEFmaPago(BigInteger.valueOf(2)); // 2 = Credito, 1 = Contado
+            String formaPago = invoice.get_ValueAsString("TipoFormaPago");
+            if (formaPago != null ){
+                if (formaPago.trim().equalsIgnoreCase("CONTADO")){
+                    idDoc.setCFEFmaPago(BigInteger.valueOf(1));
+                }
+            }
+
             String payRuleType = invoice.getPaymentRule();
             if (payRuleType != null){
                 if ((payRuleType.equalsIgnoreCase(X_C_Invoice.PAYMENTRULE_Cash)) || (payRuleType.equalsIgnoreCase(X_C_Invoice.PAYMENTRULE_DirectDeposit))
