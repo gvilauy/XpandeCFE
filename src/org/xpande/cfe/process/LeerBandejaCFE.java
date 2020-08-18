@@ -145,6 +145,12 @@ public class LeerBandejaCFE extends SvrProcess {
                                         bandejaCFEError.setSubject(message.getSubject());
                                         bandejaCFEError.setEMail(message.getFrom()[0].toString().trim());
                                         bandejaCFEError.setFileName(fileName);
+                                        if (resultado == null){
+                                            resultado = "No se pudo leer archivo xml";
+                                        }
+                                        if (resultado.length() > 500){
+                                            resultado = resultado.substring(1, 500);
+                                        }
                                         bandejaCFEError.setErrorMsg(resultado);
                                         bandejaCFEError.saveEx();
 
@@ -162,7 +168,14 @@ public class LeerBandejaCFE extends SvrProcess {
                                     bandejaCFEError.setSubject(message.getSubject());
                                     bandejaCFEError.setEMail(message.getFrom()[0].toString().trim());
                                     bandejaCFEError.setFileName(fileName);
-                                    bandejaCFEError.setErrorMsg(e.getMessage());
+                                    String errorMsg = e.toString();
+                                    if (errorMsg == null){
+                                        errorMsg = "No se pudo leer archivo xml";
+                                    }
+                                    if (errorMsg.length() > 500){
+                                        errorMsg = errorMsg.substring(1, 500);
+                                    }
+                                    bandejaCFEError.setErrorMsg(errorMsg);
                                     bandejaCFEError.saveEx();
 
                                     messagesErrorsList.add(message);
@@ -442,6 +455,15 @@ public class LeerBandejaCFE extends SvrProcess {
                     bandejaCFELin.setUniMedCFE(detFact.getUniMed().trim().toUpperCase());
                 }
 
+                // Seteo impuesto según código recibido por DGI
+                if (bandejaCFELin.getIndFactCFE() != null){
+                    sql = " select c_tax_id from c_tax where codigoiva ='" + bandejaCFELin.getIndFactCFE() + "'";
+                    int cTaxID = DB.getSQLValueEx(null, sql);
+                    if (cTaxID > 0){
+                        bandejaCFELin.setC_Tax_ID(cTaxID);
+                    }
+                }
+
                 bandejaCFELin.saveEx();
 
                 for (RetPerc retPercItem: detFact.getRetencPercep()){
@@ -644,6 +666,15 @@ public class LeerBandejaCFE extends SvrProcess {
                 }
                 if (detFact.getUniMed() != null){
                     bandejaCFELin.setUniMedCFE(detFact.getUniMed().trim().toUpperCase());
+                }
+
+                // Seteo impuesto según código recibido por DGI
+                if (bandejaCFELin.getIndFactCFE() != null){
+                    sql = " select c_tax_id from c_tax where codigoiva ='" + bandejaCFELin.getIndFactCFE() + "'";
+                    int cTaxID = DB.getSQLValueEx(null, sql);
+                    if (cTaxID > 0){
+                        bandejaCFELin.setC_Tax_ID(cTaxID);
+                    }
                 }
 
                 bandejaCFELin.saveEx();

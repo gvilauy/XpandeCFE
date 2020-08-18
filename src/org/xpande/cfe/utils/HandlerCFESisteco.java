@@ -501,21 +501,27 @@ public class HandlerCFESisteco extends HandlerCFE {
                 }
 
                 MTax tax = (MTax) invoiceLine.getC_Tax();
-
-                if (tax.getRate().compareTo(ivaMinimo.getRate()) == 0) {
-
-                    detalleItem.setIndFact(BigInteger.valueOf(2));
+                String codigoImpuestoDGI = tax.get_ValueAsString("CodigoIVA");
+                if ((codigoImpuestoDGI != null) && (!codigoImpuestoDGI.trim().equalsIgnoreCase(""))){
+                    long codIVA = Long.valueOf(codigoImpuestoDGI).longValue();
+                    detalleItem.setIndFact(BigInteger.valueOf(codIVA));
                 }
-                else if (tax.getRate().compareTo(ivaBasico.getRate()) == 0) {
+                else {
+                    if (tax.getRate().compareTo(ivaMinimo.getRate()) == 0) {
 
-                    detalleItem.setIndFact(BigInteger.valueOf(3));
-                }
-                else if (tax.getRate().compareTo(Env.ZERO) == 0) {
+                        detalleItem.setIndFact(BigInteger.valueOf(2));
+                    }
+                    else if (tax.getRate().compareTo(ivaBasico.getRate()) == 0) {
 
-                    detalleItem.setIndFact(BigInteger.valueOf(1));
-                }
-                else{
-                    return "Tasa de impuesto en linea del Documento, no parametrizada para DGI";
+                        detalleItem.setIndFact(BigInteger.valueOf(3));
+                    }
+                    else if (tax.getRate().compareTo(Env.ZERO) == 0) {
+
+                        detalleItem.setIndFact(BigInteger.valueOf(1));
+                    }
+                    else{
+                        return "Tasa de impuesto en linea del Documento, no parametrizada para DGI";
+                    }
                 }
 
                 detalleItem.setIndAgenteResp(null);
@@ -632,21 +638,27 @@ public class HandlerCFESisteco extends HandlerCFE {
                 }
 
                 MTax tax = (MTax) invoiceLine.getC_Tax();
-
-                if (tax.getRate().compareTo(ivaMinimo.getRate()) == 0) {
-
-                    detalleItem.setIndFact(BigInteger.valueOf(2));
-                }
-                else if (tax.getRate().compareTo(ivaBasico.getRate()) == 0) {
-
-                    detalleItem.setIndFact(BigInteger.valueOf(3));
-                }
-                else if (tax.getRate().compareTo(Env.ZERO) == 0) {
-
-                    detalleItem.setIndFact(BigInteger.valueOf(1));
+                String codigoImpuestoDGI = tax.get_ValueAsString("CodigoIVA");
+                if ((codigoImpuestoDGI != null) && (!codigoImpuestoDGI.trim().equalsIgnoreCase(""))){
+                    long codIVA = Long.valueOf(codigoImpuestoDGI).longValue();
+                    detalleItem.setIndFact(BigInteger.valueOf(codIVA));
                 }
                 else{
-                    return "Tasa de impuesto en linea del Documento, no parametrizada para DGI";
+                    if (tax.getRate().compareTo(ivaMinimo.getRate()) == 0) {
+
+                        detalleItem.setIndFact(BigInteger.valueOf(2));
+                    }
+                    else if (tax.getRate().compareTo(ivaBasico.getRate()) == 0) {
+
+                        detalleItem.setIndFact(BigInteger.valueOf(3));
+                    }
+                    else if (tax.getRate().compareTo(Env.ZERO) == 0) {
+
+                        detalleItem.setIndFact(BigInteger.valueOf(1));
+                    }
+                    else{
+                        return "Tasa de impuesto en linea del Documento, no parametrizada para DGI";
+                    }
                 }
 
                 detalleItem.setIndAgenteResp(null);
