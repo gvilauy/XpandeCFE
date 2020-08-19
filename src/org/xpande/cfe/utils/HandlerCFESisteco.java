@@ -1416,6 +1416,7 @@ public class HandlerCFESisteco extends HandlerCFE {
                 xml += linea + "\n";
             }
 
+            /*
             xml = xml
                     .replace("<CFE version=\"1.0\" xmlns:ns0=\"http://cfe.dgi.gub.uy\">", "<ns0:CFE version=\"1.0\">")
                     .replace("<CFE xmlns:ns0=\"http://cfe.dgi.gub.uy\" version=\"1.0\">", "<ns0:CFE version=\"1.0\">")
@@ -1426,6 +1427,7 @@ public class HandlerCFESisteco extends HandlerCFE {
                     .replace(" xmlns:ns0=\"http://cfe.dgi.gub.uy\"xmlns:ns2=\"http://www.w3.org/2001/04/xmlenc#\"", " xmlns:ns0=\"http://cfe.dgi.gub.uy\" xmlns:ns2=\"http://www.w3.org/2001/04/xmldsig#\"")
                     .replace("<Adenda", "<ns0:Adenda")
                     .replace("</Adenda>", "</ns0:Adenda>");
+             */
 
             PrintWriter pw = new PrintWriter(file);
             pw.println(xml);

@@ -28,7 +28,9 @@ import com.sun.mail.pop3.POP3Store;
  */
 public class LeerBandejaCFE extends SvrProcess {
 
-    MZCFEConfig cfeConfig = null;
+    private MZCFEConfig cfeConfig = null;
+    private MTax ivaBasico = null;
+    private MTax ivaMinimo = null;
 
     @Override
     protected void prepare() {
@@ -41,6 +43,17 @@ public class LeerBandejaCFE extends SvrProcess {
         try{
             // Instancio configuracion de CFE
             this.cfeConfig = MZCFEConfig.getDefault(getCtx(), null);
+
+            // Instancio modelos de referencia para Tasa Básico y Tasa Minimo.
+            this.ivaBasico = new MTax(getCtx(), this.cfeConfig.getTaxBasico_ID(), null);
+            if ((this.ivaBasico == null) || (this.ivaBasico.get_ID() <= 0)){
+                throw new AdempiereException("Falta indicar Tasa de Impuesto Básico en Configuración CFE");
+            }
+
+            this.ivaMinimo = new MTax(getCtx(), this.cfeConfig.getTaxMinimo_ID(), null);
+            if ((this.ivaMinimo == null) || (this.ivaMinimo.get_ID() <= 0)){
+                throw new AdempiereException("Falta indicar Tasa de Impuesto Mínimo en Configuración CFE");
+            }
 
             // Leer emails, obtener archivos xmls y procesarlos
             String message = this.getEmails();
@@ -370,7 +383,9 @@ public class LeerBandejaCFE extends SvrProcess {
                 bandejaCFE.setRegionName(emisor.getDepartamento().trim().toUpperCase());
             }
             if (adenda != null){
-                bandejaCFE.setAdendaCFE(adenda.trim().toUpperCase());
+                if ((!adenda.contains("null")) && (!adenda.contains("NULL"))){
+                    bandejaCFE.setAdendaCFE(adenda.trim().toUpperCase());
+                }
             }
 
             // Seteo moneda
@@ -457,10 +472,18 @@ public class LeerBandejaCFE extends SvrProcess {
 
                 // Seteo impuesto según código recibido por DGI
                 if (bandejaCFELin.getIndFactCFE() != null){
-                    sql = " select c_tax_id from c_tax where codigoiva ='" + bandejaCFELin.getIndFactCFE() + "'";
-                    int cTaxID = DB.getSQLValueEx(null, sql);
-                    if (cTaxID > 0){
-                        bandejaCFELin.setC_Tax_ID(cTaxID);
+                    if (bandejaCFELin.getIndFactCFE().equalsIgnoreCase("2")){ // Tasa Mínima
+                        bandejaCFELin.setC_Tax_ID(this.ivaMinimo.get_ID());
+                    }
+                    else if (bandejaCFELin.getIndFactCFE().equalsIgnoreCase("3")){ // Tasa Básica
+                        bandejaCFELin.setC_Tax_ID(this.ivaMinimo.get_ID());
+                    }
+                    else{
+                        sql = " select c_tax_id from c_tax where codigoiva ='" + bandejaCFELin.getIndFactCFE() + "'";
+                        int cTaxID = DB.getSQLValueEx(null, sql);
+                        if (cTaxID > 0){
+                            bandejaCFELin.setC_Tax_ID(cTaxID);
+                        }
                     }
                 }
 
@@ -670,10 +693,18 @@ public class LeerBandejaCFE extends SvrProcess {
 
                 // Seteo impuesto según código recibido por DGI
                 if (bandejaCFELin.getIndFactCFE() != null){
-                    sql = " select c_tax_id from c_tax where codigoiva ='" + bandejaCFELin.getIndFactCFE() + "'";
-                    int cTaxID = DB.getSQLValueEx(null, sql);
-                    if (cTaxID > 0){
-                        bandejaCFELin.setC_Tax_ID(cTaxID);
+                    if (bandejaCFELin.getIndFactCFE().equalsIgnoreCase("2")){ // Tasa Mínima
+                        bandejaCFELin.setC_Tax_ID(this.ivaMinimo.get_ID());
+                    }
+                    else if (bandejaCFELin.getIndFactCFE().equalsIgnoreCase("3")){ // Tasa Básica
+                        bandejaCFELin.setC_Tax_ID(this.ivaMinimo.get_ID());
+                    }
+                    else{
+                        sql = " select c_tax_id from c_tax where codigoiva ='" + bandejaCFELin.getIndFactCFE() + "'";
+                        int cTaxID = DB.getSQLValueEx(null, sql);
+                        if (cTaxID > 0){
+                            bandejaCFELin.setC_Tax_ID(cTaxID);
+                        }
                     }
                 }
 

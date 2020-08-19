@@ -10,12 +10,7 @@ package uy.gub.dgi.cfe;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.w3._2000._09.xmldsig_.SignatureType;
 
@@ -351,6 +346,7 @@ import org.w3._2000._09.xmldsig_.SignatureType;
  * 
  * 
  */
+@XmlRootElement(name = "CFE")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CFEDefType", propOrder = {
     "eTck",
@@ -363,6 +359,9 @@ import org.w3._2000._09.xmldsig_.SignatureType;
     "signature"
 })
 public class CFEDefType {
+
+    @XmlAttribute(name = "xmlns:ns0")
+    protected String xmlns_ns0 = "http://cfe.dgi.gub.uy";
 
     protected ETck eTck;
     protected EFact eFact;
