@@ -2,7 +2,7 @@ package org.xpande.cfe.utils;
 
 import dto.sisteco.SistecoConvertResponse;
 import dto.sisteco.SistecoResponseDTO;
-import uy.gub.dgi.cfe.*;
+import dto.sisteco.cfe.*;
 import org.adempiere.exceptions.AdempiereException;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
@@ -1392,8 +1392,7 @@ public class HandlerCFESisteco extends HandlerCFE {
     }
 
     @Override
-    protected String
-    send(MZCFEVendorOrg vendorOrg, int cDocType, String documentNo) throws Exception {
+    protected String send(MZCFEVendorOrg vendorOrg, int cDocType, String documentNo) throws Exception {
 
         String message = null;
 

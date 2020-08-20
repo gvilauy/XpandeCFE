@@ -74,31 +74,31 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class ReceptorFact {
 
-    @XmlElement(name = "ns0:TipoDocRecep")
+    @XmlElement(name = "TipoDocRecep")
     @XmlSchemaType(name = "positiveInteger")
     protected int tipoDocRecep;
-    @XmlElement(name = "ns0:CodPaisRecep", required = true)
+    @XmlElement(name = "CodPaisRecep", required = true)
     protected String codPaisRecep;
-    @XmlElement(name = "ns0:DocRecep", required = true)
+    @XmlElement(name = "DocRecep", required = true)
     protected String docRecep;
-    @XmlElement(name = "ns0:RznSocRecep", required = true)
+    @XmlElement(name = "RznSocRecep", required = true)
     protected String rznSocRecep;
-    @XmlElement(name = "ns0:DirRecep", required = true)
+    @XmlElement(name = "DirRecep", required = true)
     protected String dirRecep;
-    @XmlElement(name = "ns0:CiudadRecep", required = true)
+    @XmlElement(name = "CiudadRecep", required = true)
     protected String ciudadRecep;
-    @XmlElement(name = "ns0:DeptoRecep")
+    @XmlElement(name = "DeptoRecep")
     protected String deptoRecep;
-    @XmlElement(name = "ns0:PaisRecep")
+    @XmlElement(name = "PaisRecep")
     protected String paisRecep;
-    @XmlElement(name = "ns0:CP")
+    @XmlElement(name = "CP")
     @XmlSchemaType(name = "integer")
     protected Integer cp;
-    @XmlElement(name = "ns0:InfoAdicional")
+    @XmlElement(name = "InfoAdicional")
     protected String infoAdicional;
-    @XmlElement(name = "ns0:LugarDestEnt")
+    @XmlElement(name = "LugarDestEnt")
     protected String lugarDestEnt;
-    @XmlElement(name = "ns0:CompraID")
+    @XmlElement(name = "CompraID")
     protected String compraID;
 
     /**

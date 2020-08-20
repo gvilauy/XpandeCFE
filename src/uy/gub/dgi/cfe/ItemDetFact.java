@@ -188,39 +188,39 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class ItemDetFact {
 
-    @XmlElement(name = "ns0:NroLinDet")
+    @XmlElement(name = "NroLinDet")
     protected int nroLinDet;
-    @XmlElement(name = "ns0:CodItem")
+    @XmlElement(name = "CodItem")
     protected List<CodItem> codItem;
-    @XmlElement(name = "ns0:IndFact", required = true)
+    @XmlElement(name = "IndFact", required = true)
     protected BigInteger indFact;
-    @XmlElement(name = "ns0:IndAgenteResp")
+    @XmlElement(name = "IndAgenteResp")
     protected String indAgenteResp;
-    @XmlElement(name = "ns0:NomItem", required = true)
+    @XmlElement(name = "NomItem", required = true)
     protected String nomItem;
-    @XmlElement(name = "ns0:DscItem")
+    @XmlElement(name = "DscItem")
     protected String dscItem;
-    @XmlElement(name = "ns0:Cantidad", required = true)
+    @XmlElement(name = "Cantidad", required = true)
     protected BigDecimal cantidad;
-    @XmlElement(name = "ns0:UniMed", required = true)
+    @XmlElement(name = "UniMed", required = true)
     protected String uniMed;
-    @XmlElement(name = "ns0:PrecioUnitario", required = true)
+    @XmlElement(name = "PrecioUnitario", required = true)
     protected BigDecimal precioUnitario;
-    @XmlElement(name = "ns0:DescuentoPct")
+    @XmlElement(name = "DescuentoPct")
     protected BigDecimal descuentoPct;
-    @XmlElement(name = "ns0:DescuentoMonto")
+    @XmlElement(name = "DescuentoMonto")
     protected BigDecimal descuentoMonto;
-    @XmlElement(name = "ns0:SubDescuento")
+    @XmlElement(name = "SubDescuento")
     protected List<SubDescuento> subDescuento;
-    @XmlElement(name = "ns0:RecargoPct")
+    @XmlElement(name = "RecargoPct")
     protected BigDecimal recargoPct;
-    @XmlElement(name = "ns0:RecargoMnt")
+    @XmlElement(name = "RecargoMnt")
     protected BigDecimal recargoMnt;
-    @XmlElement(name = "ns0:SubRecargo")
+    @XmlElement(name = "SubRecargo")
     protected List<SubRecargo> subRecargo;
-    @XmlElement(name = "ns0:RetencPercep")
+    @XmlElement(name = "RetencPercep")
     protected List<RetPerc> retencPercep;
-    @XmlElement(name = "ns0:MontoItem", required = true)
+    @XmlElement(name = "MontoItem", required = true)
     protected BigDecimal montoItem;
 
     /**
@@ -683,9 +683,9 @@ public class ItemDetFact {
     })
     public static class CodItem {
 
-        @XmlElement(name = "ns0:TpoCod", required = true)
+        @XmlElement(name = "TpoCod", required = true)
         protected String tpoCod;
-        @XmlElement(name = "ns0:Cod", required = true)
+        @XmlElement(name = "Cod", required = true)
         protected String cod;
 
         /**
@@ -775,9 +775,9 @@ public class ItemDetFact {
     })
     public static class SubDescuento {
 
-        @XmlElement(name = "ns0:DescTipo", required = true)
+        @XmlElement(name = "DescTipo", required = true)
         protected BigInteger descTipo;
-        @XmlElement(name = "ns0:DescVal", required = true)
+        @XmlElement(name = "DescVal", required = true)
         protected BigDecimal descVal;
 
         /**
@@ -867,9 +867,9 @@ public class ItemDetFact {
     })
     public static class SubRecargo {
 
-        @XmlElement(name = "ns0:RecargoTipo", required = true)
+        @XmlElement(name = "RecargoTipo", required = true)
         protected BigInteger recargoTipo;
-        @XmlElement(name = "ns0:RecargoVal", required = true)
+        @XmlElement(name = "RecargoVal", required = true)
         protected BigDecimal recargoVal;
 
         /**

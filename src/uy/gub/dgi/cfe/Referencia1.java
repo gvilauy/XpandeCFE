@@ -86,7 +86,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 })
 public class Referencia1 {
 
-    @XmlElement(name = "ns0:Referencia")
+    @XmlElement(name = "Referencia")
     protected List<Referencia> referencia;
 
     /**
@@ -182,19 +182,19 @@ public class Referencia1 {
     })
     public static class Referencia {
 
-        @XmlElement(name = "ns0:NroLinRef")
+        @XmlElement(name = "NroLinRef")
         protected int nroLinRef;
-        @XmlElement(name = "ns0:IndGlobal")
+        @XmlElement(name = "IndGlobal")
         protected BigInteger indGlobal;
-        @XmlElement(name = "ns0:TpoDocRef")
+        @XmlElement(name = "TpoDocRef")
         protected BigInteger tpoDocRef;
-        @XmlElement(name = "ns0:Serie")
+        @XmlElement(name = "Serie")
         protected String serie;
-        @XmlElement(name = "ns0:NroCFERef")
+        @XmlElement(name = "NroCFERef")
         protected BigInteger nroCFERef;
-        @XmlElement(name = "ns0:RazonRef")
+        @XmlElement(name = "RazonRef")
         protected String razonRef;
-        @XmlElement(name = "ns0:FechaCFEref")
+        @XmlElement(name = "FechaCFEref")
         @XmlSchemaType(name = "date")
         protected XMLGregorianCalendar fechaCFEref;
 

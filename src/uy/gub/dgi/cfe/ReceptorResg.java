@@ -75,29 +75,29 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class ReceptorResg {
 
-    @XmlElement(name = "ns0:TipoDocRecep")
+    @XmlElement(name = "TipoDocRecep")
     @XmlSchemaType(name = "positiveInteger")
     protected Integer tipoDocRecep;
-    @XmlElement(name = "ns0:CodPaisRecep")
+    @XmlElement(name = "CodPaisRecep")
     protected String codPaisRecep;
-    @XmlElement(name = "ns0:DocRecep")
+    @XmlElement(name = "DocRecep")
     protected String docRecep;
-    @XmlElement(name = "ns0:DocRecepExt")
+    @XmlElement(name = "DocRecepExt")
     protected String docRecepExt;
-    @XmlElement(name = "ns0:RznSocRecep")
+    @XmlElement(name = "RznSocRecep")
     protected String rznSocRecep;
-    @XmlElement(name = "ns0:DirRecep")
+    @XmlElement(name = "DirRecep")
     protected String dirRecep;
-    @XmlElement(name = "ns0:CiudadRecep")
+    @XmlElement(name = "CiudadRecep")
     protected String ciudadRecep;
-    @XmlElement(name = "ns0:DeptoRecep")
+    @XmlElement(name = "DeptoRecep")
     protected String deptoRecep;
-    @XmlElement(name = "ns0:PaisRecep")
+    @XmlElement(name = "PaisRecep")
     protected String paisRecep;
-    @XmlElement(name = "ns0:CP")
+    @XmlElement(name = "CP")
     @XmlSchemaType(name = "integer")
     protected Integer cp;
-    @XmlElement(name = "ns0:InfoAdicional")
+    @XmlElement(name = "InfoAdicional")
     protected String infoAdicional;
 
     /**

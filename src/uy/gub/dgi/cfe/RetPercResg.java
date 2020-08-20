@@ -48,15 +48,15 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class RetPercResg {
 
-    @XmlElement(name = "ns0:CodRet", required = true)
+    @XmlElement(name = "CodRet", required = true)
     protected String codRet;
-    @XmlElement(name = "ns0:Tasa")
+    @XmlElement(name = "Tasa")
     protected BigDecimal tasa;
-    @XmlElement(name = "ns0:MntSujetoaRet", required = true)
+    @XmlElement(name = "MntSujetoaRet", required = true)
     protected BigDecimal mntSujetoaRet;
-    @XmlElement(name = "ns0:InfoAdicionalRet")
+    @XmlElement(name = "InfoAdicionalRet")
     protected String infoAdicionalRet;
-    @XmlElement(name = "ns0:ValRetPerc", required = true)
+    @XmlElement(name = "ValRetPerc", required = true)
     protected BigDecimal valRetPerc;
 
     /**

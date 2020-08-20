@@ -346,7 +346,6 @@ import org.w3._2000._09.xmldsig_.SignatureType;
  * 
  * 
  */
-@XmlRootElement(name = "CFE")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CFEDefType", propOrder = {
     "eTck",
@@ -360,26 +359,14 @@ import org.w3._2000._09.xmldsig_.SignatureType;
 })
 public class CFEDefType {
 
-    @XmlAttribute(name = "xmlns:ns0")
-    protected String xmlns_ns0 = "http://cfe.dgi.gub.uy";
-
-    @XmlElement(name = "ns0:eTck")
     protected ETck eTck;
-
-    @XmlElement(name = "ns0:eFact")
     protected EFact eFact;
-
-    @XmlElement(name = "ns0:eFact_Exp")
+    @XmlElement(name = "eFact_Exp")
     protected EFactExp eFactExp;
-
     protected ERem eRem;
-
-    @XmlElement(name = "ns0:eRem_Exp")
+    @XmlElement(name = "eRem_Exp")
     protected ERemExp eRemExp;
-
-    @XmlElement(name = "ns0:eResg")
     protected EResg eResg;
-
     protected EBoleta eBoleta;
     @XmlElement(name = "Signature", namespace = "http://www.w3.org/2000/09/xmldsig#", required = true)
     protected SignatureType signature;
@@ -1145,24 +1132,24 @@ public class CFEDefType {
     })
     public static class EFact {
 
-        @XmlElement(name = "ns0:TmstFirma", required = true)
+        @XmlElement(name = "TmstFirma", required = true)
         @XmlSchemaType(name = "dateTime")
         protected XMLGregorianCalendar tmstFirma;
-        @XmlElement(name = "ns0:Encabezado", required = true)
+        @XmlElement(name = "Encabezado", required = true)
         protected Encabezado encabezado;
-        @XmlElement(name = "ns0:Detalle", required = true)
+        @XmlElement(name = "Detalle", required = true)
         protected Detalle detalle;
-        @XmlElement(name = "ns0:SubTotInfo")
+        @XmlElement(name = "SubTotInfo")
         protected SubTotInfo subTotInfo;
-        @XmlElement(name = "ns0:DscRcgGlobal")
+        @XmlElement(name = "DscRcgGlobal")
         protected DscRcgGlobal dscRcgGlobal;
-        @XmlElement(name = "ns0:MediosPago")
+        @XmlElement(name = "MediosPago")
         protected MediosPago mediosPago;
-        @XmlElement(name = "ns0:Referencia")
+        @XmlElement(name = "Referencia")
         protected Referencia1 referencia;
-        @XmlElement(name = "ns0:CAEData", required = true)
+        @XmlElement(name = "CAEData", required = true)
         protected CAEDataType caeData;
-        @XmlElement(name = "ns0:Compl_Fiscal")
+        @XmlElement(name = "Compl_Fiscal")
         protected ComplFiscalType complFiscal;
 
         /**
@@ -1407,7 +1394,7 @@ public class CFEDefType {
         })
         public static class Detalle {
 
-            @XmlElement(name = "ns0:Item", required = true)
+            @XmlElement(name = "Item", required = true)
             protected List<ItemDetFact> item;
 
             /**
@@ -1473,13 +1460,13 @@ public class CFEDefType {
         })
         public static class Encabezado {
 
-            @XmlElement(name = "ns0:IdDoc", required = true)
+            @XmlElement(name = "IdDoc", required = true)
             protected IdDocFact idDoc;
-            @XmlElement(name = "ns0:Emisor", required = true)
+            @XmlElement(name = "Emisor", required = true)
             protected Emisor emisor;
-            @XmlElement(name = "ns0:Receptor")
+            @XmlElement(name = "Receptor")
             protected ReceptorFact receptor;
-            @XmlElement(name = "ns0:Totales", required = true)
+            @XmlElement(name = "Totales", required = true)
             protected Totales totales;
 
             /**
@@ -3042,18 +3029,18 @@ public class CFEDefType {
     })
     public static class EResg {
 
-        @XmlElement(name = "ns0:TmstFirma", required = true)
+        @XmlElement(name = "TmstFirma", required = true)
         @XmlSchemaType(name = "dateTime")
         protected XMLGregorianCalendar tmstFirma;
-        @XmlElement(name = "ns0:Encabezado", required = true)
+        @XmlElement(name = "Encabezado", required = true)
         protected Encabezado encabezado;
-        @XmlElement(name = "ns0:Detalle", required = true)
+        @XmlElement(name = "Detalle", required = true)
         protected Detalle detalle;
-        @XmlElement(name = "ns0:SubTotInfo")
+        @XmlElement(name = "SubTotInfo")
         protected SubTotInfo subTotInfo;
-        @XmlElement(name = "ns0:Referencia")
+        @XmlElement(name = "Referencia")
         protected Referencia1 referencia;
-        @XmlElement(name = "ns0:CAEData", required = true)
+        @XmlElement(name = "CAEData", required = true)
         protected CAEDataType caeData;
 
         /**
@@ -3226,7 +3213,7 @@ public class CFEDefType {
         })
         public static class Detalle {
 
-            @XmlElement(name = "ns0:Item", required = true)
+            @XmlElement(name = "Item", required = true)
             protected List<ItemResg> item;
 
             /**
@@ -3292,13 +3279,13 @@ public class CFEDefType {
         })
         public static class Encabezado {
 
-            @XmlElement(name = "ns0:IdDoc", required = true)
+            @XmlElement(name = "IdDoc", required = true)
             protected IdDocResg idDoc;
-            @XmlElement(name = "ns0:Emisor", required = true)
+            @XmlElement(name = "Emisor", required = true)
             protected Emisor emisor;
-            @XmlElement(name = "ns0:Receptor")
+            @XmlElement(name = "Receptor")
             protected ReceptorResg receptor;
-            @XmlElement(name = "ns0:Totales", required = true)
+            @XmlElement(name = "Totales", required = true)
             protected TotalesResg totales;
 
             /**
@@ -3466,24 +3453,24 @@ public class CFEDefType {
     })
     public static class ETck {
 
-        @XmlElement(name = "ns0:TmstFirma", required = true)
+        @XmlElement(name = "TmstFirma", required = true)
         @XmlSchemaType(name = "dateTime")
         protected XMLGregorianCalendar tmstFirma;
-        @XmlElement(name = "ns0:Encabezado", required = true)
+        @XmlElement(name = "Encabezado", required = true)
         protected Encabezado encabezado;
-        @XmlElement(name = "ns0:Detalle", required = true)
+        @XmlElement(name = "Detalle", required = true)
         protected Detalle detalle;
-        @XmlElement(name = "ns0:SubTotInfo")
+        @XmlElement(name = "SubTotInfo")
         protected SubTotInfo subTotInfo;
-        @XmlElement(name = "ns0:DscRcgGlobal")
+        @XmlElement(name = "DscRcgGlobal")
         protected DscRcgGlobal dscRcgGlobal;
-        @XmlElement(name = "ns0:MediosPago")
+        @XmlElement(name = "MediosPago")
         protected MediosPago mediosPago;
-        @XmlElement(name = "ns0:Referencia")
+        @XmlElement(name = "Referencia")
         protected Referencia1 referencia;
-        @XmlElement(name = "ns0:CAEData", required = true)
+        @XmlElement(name = "CAEData", required = true)
         protected CAEDataType caeData;
-        @XmlElement(name = "ns0:Compl_Fiscal")
+        @XmlElement(name = "Compl_Fiscal")
         protected ComplFiscalType complFiscal;
 
         /**
@@ -3728,7 +3715,7 @@ public class CFEDefType {
         })
         public static class Detalle {
 
-            @XmlElement(name = "ns0:Item", required = true)
+            @XmlElement(name = "Item", required = true)
             protected List<ItemDetFact> item;
 
             /**
@@ -3794,13 +3781,13 @@ public class CFEDefType {
         })
         public static class Encabezado {
 
-            @XmlElement(name = "ns0:IdDoc", required = true)
+            @XmlElement(name = "IdDoc", required = true)
             protected IdDocTck idDoc;
-            @XmlElement(name = "ns0:Emisor", required = true)
+            @XmlElement(name = "Emisor", required = true)
             protected Emisor emisor;
-            @XmlElement(name = "ns0:Receptor")
+            @XmlElement(name = "Receptor")
             protected ReceptorTck receptor;
-            @XmlElement(name = "ns0:Totales", required = true)
+            @XmlElement(name = "Totales", required = true)
             protected Totales totales;
 
             /**

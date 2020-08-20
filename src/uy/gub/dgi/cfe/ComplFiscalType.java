@@ -42,9 +42,9 @@ import org.w3._2001._04.xmlenc_.EncryptedDataType;
 })
 public class ComplFiscalType {
 
-    @XmlElement(name = "ns0:Compl_Fiscal_Data")
+    @XmlElement(name = "Compl_Fiscal_Data")
     protected ComplFiscalDataType complFiscalData;
-    @XmlElement(name = "ns0:EncryptedData", namespace = "http://www.w3.org/2001/04/xmlenc#")
+    @XmlElement(name = "EncryptedData", namespace = "http://www.w3.org/2001/04/xmlenc#")
     protected EncryptedDataType encryptedData;
 
     /**

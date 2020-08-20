@@ -108,39 +108,39 @@ import javax.xml.datatype.XMLGregorianCalendar;
 })
 public class IdDocFact {
 
-    @XmlElement(name = "ns0:TipoCFE", required = true)
+    @XmlElement(name = "TipoCFE", required = true)
     protected BigInteger tipoCFE;
-    @XmlElement(name = "ns0:Serie", required = true)
+    @XmlElement(name = "Serie", required = true)
     protected String serie;
-    @XmlElement(name = "ns0:Nro", required = true)
+    @XmlElement(name = "Nro", required = true)
     protected BigInteger nro;
-    @XmlElement(name = "ns0:NroInterno")
+    @XmlElement(name = "NroInterno")
     protected String nroInterno;
-    @XmlElement(name = "ns0:FchEmis", required = true)
+    @XmlElement(name = "FchEmis", required = true)
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar fchEmis;
-    @XmlElement(name = "ns0:PeriodoDesde")
+    @XmlElement(name = "PeriodoDesde")
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar periodoDesde;
-    @XmlElement(name = "ns0:PeriodoHasta")
+    @XmlElement(name = "PeriodoHasta")
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar periodoHasta;
-    @XmlElement(name = "ns0:MntBruto")
+    @XmlElement(name = "MntBruto")
     protected BigInteger mntBruto;
-    @XmlElement(name = "ns0:FmaPago", required = true)
+    @XmlElement(name = "FmaPago", required = true)
     protected BigInteger fmaPago;
-    @XmlElement(name = "ns0:FchVenc")
+    @XmlElement(name = "FchVenc")
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar fchVenc;
-    @XmlElement(name = "ns0:InfoAdicionalDoc")
+    @XmlElement(name = "InfoAdicionalDoc")
     protected String infoAdicionalDoc;
-    @XmlElement(name = "ns0:IVAalDia")
+    @XmlElement(name = "IVAalDia")
     protected BigInteger ivAalDia;
-    @XmlElement(name = "ns0:SecProf")
+    @XmlElement(name = "SecProf")
     protected BigInteger secProf;
-    @XmlElement(name = "ns0:IndPagCta3ros")
+    @XmlElement(name = "IndPagCta3ros")
     protected BigInteger indPagCta3Ros;
-    @XmlElement(name = "ns0:IndCobPropia")
+    @XmlElement(name = "IndCobPropia")
     protected BigInteger indCobPropia;
 
     /**

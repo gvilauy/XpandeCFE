@@ -69,23 +69,23 @@ import javax.xml.datatype.XMLGregorianCalendar;
 })
 public class IdDocResg {
 
-    @XmlElement(name = "ns0:TipoCFE", required = true)
+    @XmlElement(name = "TipoCFE", required = true)
     protected BigInteger tipoCFE;
-    @XmlElement(name = "ns0:Serie", required = true)
+    @XmlElement(name = "Serie", required = true)
     protected String serie;
-    @XmlElement(name = "ns0:Nro", required = true)
+    @XmlElement(name = "Nro", required = true)
     protected BigInteger nro;
-    @XmlElement(name = "ns0:NroInterno")
+    @XmlElement(name = "NroInterno")
     protected String nroInterno;
-    @XmlElement(name = "ns0:FchEmis", required = true)
+    @XmlElement(name = "FchEmis", required = true)
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar fchEmis;
-    @XmlElement(name = "ns0:FchValor")
+    @XmlElement(name = "FchValor")
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar fchValor;
-    @XmlElement(name = "ns0:InfoAdicionalDoc")
+    @XmlElement(name = "InfoAdicionalDoc")
     protected String infoAdicionalDoc;
-    @XmlElement(name = "ns0:SecProf")
+    @XmlElement(name = "SecProf")
     protected BigInteger secProf;
 
     /**

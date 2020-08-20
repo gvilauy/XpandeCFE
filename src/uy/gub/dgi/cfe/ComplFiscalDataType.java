@@ -54,16 +54,16 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class ComplFiscalDataType {
 
-    @XmlElement(name = "ns0:RUCEmisor", required = true)
+    @XmlElement(name = "RUCEmisor", required = true)
     protected String rucEmisor;
-    @XmlElement(name = "ns0:TipoDocMdte")
+    @XmlElement(name = "TipoDocMdte")
     @XmlSchemaType(name = "positiveInteger")
     protected int tipoDocMdte;
-    @XmlElement(name = "ns0:Pais", required = true)
+    @XmlElement(name = "Pais", required = true)
     protected String pais;
-    @XmlElement(name = "ns0:DocMdte", required = true)
+    @XmlElement(name = "DocMdte", required = true)
     protected String docMdte;
-    @XmlElement(name = "ns0:NombreMdte", required = true)
+    @XmlElement(name = "NombreMdte", required = true)
     protected String nombreMdte;
 
     /**
