@@ -99,7 +99,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class DscRcgGlobal {
 
-    @XmlElement(name = "DRG_Item")
+    @XmlElement(name = "ns0:DRG_Item")
     protected List<DRGItem> drgItem;
 
     /**
@@ -208,20 +208,20 @@ public class DscRcgGlobal {
     })
     public static class DRGItem {
 
-        @XmlElement(name = "NroLinDR")
+        @XmlElement(name = "ns0:NroLinDR")
         protected int nroLinDR;
-        @XmlElement(name = "TpoMovDR", required = true)
+        @XmlElement(name = "ns0:TpoMovDR", required = true)
         protected String tpoMovDR;
-        @XmlElement(name = "TpoDR", required = true)
+        @XmlElement(name = "ns0:TpoDR", required = true)
         @XmlSchemaType(name = "positiveInteger")
         protected BigInteger tpoDR;
-        @XmlElement(name = "CodDR")
+        @XmlElement(name = "ns0:CodDR")
         protected BigInteger codDR;
-        @XmlElement(name = "GlosaDR", required = true)
+        @XmlElement(name = "ns0:GlosaDR", required = true)
         protected String glosaDR;
-        @XmlElement(name = "ValorDR", required = true)
+        @XmlElement(name = "ns0:ValorDR", required = true)
         protected BigDecimal valorDR;
-        @XmlElement(name = "IndFactDR", required = true)
+        @XmlElement(name = "ns0:IndFactDR", required = true)
         protected BigInteger indFactDR;
 
         /**

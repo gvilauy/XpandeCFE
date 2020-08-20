@@ -39,9 +39,9 @@ import javax.xml.bind.annotation.*;
 })
 public class CFEEmpresasType {
 
-    @XmlElement(name = "CFE", required = true)
+    @XmlElement(name = "ns0:CFE", required = true)
     protected CFEDefType cfe;
-    @XmlElement(name = "Adenda")
+    @XmlElement(name = "ns0:Adenda")
     protected Object adenda;
 
     /**

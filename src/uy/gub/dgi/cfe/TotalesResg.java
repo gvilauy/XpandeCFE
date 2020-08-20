@@ -72,18 +72,18 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class TotalesResg {
 
-    @XmlElement(name = "TpoMoneda", required = true)
+    @XmlElement(name = "ns0:TpoMoneda", required = true)
     @XmlSchemaType(name = "string")
     protected TipMonType tpoMoneda;
-    @XmlElement(name = "TpoCambio")
+    @XmlElement(name = "ns0:TpoCambio")
     protected BigDecimal tpoCambio;
-    @XmlElement(name = "MntTotRetenido", required = true)
+    @XmlElement(name = "ns0:MntTotRetenido", required = true)
     protected BigDecimal mntTotRetenido;
-    @XmlElement(name = "MntTotCredFisc")
+    @XmlElement(name = "ns0:MntTotCredFisc")
     protected BigDecimal mntTotCredFisc;
-    @XmlElement(name = "CantLinDet")
+    @XmlElement(name = "ns0:CantLinDet")
     protected int cantLinDet;
-    @XmlElement(name = "RetencPercep", required = true)
+    @XmlElement(name = "ns0:RetencPercep", required = true)
     protected List<RetencPercep> retencPercep;
 
     /**
@@ -255,9 +255,9 @@ public class TotalesResg {
     })
     public static class RetencPercep {
 
-        @XmlElement(name = "CodRet", required = true)
+        @XmlElement(name = "ns0:CodRet", required = true)
         protected String codRet;
-        @XmlElement(name = "ValRetPerc", required = true)
+        @XmlElement(name = "ns0:ValRetPerc", required = true)
         protected BigDecimal valRetPerc;
 
         /**

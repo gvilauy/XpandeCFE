@@ -70,7 +70,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class MediosPago {
 
-    @XmlElement(name = "MedioPago")
+    @XmlElement(name = "ns0:MedioPago")
     protected List<MedioPago> medioPago;
 
     /**
@@ -149,15 +149,15 @@ public class MediosPago {
     })
     public static class MedioPago {
 
-        @XmlElement(name = "NroLinMP")
+        @XmlElement(name = "ns0:NroLinMP")
         protected int nroLinMP;
-        @XmlElement(name = "CodMP")
+        @XmlElement(name = "ns0:CodMP")
         protected BigInteger codMP;
-        @XmlElement(name = "GlosaMP", required = true)
+        @XmlElement(name = "ns0:GlosaMP", required = true)
         protected String glosaMP;
-        @XmlElement(name = "OrdenMP")
+        @XmlElement(name = "ns0:OrdenMP")
         protected BigInteger ordenMP;
-        @XmlElement(name = "ValorPago", required = true)
+        @XmlElement(name = "ns0:ValorPago", required = true)
         protected BigDecimal valorPago;
 
         /**

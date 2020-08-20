@@ -60,11 +60,11 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class ItemResg {
 
-    @XmlElement(name = "NroLinDet")
+    @XmlElement(name = "ns0:NroLinDet")
     protected int nroLinDet;
-    @XmlElement(name = "IndFact")
+    @XmlElement(name = "ns0:IndFact")
     protected BigInteger indFact;
-    @XmlElement(name = "RetencPercep")
+    @XmlElement(name = "ns0:RetencPercep")
     protected List<RetPercResg> retencPercep;
 
     /**

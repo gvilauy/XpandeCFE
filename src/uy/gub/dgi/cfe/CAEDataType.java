@@ -90,18 +90,18 @@ import javax.xml.datatype.XMLGregorianCalendar;
 })
 public class CAEDataType {
 
-    @XmlElement(name = "CAE_ID", required = true)
+    @XmlElement(name = "ns0:CAE_ID", required = true)
     protected BigInteger caeid;
-    @XmlElement(name = "DNro", required = true)
+    @XmlElement(name = "ns0:DNro", required = true)
     protected BigInteger dNro;
-    @XmlElement(name = "HNro", required = true)
+    @XmlElement(name = "ns0:HNro", required = true)
     protected BigInteger hNro;
-    @XmlElement(name = "FecVenc", required = true)
+    @XmlElement(name = "ns0:FecVenc", required = true)
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar fecVenc;
-    @XmlElement(name = "CAEEspecial")
+    @XmlElement(name = "ns0:CAEEspecial")
     protected BigInteger caeEspecial;
-    @XmlElement(name = "CausalCAEEsp")
+    @XmlElement(name = "ns0:CausalCAEEsp")
     protected BigInteger causalCAEEsp;
 
     /**

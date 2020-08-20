@@ -102,48 +102,48 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class Totales {
 
-    @XmlElement(name = "TpoMoneda", required = true)
+    @XmlElement(name = "ns0:TpoMoneda", required = true)
     @XmlSchemaType(name = "string")
     protected TipMonType tpoMoneda;
-    @XmlElement(name = "TpoCambio")
+    @XmlElement(name = "ns0:TpoCambio")
     protected BigDecimal tpoCambio;
-    @XmlElement(name = "MntNoGrv")
+    @XmlElement(name = "ns0:MntNoGrv")
     protected BigDecimal mntNoGrv;
-    @XmlElement(name = "MntExpoyAsim")
+    @XmlElement(name = "ns0:MntExpoyAsim")
     protected BigDecimal mntExpoyAsim;
-    @XmlElement(name = "MntImpuestoPerc")
+    @XmlElement(name = "ns0:MntImpuestoPerc")
     protected BigDecimal mntImpuestoPerc;
-    @XmlElement(name = "MntIVaenSusp")
+    @XmlElement(name = "ns0:MntIVaenSusp")
     protected BigDecimal mntIVaenSusp;
-    @XmlElement(name = "MntNetoIvaTasaMin")
+    @XmlElement(name = "ns0:MntNetoIvaTasaMin")
     protected BigDecimal mntNetoIvaTasaMin;
-    @XmlElement(name = "MntNetoIVATasaBasica")
+    @XmlElement(name = "ns0:MntNetoIVATasaBasica")
     protected BigDecimal mntNetoIVATasaBasica;
-    @XmlElement(name = "MntNetoIVAOtra")
+    @XmlElement(name = "ns0:MntNetoIVAOtra")
     protected BigDecimal mntNetoIVAOtra;
-    @XmlElement(name = "IVATasaMin")
+    @XmlElement(name = "ns0:IVATasaMin")
     protected BigDecimal ivaTasaMin;
-    @XmlElement(name = "IVATasaBasica")
+    @XmlElement(name = "ns0:IVATasaBasica")
     protected BigDecimal ivaTasaBasica;
-    @XmlElement(name = "MntIVATasaMin")
+    @XmlElement(name = "ns0:MntIVATasaMin")
     protected BigDecimal mntIVATasaMin;
-    @XmlElement(name = "MntIVATasaBasica")
+    @XmlElement(name = "ns0:MntIVATasaBasica")
     protected BigDecimal mntIVATasaBasica;
-    @XmlElement(name = "MntIVAOtra")
+    @XmlElement(name = "ns0:MntIVAOtra")
     protected BigDecimal mntIVAOtra;
-    @XmlElement(name = "MntTotal", required = true)
+    @XmlElement(name = "ns0:MntTotal", required = true)
     protected BigDecimal mntTotal;
-    @XmlElement(name = "MntTotRetenido")
+    @XmlElement(name = "ns0:MntTotRetenido")
     protected BigDecimal mntTotRetenido;
-    @XmlElement(name = "MntTotCredFisc")
+    @XmlElement(name = "ns0:MntTotCredFisc")
     protected BigDecimal mntTotCredFisc;
-    @XmlElement(name = "CantLinDet")
+    @XmlElement(name = "ns0:CantLinDet")
     protected int cantLinDet;
-    @XmlElement(name = "RetencPercep")
+    @XmlElement(name = "ns0:RetencPercep")
     protected List<RetencPercep> retencPercep;
-    @XmlElement(name = "MontoNF")
+    @XmlElement(name = "ns0:MontoNF")
     protected BigDecimal montoNF;
-    @XmlElement(name = "MntPagar", required = true)
+    @XmlElement(name = "ns0:MntPagar", required = true)
     protected BigDecimal mntPagar;
 
     /**

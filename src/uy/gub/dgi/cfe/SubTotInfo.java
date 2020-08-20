@@ -74,7 +74,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class SubTotInfo {
 
-    @XmlElement(name = "STI_Item")
+    @XmlElement(name = "ns0:STI_Item")
     protected List<STIItem> stiItem;
 
     /**
@@ -157,13 +157,13 @@ public class SubTotInfo {
     })
     public static class STIItem {
 
-        @XmlElement(name = "NroSTI")
+        @XmlElement(name = "ns0:NroSTI")
         protected int nroSTI;
-        @XmlElement(name = "GlosaSTI", required = true)
+        @XmlElement(name = "ns0:GlosaSTI", required = true)
         protected String glosaSTI;
-        @XmlElement(name = "OrdenSTI")
+        @XmlElement(name = "ns0:OrdenSTI")
         protected Integer ordenSTI;
-        @XmlElement(name = "ValSubtotSTI", required = true)
+        @XmlElement(name = "ns0:ValSubtotSTI", required = true)
         protected BigDecimal valSubtotSTI;
 
         /**

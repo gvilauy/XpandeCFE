@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "EncryptedDataType")
+@XmlType(name = "ns0:EncryptedDataType")
 public class EncryptedDataType
     extends EncryptedType
 {
