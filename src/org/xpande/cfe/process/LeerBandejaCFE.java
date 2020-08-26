@@ -476,7 +476,7 @@ public class LeerBandejaCFE extends SvrProcess {
                         bandejaCFELin.setC_Tax_ID(this.ivaMinimo.get_ID());
                     }
                     else if (bandejaCFELin.getIndFactCFE().equalsIgnoreCase("3")){ // Tasa Básica
-                        bandejaCFELin.setC_Tax_ID(this.ivaMinimo.get_ID());
+                        bandejaCFELin.setC_Tax_ID(this.ivaBasico.get_ID());
                     }
                     else{
                         sql = " select c_tax_id from c_tax where codigoiva ='" + bandejaCFELin.getIndFactCFE() + "'";
@@ -697,7 +697,7 @@ public class LeerBandejaCFE extends SvrProcess {
                         bandejaCFELin.setC_Tax_ID(this.ivaMinimo.get_ID());
                     }
                     else if (bandejaCFELin.getIndFactCFE().equalsIgnoreCase("3")){ // Tasa Básica
-                        bandejaCFELin.setC_Tax_ID(this.ivaMinimo.get_ID());
+                        bandejaCFELin.setC_Tax_ID(this.ivaBasico.get_ID());
                     }
                     else{
                         sql = " select c_tax_id from c_tax where codigoiva ='" + bandejaCFELin.getIndFactCFE() + "'";

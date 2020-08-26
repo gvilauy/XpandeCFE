@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.*;
  * 
  * 
  */
-@XmlRootElement(name = "CFE_Adenda")
+@XmlRootElement(name = "ns0:CFE_Adenda")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CFE_Empresas_Type", propOrder = {
     "cfe",

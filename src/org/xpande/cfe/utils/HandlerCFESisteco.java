@@ -1415,6 +1415,9 @@ public class HandlerCFESisteco extends HandlerCFE {
                 xml += linea + "\n";
             }
 
+
+            xml = xml.replace("xmlns=","xmlns:ns0=");
+
             /*
             xml = xml
                     .replace("<CFE version=\"1.0\" xmlns:ns0=\"http://cfe.dgi.gub.uy\">", "<ns0:CFE version=\"1.0\">")
