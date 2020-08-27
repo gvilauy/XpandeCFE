@@ -102,6 +102,19 @@ public interface I_Z_BandejaCFE
 	  */
 	public int getAD_OrgTrx_ID();
 
+    /** Column name AmtSubtotal */
+    public static final String COLUMNNAME_AmtSubtotal = "AmtSubtotal";
+
+	/** Set AmtSubtotal.
+	  * Subtotales para no mostrar impuestos incluídos
+	  */
+	public void setAmtSubtotal (BigDecimal AmtSubtotal);
+
+	/** Get AmtSubtotal.
+	  * Subtotales para no mostrar impuestos incluídos
+	  */
+	public BigDecimal getAmtSubtotal();
+
     /** Column name C_BPartner_ID */
     public static final String COLUMNNAME_C_BPartner_ID = "C_BPartner_ID";
 
@@ -294,6 +307,19 @@ public interface I_Z_BandejaCFE
 	  * Forma de Pago para CFE
 	  */
 	public String getFormaPagoCFE();
+
+    /** Column name GrandTotal */
+    public static final String COLUMNNAME_GrandTotal = "GrandTotal";
+
+	/** Set Grand Total.
+	  * Total amount of document
+	  */
+	public void setGrandTotal (BigDecimal GrandTotal);
+
+	/** Get Grand Total.
+	  * Total amount of document
+	  */
+	public BigDecimal getGrandTotal();
 
     /** Column name Idemisor */
     public static final String COLUMNNAME_Idemisor = "Idemisor";
@@ -593,6 +619,15 @@ public interface I_Z_BandejaCFE
 	  * Número de CFE
 	  */
 	public String getNumeroCFE();
+
+    /** Column name ProcessButton */
+    public static final String COLUMNNAME_ProcessButton = "ProcessButton";
+
+	/** Set ProcessButton	  */
+	public void setProcessButton (String ProcessButton);
+
+	/** Get ProcessButton	  */
+	public String getProcessButton();
 
     /** Column name RegionName */
     public static final String COLUMNNAME_RegionName = "RegionName";

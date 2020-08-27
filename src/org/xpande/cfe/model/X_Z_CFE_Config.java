@@ -30,7 +30,7 @@ public class X_Z_CFE_Config extends PO implements I_Z_CFE_Config, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20200808L;
+	private static final long serialVersionUID = 20200827L;
 
     /** Standard Constructor */
     public X_Z_CFE_Config (Properties ctx, int Z_CFE_Config_ID, String trxName)
@@ -148,6 +148,34 @@ public class X_Z_CFE_Config extends PO implements I_Z_CFE_Config, I_Persistent
 	public int getTaxBasico_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_TaxBasico_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public I_C_Tax getTaxExento() throws RuntimeException
+    {
+		return (I_C_Tax)MTable.get(getCtx(), I_C_Tax.Table_Name)
+			.getPO(getTaxExento_ID(), get_TrxName());	}
+
+	/** Set TaxExento_ID.
+		@param TaxExento_ID 
+		ID de Impuesto Exento por Defecto
+	  */
+	public void setTaxExento_ID (int TaxExento_ID)
+	{
+		if (TaxExento_ID < 1) 
+			set_Value (COLUMNNAME_TaxExento_ID, null);
+		else 
+			set_Value (COLUMNNAME_TaxExento_ID, Integer.valueOf(TaxExento_ID));
+	}
+
+	/** Get TaxExento_ID.
+		@return ID de Impuesto Exento por Defecto
+	  */
+	public int getTaxExento_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_TaxExento_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();

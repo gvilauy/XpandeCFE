@@ -33,7 +33,7 @@ public class X_Z_BandejaCFE extends PO implements I_Z_BandejaCFE, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20200815L;
+	private static final long serialVersionUID = 20200827L;
 
     /** Standard Constructor */
     public X_Z_BandejaCFE (Properties ctx, int Z_BandejaCFE_ID, String trxName)
@@ -41,8 +41,6 @@ public class X_Z_BandejaCFE extends PO implements I_Z_BandejaCFE, I_Persistent
       super (ctx, Z_BandejaCFE_ID, trxName);
       /** if (Z_BandejaCFE_ID == 0)
         {
-			setAddress1 (null);
-			setCity (null);
 			setCodSucursal (null);
 			setDateDoc (new Timestamp( System.currentTimeMillis() ));
 // @#Date@
@@ -54,7 +52,6 @@ public class X_Z_BandejaCFE extends PO implements I_Z_BandejaCFE, I_Persistent
 			setMntTotal (Env.ZERO);
 			setName (null);
 			setNumeroCFE (null);
-			setRegionName (null);
 			setRUCEmisor (null);
 			setRutReceptor (null);
 			setSerieCFE (null);
@@ -148,6 +145,26 @@ public class X_Z_BandejaCFE extends PO implements I_Z_BandejaCFE, I_Persistent
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set AmtSubtotal.
+		@param AmtSubtotal 
+		Subtotales para no mostrar impuestos incluídos
+	  */
+	public void setAmtSubtotal (BigDecimal AmtSubtotal)
+	{
+		set_Value (COLUMNNAME_AmtSubtotal, AmtSubtotal);
+	}
+
+	/** Get AmtSubtotal.
+		@return Subtotales para no mostrar impuestos incluídos
+	  */
+	public BigDecimal getAmtSubtotal () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_AmtSubtotal);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	public I_C_BPartner getC_BPartner() throws RuntimeException
@@ -413,6 +430,26 @@ public class X_Z_BandejaCFE extends PO implements I_Z_BandejaCFE, I_Persistent
 	public String getFormaPagoCFE () 
 	{
 		return (String)get_Value(COLUMNNAME_FormaPagoCFE);
+	}
+
+	/** Set Grand Total.
+		@param GrandTotal 
+		Total amount of document
+	  */
+	public void setGrandTotal (BigDecimal GrandTotal)
+	{
+		set_Value (COLUMNNAME_GrandTotal, GrandTotal);
+	}
+
+	/** Get Grand Total.
+		@return Total amount of document
+	  */
+	public BigDecimal getGrandTotal () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_GrandTotal);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set Idemisor.
@@ -838,6 +875,20 @@ public class X_Z_BandejaCFE extends PO implements I_Z_BandejaCFE, I_Persistent
 	public String getNumeroCFE () 
 	{
 		return (String)get_Value(COLUMNNAME_NumeroCFE);
+	}
+
+	/** Set ProcessButton.
+		@param ProcessButton ProcessButton	  */
+	public void setProcessButton (String ProcessButton)
+	{
+		set_Value (COLUMNNAME_ProcessButton, ProcessButton);
+	}
+
+	/** Get ProcessButton.
+		@return ProcessButton	  */
+	public String getProcessButton () 
+	{
+		return (String)get_Value(COLUMNNAME_ProcessButton);
 	}
 
 	/** Set Region.

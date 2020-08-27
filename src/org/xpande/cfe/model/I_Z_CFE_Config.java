@@ -142,6 +142,21 @@ public interface I_Z_CFE_Config
 	  */
 	public int getTaxBasico_ID();
 
+    /** Column name TaxExento_ID */
+    public static final String COLUMNNAME_TaxExento_ID = "TaxExento_ID";
+
+	/** Set TaxExento_ID.
+	  * ID de Impuesto Exento por Defecto
+	  */
+	public void setTaxExento_ID (int TaxExento_ID);
+
+	/** Get TaxExento_ID.
+	  * ID de Impuesto Exento por Defecto
+	  */
+	public int getTaxExento_ID();
+
+	public I_C_Tax getTaxExento() throws RuntimeException;
+
     /** Column name TaxMinimo_ID */
     public static final String COLUMNNAME_TaxMinimo_ID = "TaxMinimo_ID";
 

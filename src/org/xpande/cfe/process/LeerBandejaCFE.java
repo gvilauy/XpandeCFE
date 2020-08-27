@@ -3,6 +3,7 @@ package org.xpande.cfe.process;
 import com.sun.mail.imap.IMAPStore;
 import org.compiere.model.*;
 import org.compiere.util.DB;
+import org.compiere.util.Env;
 import org.compiere.util.TimeUtil;
 import org.xpande.cfe.model.*;
 import uy.gub.dgi.cfe.*;
@@ -10,6 +11,7 @@ import org.adempiere.exceptions.AdempiereException;
 import org.compiere.process.SvrProcess;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,7 @@ public class LeerBandejaCFE extends SvrProcess {
     private MZCFEConfig cfeConfig = null;
     private MTax ivaBasico = null;
     private MTax ivaMinimo = null;
+    private MTax ivaExento = null;
 
     @Override
     protected void prepare() {
@@ -53,6 +56,10 @@ public class LeerBandejaCFE extends SvrProcess {
             this.ivaMinimo = new MTax(getCtx(), this.cfeConfig.getTaxMinimo_ID(), null);
             if ((this.ivaMinimo == null) || (this.ivaMinimo.get_ID() <= 0)){
                 throw new AdempiereException("Falta indicar Tasa de Impuesto Mínimo en Configuración CFE");
+            }
+            this.ivaExento = new MTax(getCtx(), this.cfeConfig.getTaxExento_ID(), null);
+            if ((this.ivaExento == null) || (this.ivaExento.get_ID() <= 0)){
+                throw new AdempiereException("Falta indicar Tasa de Impuesto No Gravado en Configuración CFE");
             }
 
             // Leer emails, obtener archivos xmls y procesarlos
@@ -343,7 +350,13 @@ public class LeerBandejaCFE extends SvrProcess {
                 bandejaCFE.setDueDate(bandejaCFE.getDueDate());
             }
 
-            bandejaCFE.setFormaPagoCFE(String.valueOf(idDocFact.getFmaPago()));
+            if (String.valueOf(idDocFact.getFmaPago()).equalsIgnoreCase("2")){
+                bandejaCFE.setFormaPagoCFE("CREDITO");
+            }
+            else{
+                bandejaCFE.setFormaPagoCFE("CONTADO");
+            }
+
             bandejaCFE.setRUCEmisor(emisor.getRUCEmisor());
             bandejaCFE.setName(emisor.getRznSoc().trim().toUpperCase());
             bandejaCFE.setCodSucursal(String.valueOf(emisor.getCdgDGISucur()));
@@ -425,6 +438,42 @@ public class LeerBandejaCFE extends SvrProcess {
                 }
             }
 
+            // Subtotal y Total general
+            BigDecimal mntivatasamin = bandejaCFE.getMntIVATasaMin();
+            BigDecimal mntnetoivatasamin = bandejaCFE.getMntNetoIvaTasaMin();
+            BigDecimal mntivatasabasica = bandejaCFE.getMntIVATasaBasica();
+            BigDecimal mntnetoivatasabasica = bandejaCFE.getMntNetoIVATasaBasica();
+            BigDecimal mntnogrv = bandejaCFE.getMntNoGrv();
+            BigDecimal mntivaotra = bandejaCFE.getMntIVAOtra();
+            BigDecimal mntnetoivaotra = bandejaCFE.getMntNetoIVAOtra();
+            BigDecimal mntimpuestoperc = bandejaCFE.getMntImpuestoPerc();
+            BigDecimal mntivaensusp = bandejaCFE.getMntIVaenSusp();
+            BigDecimal mntexpoyasim = bandejaCFE.getMntExpoyAsim();
+
+            if (mntivatasamin == null) mntivatasamin = Env.ZERO;
+            if (mntnetoivatasamin == null) mntnetoivatasamin = Env.ZERO;
+            if (mntivatasabasica == null) mntivatasabasica = Env.ZERO;
+            if (mntnetoivatasabasica == null) mntnetoivatasabasica = Env.ZERO;
+            if (mntnogrv == null) mntnogrv = Env.ZERO;
+            if (mntivaotra == null) mntivaotra = Env.ZERO;
+            if (mntnetoivaotra == null) mntnetoivaotra = Env.ZERO;
+            if (mntimpuestoperc == null) mntimpuestoperc = Env.ZERO;
+            if (mntivaensusp == null) mntivaensusp = Env.ZERO;
+            if (mntexpoyasim == null) mntexpoyasim = Env.ZERO;
+
+            bandejaCFE.setAmtSubtotal(mntivatasamin.add(mntnetoivatasamin).add(mntivatasabasica).add(mntnetoivatasabasica)
+                    .add(mntnogrv).add(mntivaotra).add(mntnetoivaotra).add(mntimpuestoperc).add(mntivaensusp).add(mntexpoyasim));
+
+            BigDecimal montonf = bandejaCFE.getMontoNF();
+            BigDecimal mnttotretenido = bandejaCFE.getMntTotRetenido();
+            BigDecimal mnttotcredfisc = bandejaCFE.getMntTotCredFisc();
+
+            if (montonf == null) montonf = Env.ZERO;
+            if (mnttotretenido == null) mnttotretenido = Env.ZERO;
+            if (mnttotcredfisc == null) mnttotcredfisc = Env.ZERO;
+
+            bandejaCFE.setGrandTotal(bandejaCFE.getMntTotal().add(montonf).add(mnttotretenido).add(mnttotcredfisc));
+
             bandejaCFE.saveEx();
 
             for (Totales.RetencPercep retencPercep: totales.getRetencPercep()){
@@ -477,6 +526,9 @@ public class LeerBandejaCFE extends SvrProcess {
                     }
                     else if (bandejaCFELin.getIndFactCFE().equalsIgnoreCase("3")){ // Tasa Básica
                         bandejaCFELin.setC_Tax_ID(this.ivaBasico.get_ID());
+                    }
+                    else if (bandejaCFELin.getIndFactCFE().equalsIgnoreCase("1")){ // Tasa No Gravado
+                        bandejaCFELin.setC_Tax_ID(this.ivaExento.get_ID());
                     }
                     else{
                         sql = " select c_tax_id from c_tax where codigoiva ='" + bandejaCFELin.getIndFactCFE() + "'";
@@ -566,7 +618,13 @@ public class LeerBandejaCFE extends SvrProcess {
                 bandejaCFE.setDueDate(bandejaCFE.getDueDate());
             }
 
-            bandejaCFE.setFormaPagoCFE(String.valueOf(idDocTck.getFmaPago()));
+            if (String.valueOf(idDocTck.getFmaPago()).equalsIgnoreCase("2")){
+                bandejaCFE.setFormaPagoCFE("CREDITO");
+            }
+            else{
+                bandejaCFE.setFormaPagoCFE("CONTADO");
+            }
+
             bandejaCFE.setRUCEmisor(emisor.getRUCEmisor());
             bandejaCFE.setName(emisor.getRznSoc().trim().toUpperCase());
             bandejaCFE.setCodSucursal(String.valueOf(emisor.getCdgDGISucur()));
@@ -646,6 +704,42 @@ public class LeerBandejaCFE extends SvrProcess {
                 }
             }
 
+            // Subtotal y Total general
+            BigDecimal mntivatasamin = bandejaCFE.getMntIVATasaMin();
+            BigDecimal mntnetoivatasamin = bandejaCFE.getMntNetoIvaTasaMin();
+            BigDecimal mntivatasabasica = bandejaCFE.getMntIVATasaBasica();
+            BigDecimal mntnetoivatasabasica = bandejaCFE.getMntNetoIVATasaBasica();
+            BigDecimal mntnogrv = bandejaCFE.getMntNoGrv();
+            BigDecimal mntivaotra = bandejaCFE.getMntIVAOtra();
+            BigDecimal mntnetoivaotra = bandejaCFE.getMntNetoIVAOtra();
+            BigDecimal mntimpuestoperc = bandejaCFE.getMntImpuestoPerc();
+            BigDecimal mntivaensusp = bandejaCFE.getMntIVaenSusp();
+            BigDecimal mntexpoyasim = bandejaCFE.getMntExpoyAsim();
+
+            if (mntivatasamin == null) mntivatasamin = Env.ZERO;
+            if (mntnetoivatasamin == null) mntnetoivatasamin = Env.ZERO;
+            if (mntivatasabasica == null) mntivatasabasica = Env.ZERO;
+            if (mntnetoivatasabasica == null) mntnetoivatasabasica = Env.ZERO;
+            if (mntnogrv == null) mntnogrv = Env.ZERO;
+            if (mntivaotra == null) mntivaotra = Env.ZERO;
+            if (mntnetoivaotra == null) mntnetoivaotra = Env.ZERO;
+            if (mntimpuestoperc == null) mntimpuestoperc = Env.ZERO;
+            if (mntivaensusp == null) mntivaensusp = Env.ZERO;
+            if (mntexpoyasim == null) mntexpoyasim = Env.ZERO;
+
+            bandejaCFE.setAmtSubtotal(mntivatasamin.add(mntnetoivatasamin).add(mntivatasabasica).add(mntnetoivatasabasica)
+                    .add(mntnogrv).add(mntivaotra).add(mntnetoivaotra).add(mntimpuestoperc).add(mntivaensusp).add(mntexpoyasim));
+
+            BigDecimal montonf = bandejaCFE.getMontoNF();
+            BigDecimal mnttotretenido = bandejaCFE.getMntTotRetenido();
+            BigDecimal mnttotcredfisc = bandejaCFE.getMntTotCredFisc();
+
+            if (montonf == null) montonf = Env.ZERO;
+            if (mnttotretenido == null) mnttotretenido = Env.ZERO;
+            if (mnttotcredfisc == null) mnttotcredfisc = Env.ZERO;
+
+            bandejaCFE.setGrandTotal(bandejaCFE.getMntTotal().add(montonf).add(mnttotretenido).add(mnttotcredfisc));
+
             bandejaCFE.saveEx();
 
             for (Totales.RetencPercep retencPercep: totales.getRetencPercep()){
@@ -698,6 +792,9 @@ public class LeerBandejaCFE extends SvrProcess {
                     }
                     else if (bandejaCFELin.getIndFactCFE().equalsIgnoreCase("3")){ // Tasa Básica
                         bandejaCFELin.setC_Tax_ID(this.ivaBasico.get_ID());
+                    }
+                    else if (bandejaCFELin.getIndFactCFE().equalsIgnoreCase("1")){ // Tasa No Gravado
+                        bandejaCFELin.setC_Tax_ID(this.ivaExento.get_ID());
                     }
                     else{
                         sql = " select c_tax_id from c_tax where codigoiva ='" + bandejaCFELin.getIndFactCFE() + "'";
