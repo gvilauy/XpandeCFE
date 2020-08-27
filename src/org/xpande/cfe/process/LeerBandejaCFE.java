@@ -356,8 +356,6 @@ public class LeerBandejaCFE extends SvrProcess {
             else{
                 bandejaCFE.setFormaPagoCFE("CONTADO");
             }
-            
-
             bandejaCFE.setRUCEmisor(emisor.getRUCEmisor());
             bandejaCFE.setName(emisor.getRznSoc().trim().toUpperCase());
             bandejaCFE.setCodSucursal(String.valueOf(emisor.getCdgDGISucur()));
