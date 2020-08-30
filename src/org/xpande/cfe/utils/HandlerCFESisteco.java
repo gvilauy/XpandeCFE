@@ -967,6 +967,12 @@ public class HandlerCFESisteco extends HandlerCFE {
                     gcal.get(Calendar.MONTH)+1, gcal.get(Calendar.DAY_OF_MONTH), DatatypeConstants.FIELD_UNDEFINED);
             idDoc.setFchEmis(xgCalDateDoc);
 
+            GregorianCalendar gcalAcct = (GregorianCalendar) GregorianCalendar.getInstance();
+            gcalAcct.setTime((Timestamp)this.model.get_Value("DateAcct"));
+            XMLGregorianCalendar xgCalDateAcct = DatatypeFactory.newInstance().newXMLGregorianCalendarDate(gcalAcct.get(Calendar.YEAR),
+                    gcalAcct.get(Calendar.MONTH)+1, gcalAcct.get(Calendar.DAY_OF_MONTH), DatatypeConstants.FIELD_UNDEFINED);
+            idDoc.setFchValor(xgCalDateAcct);
+
             // ADENDA
             this.empresasType.setAdenda(this.model.get_ValueAsString("Description"));
 
