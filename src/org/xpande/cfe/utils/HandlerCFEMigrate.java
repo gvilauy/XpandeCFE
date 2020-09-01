@@ -582,6 +582,13 @@ public class HandlerCFEMigrate extends HandlerCFE {
                 item.setIteDescuentoPct(Env.ZERO);
                 item.setIteDescuentoMonto(Env.ZERO);
 
+                // Si tengo precio unitario cero y no tengo codigo de impuesto 8 o 5, avisso con error.
+                if (item.getItePrecioUnitario().compareTo(Env.ZERO) == 0){
+                    if ((item.getIteIndFact() != 5) && (item.getIteIndFact() != 8)){
+                        return "No es posible indicar Precio Unitario igual a Cero, si el Indicador de Impuesto no es 8 o 5.";
+                    }
+                }
+
                 if (priceList.isTaxIncluded()) {
                     item.setIteMontoItem(invoiceLine.getLineTotalAmt().abs());
                 }
@@ -721,6 +728,13 @@ public class HandlerCFEMigrate extends HandlerCFE {
                 item.setIteRecargoMnt(Env.ZERO);
                 item.setIteDescuentoPct(Env.ZERO);
                 item.setIteDescuentoMonto(Env.ZERO);
+
+                // Si tengo precio unitario cero y no tengo codigo de impuesto 8 o 5, avisso con error.
+                if (item.getItePrecioUnitario().compareTo(Env.ZERO) == 0){
+                    if ((item.getIteIndFact() != 5) && (item.getIteIndFact() != 8)){
+                        return "No es posible indicar Precio Unitario igual a Cero, si el Indicador de Impuesto no es 8 o 5.";
+                    }
+                }
 
                 if (priceList.isTaxIncluded()) {
                     item.setIteMontoItem(invoiceLine.getLineTotalAmt().abs());
@@ -1008,6 +1022,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
             totales.setTotMntNoGrv(Env.ZERO);
             totales.setTotMntExpoyAsim(Env.ZERO);
             totales.setTotMntImpuestoPerc(Env.ZERO);
+            totales.setTotMntIVaenSusp(Env.ZERO);
             totales.setTotMntNetoIvaTasaMin(Env.ZERO);
             totales.setTotMntNetoIVATasaBasica(Env.ZERO);
             totales.setTotMntNetoIVAOtra(Env.ZERO);
@@ -1054,23 +1069,59 @@ public class HandlerCFEMigrate extends HandlerCFE {
                 if (amtSubtotal == null) amtSubtotal = Env.ZERO;
                 if (taxAmt == null) taxAmt = Env.ZERO;
 
-                if (tax.getRate().compareTo(Env.ZERO) == 0){
-                    totales.setTotMntNoGrv(totales.getTotMntNoGrv().add(amtSubtotal));
+                // Indicar de Impuesto
+                String indFactCFE = tax.get_ValueAsString("CodigoIVA");
+                if ((indFactCFE == null) || (indFactCFE.trim().equalsIgnoreCase(""))){
+                    if (tax.getRate().compareTo(Env.ZERO) == 0){
+                        totales.setTotMntNoGrv(totales.getTotMntNoGrv().add(amtSubtotal));
+                    }
+                    else if (tax.getRate().compareTo(ivaMinimo.getRate()) == 0){
+                        totales.setTotMntNetoIvaTasaMin(totales.getTotMntNetoIvaTasaMin().add(amtSubtotal));
+                        totales.setTotMntIVATasaMin(totales.getTotMntIVATasaMin().add(taxAmt));
+                    }
+                    else if (tax.getRate().compareTo(ivaBasico.getRate()) == 0){
+                        totales.setTotMntNetoIVATasaBasica(totales.getTotMntNetoIVATasaBasica().add(amtSubtotal));
+                        totales.setTotMntIVATasaBasica(totales.getTotMntIVATasaBasica().add(taxAmt));
+                    }
+                    else {
+                        totales.setTotMntNetoIVAOtra(totales.getTotMntNetoIVAOtra().add(amtSubtotal));
+                        totales.setTotMntIVAOtra(totales.getTotMntIVAOtra().add(taxAmt));
+                    }
                 }
-                else if (tax.getRate().compareTo(ivaMinimo.getRate()) == 0){
-                    totales.setTotMntNetoIvaTasaMin(totales.getTotMntNetoIvaTasaMin().add(amtSubtotal));
-                    totales.setTotMntIVATasaMin(totales.getTotMntIVATasaMin().add(taxAmt));
+                else{
+                    // NO GRAVADO
+                    if (indFactCFE.equalsIgnoreCase("1")){
+                        totales.setTotMntNoGrv(totales.getTotMntNoGrv().add(amtSubtotal));
+                    }
+                    // IVA MINIMO
+                    else if (indFactCFE.equalsIgnoreCase("2")){
+                        totales.setTotMntNetoIvaTasaMin(totales.getTotMntNetoIvaTasaMin().add(amtSubtotal));
+                        totales.setTotMntIVATasaMin(totales.getTotMntIVATasaMin().add(taxAmt));
+                    }
+                    // IVA BASICO
+                    else if (indFactCFE.equalsIgnoreCase("3")){
+                        totales.setTotMntNetoIVATasaBasica(totales.getTotMntNetoIVATasaBasica().add(amtSubtotal));
+                        totales.setTotMntIVATasaBasica(totales.getTotMntIVATasaBasica().add(taxAmt));
+                    }
+                    // IVA PERCIBIDO
+                    else if (indFactCFE.equalsIgnoreCase("11")){
+                        totales.setTotMntImpuestoPerc(totales.getTotMntImpuestoPerc().add(amtSubtotal));
+                    }
+                    // IVA EN SUSPENSO
+                    else if (indFactCFE.equalsIgnoreCase("12")){
+                        totales.setTotMntIVaenSusp(totales.getTotMntIVaenSusp().add(amtSubtotal));
+                    }
+                    // NO FACTURABLE
+                    else if (indFactCFE.equalsIgnoreCase("6")){
+                        totales.setTotMontoNF(totales.getTotMontoNF().add(amtSubtotal));
+                    }
+                    else {
+                        totales.setTotMntNetoIVAOtra(totales.getTotMntNetoIVAOtra().add(amtSubtotal));
+                        totales.setTotMntIVAOtra(totales.getTotMntIVAOtra().add(taxAmt));
+                    }
                 }
-                else if (tax.getRate().compareTo(ivaBasico.getRate()) == 0){
-                    totales.setTotMntNetoIVATasaBasica(totales.getTotMntNetoIVATasaBasica().add(amtSubtotal));
-                    totales.setTotMntIVATasaBasica(totales.getTotMntIVATasaBasica().add(taxAmt));
-                }
-                else {
-                    totales.setTotMntNetoIVAOtra(totales.getTotMntNetoIVAOtra().add(amtSubtotal));
-                    totales.setTotMntIVAOtra(totales.getTotMntIVAOtra().add(taxAmt));
-                }
-                amtTotal = amtTotal.add(amtSubtotal).add(taxAmt);
 
+                amtTotal = amtTotal.add(amtSubtotal).add(taxAmt);
             }
 
             totales.setTotIVATasaMin(ivaMinimo.getRate().setScale(3));

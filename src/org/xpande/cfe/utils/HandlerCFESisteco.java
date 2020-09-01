@@ -537,6 +537,13 @@ public class HandlerCFESisteco extends HandlerCFE {
                 detalleItem.setRecargoPct(Env.ZERO);
                 detalleItem.setRecargoMnt(Env.ZERO);
 
+                // Si tengo precio unitario cero y no tengo codigo de impuesto 8 o 5, avisso con error.
+                if (detalleItem.getPrecioUnitario().compareTo(Env.ZERO) == 0){
+                    if ((!detalleItem.getIndFact().equals(BigInteger.valueOf(5))) && (!detalleItem.getIndFact().equals(BigInteger.valueOf(8)))){
+                        return "No es posible indicar Precio Unitario igual a Cero, si el Indicador de Impuesto no es 8 o 5.";
+                    }
+                }
+
                 if (priceList.isTaxIncluded()) {
                     detalleItem.setMontoItem(invoiceLine.getLineTotalAmt().abs());
                 }
@@ -674,6 +681,13 @@ public class HandlerCFESisteco extends HandlerCFE {
                 detalleItem.setRecargoPct(Env.ZERO);
                 detalleItem.setRecargoMnt(Env.ZERO);
 
+                // Si tengo precio unitario cero y no tengo codigo de impuesto 8 o 5, avisso con error.
+                if (detalleItem.getPrecioUnitario().compareTo(Env.ZERO) == 0){
+                    if ((!detalleItem.getIndFact().equals(BigInteger.valueOf(5))) && (!detalleItem.getIndFact().equals(BigInteger.valueOf(8)))){
+                        return "No es posible indicar Precio Unitario igual a Cero, si el Indicador de Impuesto no es 8 o 5.";
+                    }
+                }
+
                 if (priceList.isTaxIncluded()) {
                     detalleItem.setMontoItem(invoiceLine.getLineTotalAmt().abs());
                 }
@@ -743,6 +757,7 @@ public class HandlerCFESisteco extends HandlerCFE {
             totales.setMntNoGrv(Env.ZERO);
             totales.setMntExpoyAsim(Env.ZERO);
             totales.setMntImpuestoPerc(Env.ZERO);
+            totales.setMntIVaenSusp(Env.ZERO);
             totales.setMntNetoIvaTasaMin(Env.ZERO);
             totales.setMntNetoIVATasaBasica(Env.ZERO);
             totales.setMntNetoIVAOtra(Env.ZERO);
@@ -788,23 +803,59 @@ public class HandlerCFESisteco extends HandlerCFE {
                 if (amtSubtotal == null) amtSubtotal = Env.ZERO;
                 if (taxAmt == null) taxAmt = Env.ZERO;
 
-                if (tax.getRate().compareTo(Env.ZERO) == 0){
-                    totales.setMntNoGrv(totales.getMntNoGrv().add(amtSubtotal));
+                // Indicar de Impuesto
+                String indFactCFE = tax.get_ValueAsString("CodigoIVA");
+                if ((indFactCFE == null) || (indFactCFE.trim().equalsIgnoreCase(""))){
+                    if (tax.getRate().compareTo(Env.ZERO) == 0){
+                        totales.setMntNoGrv(totales.getMntNoGrv().add(amtSubtotal));
+                    }
+                    else if (tax.getRate().compareTo(ivaMinimo.getRate()) == 0){
+                        totales.setMntNetoIvaTasaMin(totales.getMntNetoIvaTasaMin().add(amtSubtotal));
+                        totales.setMntIVATasaMin(totales.getMntIVATasaMin().add(taxAmt));
+                    }
+                    else if (tax.getRate().compareTo(ivaBasico.getRate()) == 0){
+                        totales.setMntNetoIVATasaBasica(totales.getMntNetoIVATasaBasica().add(amtSubtotal));
+                        totales.setMntIVATasaBasica(totales.getMntIVATasaBasica().add(taxAmt));
+                    }
+                    else {
+                        totales.setMntNetoIVAOtra(totales.getMntNetoIVAOtra().add(amtSubtotal));
+                        totales.setMntIVAOtra(totales.getMntIVAOtra().add(taxAmt));
+                    }
                 }
-                else if (tax.getRate().compareTo(ivaMinimo.getRate()) == 0){
-                    totales.setMntNetoIvaTasaMin(totales.getMntNetoIvaTasaMin().add(amtSubtotal));
-                    totales.setMntIVATasaMin(totales.getMntIVATasaMin().add(taxAmt));
+                else{
+                    // NO GRAVADO
+                    if (indFactCFE.equalsIgnoreCase("1")){
+                        totales.setMntNoGrv(totales.getMntNoGrv().add(amtSubtotal));
+                    }
+                    // IVA MINIMO
+                    else if (indFactCFE.equalsIgnoreCase("2")){
+                        totales.setMntNetoIvaTasaMin(totales.getMntNetoIvaTasaMin().add(amtSubtotal));
+                        totales.setMntIVATasaMin(totales.getMntIVATasaMin().add(taxAmt));
+                    }
+                    // IVA BASICO
+                    else if (indFactCFE.equalsIgnoreCase("3")){
+                        totales.setMntNetoIVATasaBasica(totales.getMntNetoIVATasaBasica().add(amtSubtotal));
+                        totales.setMntIVATasaBasica(totales.getMntIVATasaBasica().add(taxAmt));
+                    }
+                    // IVA PERCIBIDO
+                    else if (indFactCFE.equalsIgnoreCase("11")){
+                        totales.setMntImpuestoPerc(totales.getMntImpuestoPerc().add(amtSubtotal));
+                    }
+                    // IVA EN SUSPENSO
+                    else if (indFactCFE.equalsIgnoreCase("12")){
+                        totales.setMntIVaenSusp(totales.getMntIVaenSusp().add(amtSubtotal));
+                    }
+                    // NO FACTURABLE
+                    else if (indFactCFE.equalsIgnoreCase("6")){
+                        totales.setMontoNF(totales.getMontoNF().add(amtSubtotal));
+                    }
+                    else {
+                        totales.setMntNetoIVAOtra(totales.getMntNetoIVAOtra().add(amtSubtotal));
+                        totales.setMntIVAOtra(totales.getMntIVAOtra().add(taxAmt));
+                    }
                 }
-                else if (tax.getRate().compareTo(ivaBasico.getRate()) == 0){
-                    totales.setMntNetoIVATasaBasica(totales.getMntNetoIVATasaBasica().add(amtSubtotal));
-                    totales.setMntIVATasaBasica(totales.getMntIVATasaBasica().add(taxAmt));
-                }
-                else {
-                    totales.setMntNetoIVAOtra(totales.getMntNetoIVAOtra().add(amtSubtotal));
-                    totales.setMntIVAOtra(totales.getMntIVAOtra().add(taxAmt));
-                }
-                amtTotal = amtTotal.add(amtSubtotal).add(taxAmt);
 
+                amtTotal = amtTotal.add(amtSubtotal).add(taxAmt);
             }
 
 
@@ -971,7 +1022,7 @@ public class HandlerCFESisteco extends HandlerCFE {
             gcalAcct.setTime((Timestamp)this.model.get_Value("DateAcct"));
             XMLGregorianCalendar xgCalDateAcct = DatatypeFactory.newInstance().newXMLGregorianCalendarDate(gcalAcct.get(Calendar.YEAR),
                     gcalAcct.get(Calendar.MONTH)+1, gcalAcct.get(Calendar.DAY_OF_MONTH), DatatypeConstants.FIELD_UNDEFINED);
-            idDoc.setFchValor(xgCalDateAcct);
+            //idDoc.setFchValor(xgCalDateAcct);
 
             // ADENDA
             this.empresasType.setAdenda(this.model.get_ValueAsString("Description"));
@@ -1469,6 +1520,10 @@ public class HandlerCFESisteco extends HandlerCFE {
                 throw new AdempiereException("Error al enviar CFE : " + cfeDtoSisteco.getDescripcion());
             }
 
+            // Si viene respuesta pero sin datos aviso
+            if ((cfeDtoSisteco.getUrlDocumentoDGI() == null) || (cfeDtoSisteco.getUrlDocumentoDGI().equalsIgnoreCase(""))){
+                throw new AdempiereException("Error al enviar CFE : No se reciben datos en la Respueta de Sisteco.");
+            }
 
             MZCFERespuestaProvider cfeRespuesta = new MZCFERespuestaProvider(this.ctx, 0, this.trxName);
             cfeRespuesta.setAD_Table_ID(this.model.get_Table_ID());
