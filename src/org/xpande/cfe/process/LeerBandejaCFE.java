@@ -110,14 +110,20 @@ public class LeerBandejaCFE extends SvrProcess {
             String backupFolderName = "Backup";
             Folder backupFolder = emailFolder.getFolder(backupFolderName);
             if ((backupFolder == null) || (!backupFolder.exists())){
-                return "No se encontró la carpeta de respaldo de correo : " + backupFolderName;
+                backupFolder = emailStore.getFolder(backupFolderName);
+                if ((backupFolder == null) || (!backupFolder.exists())){
+                    return "No se encontró la carpeta de respaldo de correo : " + backupFolderName;
+                }
             }
             //backupFolder.open(Folder.READ_WRITE);
 
             String errorFolderName = "Errores";
             Folder errorFolder = emailFolder.getFolder(errorFolderName);
             if ((errorFolder == null) || (!errorFolder.exists())){
-                return "No se encontró la carpeta para mails no procesados : " + errorFolderName;
+                errorFolder = emailStore.getFolder(errorFolderName);
+                if ((errorFolder == null) || (!errorFolder.exists())){
+                    return "No se encontró la carpeta para mails no procesados : " + errorFolderName;
+                }
             }
             //errorFolder.open(Folder.READ_WRITE);
 
@@ -130,6 +136,8 @@ public class LeerBandejaCFE extends SvrProcess {
             for (int i = 0; i < messages.length; i++) {
 
                 Message message = messages[i];
+
+                System.out.println("Mensaje " + i + " de " + messages.length);
 
                 String contentType = message.getContentType();
 
