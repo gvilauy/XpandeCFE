@@ -163,7 +163,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
             throw new AdempiereException(e);
         }
 
-        return message;
+        return null;
 
     }
 
@@ -269,7 +269,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
                     refItem.setRefIndGlobal(BigInteger.valueOf(1));
                     refItem.setRefRazonRef(referenciaCFE);
 
-                    return message;
+                    return null;
                 }
             }
 
@@ -315,45 +315,6 @@ public class HandlerCFEMigrate extends HandlerCFE {
                 documentNo = org.apache.commons.lang.StringUtils.leftPad(String.valueOf(documentNo), 7, "0");
                 refItem.setRefNroCFERef(new BigInteger(documentNo));
             }
-
-
-            /*
-            // Busco referencia de facturas en tabla
-            sql = " select C_Invoice_To_ID from Z_InvoiceRef where C_Invoice_ID =" + this.model.get_ID();
-
-            pstmt = DB.prepareStatement(sql, this.trxName);
-            rs = pstmt.executeQuery();
-
-            int contador = 0;
-
-            while(rs.next()){
-
-                contador++;
-
-                MInvoice invoiceRef = new MInvoice(this.ctx, rs.getInt("C_Invoice_To_ID"), this.trxName);
-                MDocType docRef = (MDocType) invoiceRef.getC_DocTypeTarget();
-
-                // Obtengo configuracion de envío de CFE para documento referenciado, si no tengo aviso.
-                MZCFEConfigDocSend configDocRefSend = ((MZCFEConfig) this.configDocSend.getZ_CFE_Config()).getConfigDocumentoCFE(invoiceRef.getAD_Org_ID(), docRef.get_ID());
-                if ((configDocRefSend == null) || (configDocRefSend.get_ID() <= 0)){
-                    return "No se obtuvo codigo DGI para documento : " + docRef.getName();
-                }
-                MZCFEConfigDocDGI docDGI = (MZCFEConfigDocDGI) configDocRefSend.getZ_CFE_ConfigDocDGI();
-
-
-                CFEInvoiCyType.Referencia.ReferenciaItem refItem = new CFEInvoiCyType.Referencia.ReferenciaItem();
-                refItems.add(refItem);
-
-                refItem.setRefNroLinRef(contador);
-                refItem.setRefTpoDocRef(BigInteger.valueOf(Long.parseLong(docDGI.getCodigoDGI())));
-                refItem.setRefSerie(configDocRefSend.getDocumentSerie().trim());
-                refItem.setRefIndGlobal(BigInteger.valueOf(1));
-
-                String documentNo = invoiceRef.getDocumentNo().replaceAll("[^0-9]", "");
-                documentNo = org.apache.commons.lang.StringUtils.leftPad(String.valueOf(documentNo), 7, "0");
-                refItem.setRefNroCFERef(new BigInteger(documentNo));
-            }
-            */
 
         }
         catch (Exception e){
@@ -752,9 +713,50 @@ public class HandlerCFEMigrate extends HandlerCFE {
         return message;
     }
 
-
+    /***
+     * Carga modelos para envío de CFE correspondiente a Resguardo.
+     * Xpande. Created by Gabriel Vila on 9/8/20.
+     * @return
+     * @throws Exception
+     */
     @Override
     protected String executeResguardo() throws Exception {
+
+        String message = null;
+
+        try{
+
+            MZCFEConfigDocDGI docDGI = (MZCFEConfigDocDGI) this.configDocSend.getZ_CFE_ConfigDocDGI();
+            if ((docDGI == null) || (docDGI.get_ID() <= 0)){
+                return "Falta indicar documento de DGI para configuración de envío de este documento - organización - proveedor de CFE";
+            }
+
+            // Obtengo datos del Emisor
+            Emisor emisor = this.setEmisor(this.configDocSend.getAD_OrgTrx_ID());
+
+            // Obtengo datos del Receptor
+            Receptor receptor = this.setReceptor();
+
+            // Obtengo totales
+            Totales totales = this.setTotalesResguardo();
+
+            // Obtengo deatos del encabezado
+            message = this.setEncabezado_Resguardo(docDGI, emisor, receptor, totales);
+            if (message != null) return message;
+
+            // Obtengo datos de las lineas
+            message = this.setDetalle_Resguardo();
+            if (message != null) return message;
+
+            // Referencia cuando es Contra-Resguardo
+            message = this.setReferencia_Resguardo();
+            if (message != null) return message;
+
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+
         return null;
     }
 
@@ -1233,7 +1235,6 @@ public class HandlerCFEMigrate extends HandlerCFE {
         String message = null;
 
         try{
-
             MInvoice invoice = (MInvoice) this.model;
 
             // Emisor, receptor y totales
@@ -1528,6 +1529,295 @@ public class HandlerCFEMigrate extends HandlerCFE {
             throw new AdempiereException(e);
         }
 
+    }
+
+    /***
+     * Obtiene y setea información de Totales para el envío de CFE.
+     * Xpande. Created by Gabriel Vila on 9/8/20.
+     * @return
+     */
+    private Totales setTotalesResguardo() {
+
+        String sql = "";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        Totales totales = new Totales();
+
+        try{
+
+            MDocType doc = new MDocType(this.ctx, this.model.get_ValueAsInt("C_DocType_ID"), null);
+
+            // Instancio configurador de CFE
+            MZCFEConfig cfeConfig = (MZCFEConfig) this.configDocSend.getZ_CFE_Config();
+
+            MCurrency currency = new MCurrency(this.ctx, this.model.get_ValueAsInt("C_Currency_ID"), null);
+            if ((currency == null) || (currency.get_ID() <= 0)){
+                throw new AdempiereException("Falta indicar Moneda del Documento");
+            }
+            totales.setTotTpoMoneda(TipMonType.valueOf(currency.getISO_Code()));
+
+            // Si moneda no es Pesos Uruguayos, debo informar la tasa de cambio
+            if (currency.get_ID() != 142){
+                BigDecimal currencyRate = (BigDecimal) this.model.get_Value("DivideRate");
+                if (currencyRate == null){
+                    Timestamp dateInvoiced = (Timestamp) this.model.get_Value("DateInvoiced");
+                    if (dateInvoiced != null){
+                        currencyRate = MConversionRate.getRate(currency.get_ID(), 142, dateInvoiced, 0, model.getAD_Client_ID(), 0);
+                    }
+                }
+                if ((currencyRate == null) || (currencyRate.compareTo(Env.ZERO) <= 0)){
+                    throw new AdempiereException("No se obtuvo Tasa de Cambio para Fecha y Moneda de este Documento");
+                }
+
+                totales.setTotTpoCambio(currencyRate.setScale(3, BigDecimal.ROUND_HALF_UP));
+            }
+
+            // Inicializo montos antes de setearlos
+            totales.setTotMntNoGrv(Env.ZERO);
+            totales.setTotMntExpoyAsim(Env.ZERO);
+            totales.setTotMntImpuestoPerc(Env.ZERO);
+            totales.setTotMntIVaenSusp(Env.ZERO);
+            totales.setTotMntNetoIvaTasaMin(Env.ZERO);
+            totales.setTotMntNetoIVATasaBasica(Env.ZERO);
+            totales.setTotMntNetoIVAOtra(Env.ZERO);
+            totales.setTotMntIVATasaMin(Env.ZERO);
+            totales.setTotMntIVATasaBasica(Env.ZERO);
+            totales.setTotMntIVAOtra(Env.ZERO);
+            totales.setTotMontoNF(Env.ZERO);
+            totales.setTotMntTotal(Env.ZERO);
+            totales.setTotMntTotRetenido(Env.ZERO);
+
+            BigDecimal amtTotal = Env.ZERO;
+
+            Totales.RetencPercepTot retencPercepTot = new CFEInvoiCyType.Totales.RetencPercepTot();
+            totales.setRetencPercepTot(retencPercepTot);
+
+            sql = " SELECT ret.Z_RetencionSocio_ID, ret.codigodgi, ret.emitiedgi, SUM(resl.amtretencion) total"
+                    + " FROM Z_ResguardoSocio res"
+                    + " INNER JOIN Z_ResguardoSocioRet resl ON res.Z_ResguardoSocio_ID = resl.Z_ResguardoSocio_ID"
+                    + " INNER JOIN Z_RetencionSocio ret ON resl.Z_RetencionSocio_ID = ret.Z_RetencionSocio_ID"
+                    + " WHERE res.Z_ResguardoSocio_ID = " + this.model.get_ID()
+                    + " GROUP BY ret.Z_RetencionSocio_ID, ret.codigodgi, ret.emitiedgi";
+
+            pstmt = DB.prepareStatement(sql, this.trxName);
+            rs = pstmt.executeQuery();
+
+            while(rs.next()){
+
+                boolean isDgi = rs.getString("emitieDGI").equalsIgnoreCase("Y") ? true : false;;
+                String codigo = rs.getString("codigodgi");
+                BigDecimal montoSum = rs.getBigDecimal("total");
+
+                if (montoSum != null) {
+                    montoSum = montoSum.setScale(2, RoundingMode.HALF_UP);
+                }
+
+                Totales.RetencPercepTot.RetencPercepTotItem retencPercepTotItem = new CFEInvoiCyType.Totales.RetencPercepTot.RetencPercepTotItem();
+                retencPercepTot.getRetencPercepTotItem().add(retencPercepTotItem);
+
+                // Contra-Resguardo, doy vuelta el signo.
+                if (doc.getDocBaseType().equalsIgnoreCase("RGC")) {
+                    montoSum = montoSum.negate();
+                }
+
+                retencPercepTotItem.setRetPercCodRet(codigo);
+                retencPercepTotItem.setRetPercValRetPerc(montoSum);
+                amtTotal = amtTotal.add(montoSum);
+            }
+            totales.setTotMntTotRetenido(amtTotal);
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+        finally {
+            DB.close(rs, pstmt);
+            rs = null; pstmt = null;
+        }
+
+        return totales;
+    }
+
+    /***
+     * Setea datos del cabezal de un resguardo electrónico.
+     * @param docDGI
+     * @param emisor
+     * @param receptor
+     * @param totales
+     * @return
+     */
+    private String setEncabezado_Resguardo(MZCFEConfigDocDGI docDGI, Emisor emisor, Receptor receptor, Totales totales) {
+
+        String message = null;
+
+        try{
+            // Emisor, receptor y totales
+            this.cfeInvoiCyType.setEmisor(emisor);
+            this.cfeInvoiCyType.setReceptor(receptor);
+            this.cfeInvoiCyType.setTotales(totales);
+
+            CFEInvoiCyType.IdDoc idDoc = new CFEInvoiCyType.IdDoc();
+            this.cfeInvoiCyType.setIdDoc(idDoc);
+            idDoc.setCFETipoCFE(BigInteger.valueOf(Long.parseLong(docDGI.getCodigoDGI())));
+            idDoc.setCFESerie(configDocSend.getDocumentSerie().trim());
+
+            String description = model.get_ValueAsString("Description");
+            if (description != null){
+                if (!description.trim().equalsIgnoreCase("")){
+                    idDoc.setCFEAdenda(description.trim());
+                }
+            }
+
+            String cfeNumero = model.get_ValueAsString("DocumentNo").replaceAll("[^0-9]", "");
+            cfeNumero = org.apache.commons.lang.StringUtils.leftPad(String.valueOf(cfeNumero), 7, "0");
+            idDoc.setCFENro(new BigInteger(cfeNumero));
+
+            Timestamp fechaDoc = (Timestamp) model.get_Value("DateDoc");
+            GregorianCalendar gcal = (GregorianCalendar) GregorianCalendar.getInstance();
+            gcal.setTime(fechaDoc);
+            XMLGregorianCalendar xgCalDateDoc = DatatypeFactory.newInstance().newXMLGregorianCalendarDate(gcal.get(Calendar.YEAR),
+                    gcal.get(Calendar.MONTH)+1, gcal.get(Calendar.DAY_OF_MONTH), DatatypeConstants.FIELD_UNDEFINED);
+            idDoc.setCFEFchEmis(xgCalDateDoc);
+
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+
+        return null;
+    }
+
+    /***
+     * Obtiene y setea detalle de un resguardo electrónico.
+     * Xpande. Created by Gabriel Vila on 11/15/18
+     * @return
+     */
+    private String setDetalle_Resguardo() {
+
+        String message = null;
+
+        String sql = "";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try{
+            // Documento
+            MDocType docType = new MDocType(this.ctx, model.get_ValueAsInt("C_DocType_ID"), null);
+
+            // Instancio configurador de CFE
+            MZCFEConfig cfeConfig = (MZCFEConfig) this.configDocSend.getZ_CFE_Config();
+
+            this.cfeInvoiCyType.setDetalle(new CFEInvoiCyType.Detalle());
+            List<CFEInvoiCyType.Detalle.Item> items = cfeInvoiCyType.getDetalle().getItem();
+
+            sql = " select a.amtbase, a.amtretencion, ret.codigodgi " +
+                    "from z_resguardosocioret a " +
+                    "inner join z_retencionsocio ret on a.z_retencionsocio_id = ret.z_retencionsocio_id " +
+                    "where z_resguardosocio_id = " + model.get_ID();
+
+            pstmt = DB.prepareStatement(sql, model.get_TrxName());
+            rs = pstmt.executeQuery();
+
+            int contador = 0;
+
+            while(rs.next()){
+
+                contador++;
+
+                CFEInvoiCyType.Detalle.Item item = new CFEInvoiCyType.Detalle.Item();
+                items.add(item);
+                CFEInvoiCyType.Detalle.Item.CodItem codItem = new CFEInvoiCyType.Detalle.Item.CodItem();
+                item.setCodItem(codItem);
+
+                // Contra-Resguardo
+                if (docType.getDocBaseType().equalsIgnoreCase("RGC")) {
+                    item.setIteIndFact(9);
+                }
+
+                CFEInvoiCyType.Detalle.Item.RetencPercep.RetencPercepItem retencPercepItem = new CFEInvoiCyType.Detalle.Item.RetencPercep.RetencPercepItem();
+                if (item.getRetencPercep() == null) {
+                    item.setRetencPercep(new CFEInvoiCyType.Detalle.Item.RetencPercep());
+                }
+                item.getRetencPercep().getRetencPercepItem().add(retencPercepItem);
+
+                retencPercepItem.setIteRetPercCodRet(rs.getString("codigodgi"));
+                retencPercepItem.setIteRetPercMntSujetoaRet(rs.getBigDecimal("amtbase").setScale(2, RoundingMode.HALF_UP));
+                retencPercepItem.setIteRetPercValRetPerc(rs.getBigDecimal("amtretencion").setScale(2, RoundingMode.HALF_UP));
+                retencPercepItem.setIteRetPerc(RetPerc.R);
+            }
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+        finally {
+            DB.close(rs, pstmt);
+            rs = null; pstmt = null;
+        }
+
+        return null;
+    }
+
+    /***
+     * Setea información de referencia de un contra-resguardo electrónico.
+     * Xpande. Created by Gabriel Vila on 11/15/18
+     * @return
+     */
+    private String setReferencia_Resguardo() {
+
+        String sql = "";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try{
+
+            List<CFEInvoiCyType.Referencia.ReferenciaItem> refItems = this.cfeInvoiCyType.getReferencia().getReferenciaItem();
+
+            // Documento
+            MDocType docType = new MDocType(this.ctx, model.get_ValueAsInt("C_DocType_ID"), null);
+
+            // Si no es Contra-Resguardo, no hago nada.
+            if (!docType.getDocBaseType().equalsIgnoreCase("RGC")) {
+                return null;
+            }
+
+            int resguardoID = this.model.get_ValueAsInt("Z_ResguardoSocio_Ref_ID");
+
+            if (resguardoID <= 0){
+                return "No se pudo obtener resguardo referenciado por este contra-resguardo.";
+            }
+
+            sql = " select documentno, datedoc " +
+                    "from z_resguardosocio " +
+                    "where z_resguardosocio_id =" + resguardoID;
+
+            pstmt = DB.prepareStatement(sql, this.trxName);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()){
+
+                CFEInvoiCyType.Referencia.ReferenciaItem refItem = new CFEInvoiCyType.Referencia.ReferenciaItem();
+                refItems.add(refItem);
+
+                refItem.setRefNroLinRef(1);
+                refItem.setRefSerie(this.configDocSend.getDocumentSerie());
+                refItem.setRefIndGlobal(BigInteger.valueOf(1));
+
+                String documentNo = rs.getString("documentno").trim();
+                documentNo = documentNo.replaceAll("[^0-9]", "");
+                documentNo = org.apache.commons.lang.StringUtils.leftPad(String.valueOf(documentNo), 7, "0");
+                refItem.setRefNroCFERef(new BigInteger(documentNo));
+            }
+
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+        finally {
+            DB.close(rs, pstmt);
+            rs = null; pstmt = null;
+        }
+
+        return null;
     }
 
 }

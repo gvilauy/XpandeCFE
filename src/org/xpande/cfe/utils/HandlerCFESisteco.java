@@ -873,7 +873,6 @@ public class HandlerCFESisteco extends HandlerCFE {
         return totales;
     }
 
-
     /***
      * Obtiene y setea información de Totales para el envío de CFE.
      * Xpande. Created by Gabriel Vila on 10/30/18.
@@ -1035,9 +1034,8 @@ public class HandlerCFESisteco extends HandlerCFE {
             throw new AdempiereException(e);
         }
 
-        return message;
+        return null;
     }
-
 
     /***
      * Obtiene y setea detalle de un resguardo electrónico.
@@ -1294,8 +1292,7 @@ public class HandlerCFESisteco extends HandlerCFE {
             throw new AdempiereException(e);
         }
 
-        return message;
-
+        return null;
     }
 
 
