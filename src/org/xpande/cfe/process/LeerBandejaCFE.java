@@ -288,7 +288,9 @@ public class LeerBandejaCFE extends SvrProcess {
 
                 String adenda = null;
                 if (empresasType.getAdenda() != null){
-                    adenda = empresasType.getAdenda().toString();
+                    adenda = empresasType.getAdenda().toString().trim();
+                    adenda = adenda.replace("null","");
+                    adenda = adenda.replace("NULL","");
                 }
 
                 if (cfeDefType.getEFact() != null){
@@ -403,9 +405,12 @@ public class LeerBandejaCFE extends SvrProcess {
                 bandejaCFE.setRegionName(emisor.getDepartamento().trim().toUpperCase());
             }
             if (adenda != null){
+                /*
                 if ((!adenda.contains("null")) && (!adenda.contains("NULL"))){
                     bandejaCFE.setAdendaCFE(adenda.trim().toUpperCase());
                 }
+                */
+                bandejaCFE.setAdendaCFE(adenda.trim().toUpperCase());
             }
 
             // Seteo moneda
