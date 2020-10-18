@@ -12,6 +12,11 @@ import org.compiere.process.SvrProcess;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -153,7 +158,19 @@ public class LeerBandejaCFE extends SvrProcess {
                             part.saveFile("/tmp/" + fileName);
 
                             if (fileName.contains(".xml")){
+
+                                /*
+                                // Esto es para sacar la cadena ns0: que viene en algunos xmls.
+                                Path path = Paths.get("/tmp/" + fileName);
+                                Charset charset = StandardCharsets.UTF_8;
+                                String content = new String(Files.readAllBytes(path), charset);
+                                content = content.replaceAll("ns0:Adenda", "Adenda");
+                                Files.write(path, content.getBytes(charset));
+                                //
+                                */
+
                                 File fileCFEXml = new File("/tmp/" + fileName);
+
                                 JAXBContext jaxbContext = JAXBContext.newInstance(EnvioCFEEntreEmpresas.class);
                                 Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
