@@ -1218,29 +1218,31 @@ public class HandlerCFESisteco extends HandlerCFE {
                 }
             }
 
-            // Si es un cliente con identificación (NO ES OTROS)
-            if (tipoIdentificacion != 4){
+            String nroIdentificacion = partner.getTaxID();
 
-                String nroIdentificacion = partner.getTaxID();
+            receptor.setTipoDocRecep(tipoIdentificacion);
+            receptor.setDocRecep(nroIdentificacion);
+            receptor.setRznSocRecep(partner.getName());
 
-                receptor.setTipoDocRecep(tipoIdentificacion);
-                receptor.setDocRecep(nroIdentificacion);
-                receptor.setRznSocRecep(partner.getName());
-
-                // Datos geográficos
-                String direccion = location.getAddress1();
-                if (direccion != null) {
-                    if (direccion.length() > 70){
-                        direccion = direccion.substring(0, 70);
-                    }
+            // Datos geográficos
+            String direccion = location.getAddress1();
+            if (direccion != null) {
+                if (direccion.length() > 70){
+                    direccion = direccion.substring(0, 70);
                 }
-
-                receptor.setCodPaisRecep(country.getCountryCode());
-                receptor.setPaisRecep(country.getName());
-                receptor.setCiudadRecep(location.getCity());
-                receptor.setDeptoRecep(location.getRegionName());
-                receptor.setDirRecep(direccion);
             }
+
+            receptor.setCodPaisRecep(country.getCountryCode());
+            receptor.setPaisRecep(country.getName());
+            receptor.setCiudadRecep(location.getCity());
+            receptor.setDeptoRecep(location.getRegionName());
+            receptor.setDirRecep(direccion);
+
+            // Si es identificación OTRA
+            if (tipoIdentificacion == 4){
+                receptor.setDocRecepExt(nroIdentificacion);
+            }
+
         }
         catch (Exception e){
             throw new AdempiereException(e);
@@ -1453,7 +1455,7 @@ public class HandlerCFESisteco extends HandlerCFE {
         try {
 
             File file = File.createTempFile("SistecoXMLCFE", ".xml");
-            file.deleteOnExit();
+            //file.deleteOnExit();
             JAXBContext jaxbContext = JAXBContext.newInstance(CFEEmpresasType.class);
 
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
