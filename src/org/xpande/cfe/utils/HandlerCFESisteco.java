@@ -1240,7 +1240,7 @@ public class HandlerCFESisteco extends HandlerCFE {
 
             // Si es identificación OTRA
             if (tipoIdentificacion == 4){
-                receptor.setDocRecepExt(nroIdentificacion);
+                //receptor.setDocRecepExt(nroIdentificacion);
             }
 
         }
