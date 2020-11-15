@@ -892,6 +892,44 @@ public class HandlerCFEMigrate extends HandlerCFE {
                     cfeRespuesta.setCFE_Resolucion(cfeRet.getCFEEstadoAcuse().toString());
                     cfeRespuesta.setCFE_URL_DGI(cfeRet.getCFEQrCode());
                     cfeRespuesta.setCFE_DigitoVerificador(cfeRet.getCFECodigoSeguridad());
+
+                    // Datos CAE
+                    if (cfeRet.getCFEDatosAvanzados() != null){
+
+                        if (cfeRet.getCFEDatosAvanzados().getCFECAEFchVenc() != null){
+                            Timestamp fechaVencCAE = new Timestamp(cfeRet.getCFEDatosAvanzados().getCFECAEFchVenc().toGregorianCalendar().getTimeInMillis());
+                            cfeRespuesta.setCFE_Vencimiento_CAE(fechaVencCAE);
+                        }
+                        else {
+                            cfeRespuesta.setCFE_Vencimiento_CAE(this.configDocSend.getDueDate());
+                        }
+
+                        if (cfeRet.getCFEDatosAvanzados().getCFECAEId() > 0){
+                            cfeRespuesta.setCFE_CAE_ID(Long.toString(cfeRet.getCFEDatosAvanzados().getCFECAEId()));
+                        }
+                        else {
+                            cfeRespuesta.setCFE_CAE_ID(this.configDocSend.getNumeroCAE());
+                        }
+
+                        if (cfeRet.getCFEDatosAvanzados().getAnoResAutorizadora() != null){
+                            cfeRespuesta.setCFE_AnioResolucion(cfeRet.getCFEDatosAvanzados().getAnoResAutorizadora().intValueExact());
+                        }
+
+                        if (cfeRet.getCFEDatosAvanzados().getCFECAENroIni() != null){
+                            cfeRespuesta.setCFE_NroInicial_CAE(new BigDecimal(cfeRet.getCFEDatosAvanzados().getCFECAENroIni().intValue()));
+                        }
+                        else{
+                            cfeRespuesta.setCFE_NroInicial_CAE(new BigDecimal(this.configDocSend.getNumeroDesde()));
+                        }
+
+                        if (cfeRet.getCFEDatosAvanzados().getCFECAENroFin() != null){
+                            cfeRespuesta.setCFE_NroFinal_CAE(new BigDecimal(cfeRet.getCFEDatosAvanzados().getCFECAENroFin().intValue()));
+                        }
+                        else{
+                            cfeRespuesta.setCFE_NroFinal_CAE(new BigDecimal(this.configDocSend.getNumeroHasta()));
+                        }
+                    }
+
                     cfeRespuesta.saveEx();
                 }
 
