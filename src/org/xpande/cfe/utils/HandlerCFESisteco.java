@@ -1221,7 +1221,16 @@ public class HandlerCFESisteco extends HandlerCFE {
             String nroIdentificacion = partner.getTaxID();
 
             receptor.setTipoDocRecep(tipoIdentificacion);
-            receptor.setDocRecep(nroIdentificacion);
+
+            // Si es identificación OTRA
+            if (tipoIdentificacion == 4){
+                receptor.setDocRecepExt(nroIdentificacion);
+            }
+            else{
+                receptor.setDocRecep(nroIdentificacion);
+                receptor.setPaisRecep(country.getName());
+            }
+
             receptor.setRznSocRecep(partner.getName());
 
             // Datos geográficos
@@ -1233,15 +1242,10 @@ public class HandlerCFESisteco extends HandlerCFE {
             }
 
             receptor.setCodPaisRecep(country.getCountryCode());
-            receptor.setPaisRecep(country.getName());
             receptor.setCiudadRecep(location.getCity());
             receptor.setDeptoRecep(location.getRegionName());
             receptor.setDirRecep(direccion);
 
-            // Si es identificación OTRA
-            if (tipoIdentificacion == 4){
-                receptor.setDocRecepExt(nroIdentificacion);
-            }
 
         }
         catch (Exception e){
@@ -1545,10 +1549,10 @@ public class HandlerCFESisteco extends HandlerCFE {
                 cfeRespuesta.setAD_OrgTrx_ID(this.model.getAD_Org_ID());
 
                 if (cfeDtoSisteco.getFecVenc() != null){
-                    cfeRespuesta.setCFE_Vencimiento_CAE(cfeDtoSisteco.getFecVenc());
+                    //cfeRespuesta.setCFE_Vencimiento_CAE(cfeDtoSisteco.getFecVenc());
                 }
                 else {
-                    cfeRespuesta.setCFE_Vencimiento_CAE(this.configDocSend.getDueDate());
+                    //cfeRespuesta.setCFE_Vencimiento_CAE(this.configDocSend.getDueDate());
                 }
 
                 cfeRespuesta.setZ_CFE_Vendor_ID(this.configDocSend.getZ_CFE_Vendor_ID());
