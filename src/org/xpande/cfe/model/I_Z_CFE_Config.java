@@ -142,6 +142,8 @@ public interface I_Z_CFE_Config
 	  */
 	public int getTaxBasico_ID();
 
+	public I_C_Tax getTaxBasico() throws RuntimeException;
+
     /** Column name TaxExento_ID */
     public static final String COLUMNNAME_TaxExento_ID = "TaxExento_ID";
 
@@ -169,6 +171,51 @@ public interface I_Z_CFE_Config
 	  * ID de Impuesto Tasa Mínimo por Defecto
 	  */
 	public int getTaxMinimo_ID();
+
+	public I_C_Tax getTaxMinimo() throws RuntimeException;
+
+    /** Column name TaxRedondeo_ID */
+    public static final String COLUMNNAME_TaxRedondeo_ID = "TaxRedondeo_ID";
+
+	/** Set TaxRedondeo_ID.
+	  * ID de Tasa de Impuesto por defecto para Redondeo positivo
+	  */
+	public void setTaxRedondeo_ID (int TaxRedondeo_ID);
+
+	/** Get TaxRedondeo_ID.
+	  * ID de Tasa de Impuesto por defecto para Redondeo positivo
+	  */
+	public int getTaxRedondeo_ID();
+
+	public I_C_Tax getTaxRedondeo() throws RuntimeException;
+
+    /** Column name TaxRedondeoNeg_ID */
+    public static final String COLUMNNAME_TaxRedondeoNeg_ID = "TaxRedondeoNeg_ID";
+
+	/** Set TaxRedondeoNeg_ID.
+	  * ID de Tasa de Impuesto por defecto para Redondeo negativo
+	  */
+	public void setTaxRedondeoNeg_ID (int TaxRedondeoNeg_ID);
+
+	/** Get TaxRedondeoNeg_ID.
+	  * ID de Tasa de Impuesto por defecto para Redondeo negativo
+	  */
+	public int getTaxRedondeoNeg_ID();
+
+	public I_C_Tax getTaxRedondeoNeg() throws RuntimeException;
+
+    /** Column name TopeLinFact */
+    public static final String COLUMNNAME_TopeLinFact = "TopeLinFact";
+
+	/** Set TopeLinFact.
+	  * Tope lineas para eFacturas
+	  */
+	public void setTopeLinFact (int TopeLinFact);
+
+	/** Get TopeLinFact.
+	  * Tope lineas para eFacturas
+	  */
+	public int getTopeLinFact();
 
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";

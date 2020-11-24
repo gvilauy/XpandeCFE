@@ -30,7 +30,7 @@ public class X_Z_CFE_Config extends PO implements I_Z_CFE_Config, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20200827L;
+	private static final long serialVersionUID = 20201124L;
 
     /** Standard Constructor */
     public X_Z_CFE_Config (Properties ctx, int Z_CFE_Config_ID, String trxName)
@@ -130,6 +130,11 @@ public class X_Z_CFE_Config extends PO implements I_Z_CFE_Config, I_Persistent
 		return (String)get_Value(COLUMNNAME_EMailUserPW);
 	}
 
+	public I_C_Tax getTaxBasico() throws RuntimeException
+    {
+		return (I_C_Tax)MTable.get(getCtx(), I_C_Tax.Table_Name)
+			.getPO(getTaxBasico_ID(), get_TrxName());	}
+
 	/** Set TaxBasico_ID.
 		@param TaxBasico_ID 
 		ID de Impuesto Básico por Defecto
@@ -181,6 +186,11 @@ public class X_Z_CFE_Config extends PO implements I_Z_CFE_Config, I_Persistent
 		return ii.intValue();
 	}
 
+	public I_C_Tax getTaxMinimo() throws RuntimeException
+    {
+		return (I_C_Tax)MTable.get(getCtx(), I_C_Tax.Table_Name)
+			.getPO(getTaxMinimo_ID(), get_TrxName());	}
+
 	/** Set TaxMinimo_ID.
 		@param TaxMinimo_ID 
 		ID de Impuesto Tasa Mínimo por Defecto
@@ -199,6 +209,82 @@ public class X_Z_CFE_Config extends PO implements I_Z_CFE_Config, I_Persistent
 	public int getTaxMinimo_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_TaxMinimo_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public I_C_Tax getTaxRedondeo() throws RuntimeException
+    {
+		return (I_C_Tax)MTable.get(getCtx(), I_C_Tax.Table_Name)
+			.getPO(getTaxRedondeo_ID(), get_TrxName());	}
+
+	/** Set TaxRedondeo_ID.
+		@param TaxRedondeo_ID 
+		ID de Tasa de Impuesto por defecto para Redondeo positivo
+	  */
+	public void setTaxRedondeo_ID (int TaxRedondeo_ID)
+	{
+		if (TaxRedondeo_ID < 1) 
+			set_Value (COLUMNNAME_TaxRedondeo_ID, null);
+		else 
+			set_Value (COLUMNNAME_TaxRedondeo_ID, Integer.valueOf(TaxRedondeo_ID));
+	}
+
+	/** Get TaxRedondeo_ID.
+		@return ID de Tasa de Impuesto por defecto para Redondeo positivo
+	  */
+	public int getTaxRedondeo_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_TaxRedondeo_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public I_C_Tax getTaxRedondeoNeg() throws RuntimeException
+    {
+		return (I_C_Tax)MTable.get(getCtx(), I_C_Tax.Table_Name)
+			.getPO(getTaxRedondeoNeg_ID(), get_TrxName());	}
+
+	/** Set TaxRedondeoNeg_ID.
+		@param TaxRedondeoNeg_ID 
+		ID de Tasa de Impuesto por defecto para Redondeo negativo
+	  */
+	public void setTaxRedondeoNeg_ID (int TaxRedondeoNeg_ID)
+	{
+		if (TaxRedondeoNeg_ID < 1) 
+			set_Value (COLUMNNAME_TaxRedondeoNeg_ID, null);
+		else 
+			set_Value (COLUMNNAME_TaxRedondeoNeg_ID, Integer.valueOf(TaxRedondeoNeg_ID));
+	}
+
+	/** Get TaxRedondeoNeg_ID.
+		@return ID de Tasa de Impuesto por defecto para Redondeo negativo
+	  */
+	public int getTaxRedondeoNeg_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_TaxRedondeoNeg_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set TopeLinFact.
+		@param TopeLinFact 
+		Tope lineas para eFacturas
+	  */
+	public void setTopeLinFact (int TopeLinFact)
+	{
+		set_Value (COLUMNNAME_TopeLinFact, Integer.valueOf(TopeLinFact));
+	}
+
+	/** Get TopeLinFact.
+		@return Tope lineas para eFacturas
+	  */
+	public int getTopeLinFact () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_TopeLinFact);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();

@@ -589,6 +589,19 @@ public class HandlerCFEMigrate extends HandlerCFE {
                 }
 
                 MTax tax = null;
+                if (amtRounding.compareTo(Env.ZERO) >= 0){
+                    tax = (MTax) cfeConfig.getTaxRedondeo();
+                    if ((tax == null) || (tax.get_ID() <= 0)){
+                        return "Falta indicar Impuesto para Redondeo positivo";
+                    }
+                }
+                else {
+                    tax = (MTax) cfeConfig.getTaxRedondeoNeg();
+                    if ((tax == null) || (tax.get_ID() <= 0)){
+                        return "Falta indicar Impuesto para Redondeo negativo";
+                    }
+                }
+
                 String codigoImpuestoDGI = tax.get_ValueAsString("CodigoIVA");
                 if ((codigoImpuestoDGI != null) && (!codigoImpuestoDGI.trim().equalsIgnoreCase(""))){
                     int codIVA = Integer.valueOf(codigoImpuestoDGI).intValue();
@@ -605,9 +618,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
 
                 MUOM uom = new MUOM(ctx, 100, null);
                 item.setIteUniMed(uom.getUOMSymbol());
-
-                BigDecimal precioUnitario = amtRounding;
-                item.setItePrecioUnitario(precioUnitario);
+                item.setItePrecioUnitario(amtRounding);
                 item.setIteRecargoPct(Env.ZERO);
                 item.setIteRecargoMnt(Env.ZERO);
                 item.setIteDescuentoPct(Env.ZERO);
