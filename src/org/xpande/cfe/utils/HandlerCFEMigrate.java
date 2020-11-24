@@ -558,12 +558,75 @@ public class HandlerCFEMigrate extends HandlerCFE {
                 }
             }
 
+            // Si tengo redondeo en el cabezal, lo informo com linea de redondeo
+            BigDecimal amtRounding = (BigDecimal) invoice.get_Value("AmtRounding");
+
+            if (amtRounding == null) amtRounding = Env.ZERO;
+            if (amtRounding.compareTo(Env.ZERO) != 0){
+                // Cargo dol redondeo
+                MCharge charge = (MCharge) invoice.getC_Charge();
+                if ((charge == null) || (charge.get_ID() <= 0)){
+                    return "Falta indicar Cargo por Redondeo en este comprobante.";
+                }
+
+                String codigoLinea = null, nombreLinea = null, descLinea = null;
+                codigoLinea = String.valueOf(charge.get_ID());
+                nombreLinea = charge.getName();
+                descLinea = charge.getName();
+
+                CFEInvoiCyType.Detalle.Item item = new CFEInvoiCyType.Detalle.Item();
+                items.add(item);
+
+                CFEInvoiCyType.Detalle.Item.CodItem codItem = new CFEInvoiCyType.Detalle.Item.CodItem();
+                item.setCodItem(codItem);
+
+                // Codigo del producto
+                if (codigoLinea != null) {
+                    CFEInvoiCyType.Detalle.Item.CodItem.CodItemItem codItemItem = new CFEInvoiCyType.Detalle.Item.CodItem.CodItemItem();
+                    codItemItem.setIteCodiTpoCod("INT1");
+                    codItemItem.setIteCodiCod(codigoLinea);
+                    codItem.getCodItemItem().add(codItemItem);
+                }
+
+                MTax tax = null;
+                String codigoImpuestoDGI = tax.get_ValueAsString("CodigoIVA");
+                if ((codigoImpuestoDGI != null) && (!codigoImpuestoDGI.trim().equalsIgnoreCase(""))){
+                    int codIVA = Integer.valueOf(codigoImpuestoDGI).intValue();
+                    item.setIteIndFact(codIVA);
+                }
+                else{
+                    return "Tasa de impuesto en linea del Documento, no parametrizada para DGI";
+                }
+
+                item.setIteIndAgenteResp(null);
+                item.setIteNomItem(nombreLinea);
+                item.setIteDscItem(descLinea);
+                item.setIteCantidad(Env.ONE);
+
+                MUOM uom = new MUOM(ctx, 100, null);
+                item.setIteUniMed(uom.getUOMSymbol());
+
+                BigDecimal precioUnitario = amtRounding;
+                item.setItePrecioUnitario(precioUnitario);
+                item.setIteRecargoPct(Env.ZERO);
+                item.setIteRecargoMnt(Env.ZERO);
+                item.setIteDescuentoPct(Env.ZERO);
+                item.setIteDescuentoMonto(Env.ZERO);
+                item.setIteMontoItem(amtRounding);
+
+                // Si tengo precio unitario cero y no tengo codigo de impuesto 8 o 5, avisso con error.
+                if (item.getItePrecioUnitario().compareTo(Env.ZERO) == 0){
+                    if ((item.getIteIndFact() != 5) && (item.getIteIndFact() != 8)){
+                        return "No es posible indicar Precio Unitario igual a Cero, si el Indicador de Impuesto no es 8 o 5.";
+                    }
+                }
+            }
         }
         catch (Exception e){
             throw new AdempiereException(e);
         }
 
-        return message;
+        return null;
     }
 
 
