@@ -600,6 +600,8 @@ public class HandlerCFEMigrate extends HandlerCFE {
                     if ((tax == null) || (tax.get_ID() <= 0)){
                         return "Falta indicar Impuesto para Redondeo negativo";
                     }
+                    // Doy vuelta signo del redondeo porque DGI no acepta montos negativos
+                    amtRounding = amtRounding.negate();
                 }
 
                 String codigoImpuestoDGI = tax.get_ValueAsString("CodigoIVA");
@@ -1013,7 +1015,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
             throw new AdempiereException(e);
         }
 
-        return message;
+        return null;
     }
 
 
