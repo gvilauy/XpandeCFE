@@ -1245,6 +1245,14 @@ public class HandlerCFEMigrate extends HandlerCFE {
             totales.setTotMntTotal(amtTotal);
             totales.setTotMntPagar(invoice.getGrandTotal());
 
+            // Redondeo
+            totales.setTotMontoNF(Env.ZERO);
+            BigDecimal amtRounding = (BigDecimal) invoice.get_Value("AmtRounding");
+            if (amtRounding == null) amtRounding = Env.ZERO;
+            if (amtRounding.compareTo(Env.ZERO) != 0){
+                totales.setTotMontoNF(amtRounding);
+            }
+
             // Datos de Descuentos y Recargos Generales
             this.cfeInvoiCyType.setDscRcgGlobal(new CFEInvoiCyType.DscRcgGlobal());
             List<CFEInvoiCyType.DscRcgGlobal.DRGItem> drgItems = cfeInvoiCyType.getDscRcgGlobal().getDRGItem();
