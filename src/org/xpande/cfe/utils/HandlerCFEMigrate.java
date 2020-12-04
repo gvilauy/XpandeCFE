@@ -1151,7 +1151,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
 
             BigDecimal amtTotal = Env.ZERO;
 
-            // Recorro lineas para cargar totaless
+            // Recorro lineas para cargar totales
             MInvoice invoice = (MInvoice) this.model;
             MInvoiceLine[] invoiceLines = ((MInvoice) this.model).getLines(true);
             for (int i = 0; i < invoiceLines.length; i++){
@@ -1240,15 +1240,16 @@ public class HandlerCFEMigrate extends HandlerCFE {
                 amtTotal = amtTotal.add(amtSubtotal).add(taxAmt);
             }
 
+            BigDecimal amtRounding = (BigDecimal) invoice.get_Value("AmtRounding");
+            if (amtRounding == null) amtRounding = Env.ZERO;
+
             totales.setTotIVATasaMin(ivaMinimo.getRate().setScale(3));
             totales.setTotIVATasaBasica(ivaBasico.getRate().setScale(3));
             totales.setTotMntTotal(amtTotal);
-            totales.setTotMntPagar(invoice.getGrandTotal());
+            totales.setTotMntPagar(amtTotal.add(amtRounding));
 
             // Redondeo
             totales.setTotMontoNF(Env.ZERO);
-            BigDecimal amtRounding = (BigDecimal) invoice.get_Value("AmtRounding");
-            if (amtRounding == null) amtRounding = Env.ZERO;
             if (amtRounding.compareTo(Env.ZERO) != 0){
                 totales.setTotMontoNF(amtRounding);
             }
@@ -1369,9 +1370,13 @@ public class HandlerCFEMigrate extends HandlerCFE {
             idDoc.setCFETipoCFE(BigInteger.valueOf(Long.parseLong(docDGI.getCodigoDGI())));
             idDoc.setCFESerie(configDocSend.getDocumentSerie().trim());
 
-            if (invoice.getDescription() != null){
-                if (!invoice.getDescription().trim().equalsIgnoreCase("")){
-                    idDoc.setCFEAdenda(invoice.getDescription().trim());
+            String adendaCFE = invoice.get_ValueAsString("AdendaCFE");
+            if ((adendaCFE == null) || (adendaCFE.trim().equalsIgnoreCase(""))){
+                adendaCFE = invoice.getDescription();
+            }
+            if (adendaCFE != null){
+                if (!adendaCFE.trim().equalsIgnoreCase("")){
+                    idDoc.setCFEAdenda(adendaCFE.trim());
                 }
             }
 
@@ -1461,9 +1466,13 @@ public class HandlerCFEMigrate extends HandlerCFE {
             idDoc.setCFETipoCFE(BigInteger.valueOf(Long.parseLong(docDGI.getCodigoDGI())));
             idDoc.setCFESerie(configDocSend.getDocumentSerie().trim());
 
-            if (invoice.getDescription() != null){
-                if (!invoice.getDescription().trim().equalsIgnoreCase("")){
-                    idDoc.setCFEAdenda(invoice.getDescription().trim());
+            String adendaCFE = invoice.get_ValueAsString("AdendaCFE");
+            if ((adendaCFE == null) || (adendaCFE.trim().equalsIgnoreCase(""))){
+                adendaCFE = invoice.getDescription();
+            }
+            if (adendaCFE != null){
+                if (!adendaCFE.trim().equalsIgnoreCase("")){
+                    idDoc.setCFEAdenda(adendaCFE.trim());
                 }
             }
 
