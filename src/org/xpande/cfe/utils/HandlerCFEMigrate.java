@@ -46,9 +46,9 @@ import java.util.*;
  */
 public class HandlerCFEMigrate extends HandlerCFE {
 
-    private List<CFEInvoiCyType> cfeInvoiCyTypes = null;
-    private CFEInvoiCyType cfeInvoiCyType = null;
-    private EnvioCFE envioCFE = null;
+    private List<CFEInvoiCyType> cfeInvoiCyTypes;
+    private CFEInvoiCyType cfeInvoiCyType;
+    private EnvioCFE envioCFE;
 
 
     /***
