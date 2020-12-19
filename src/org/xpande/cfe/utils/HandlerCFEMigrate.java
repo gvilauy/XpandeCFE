@@ -786,7 +786,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
             throw new AdempiereException(e);
         }
 
-        return message;
+        return null;
     }
 
     /***
@@ -825,6 +825,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
             if (message != null) return message;
 
             // Referencia cuando es Contra-Resguardo
+            this.cfeInvoiCyType.setReferencia(new CFEInvoiCyType.Referencia());
             message = this.setReferencia_Resguardo();
             if (message != null) return message;
 
@@ -1150,11 +1151,14 @@ public class HandlerCFEMigrate extends HandlerCFE {
             totales.setTotMntTotRetenido(Env.ZERO);
 
             BigDecimal amtTotal = Env.ZERO;
+            BigDecimal amtTotalaPagar = Env.ZERO;
 
             // Recorro lineas para cargar totales
             MInvoice invoice = (MInvoice) this.model;
             MInvoiceLine[] invoiceLines = ((MInvoice) this.model).getLines(true);
             for (int i = 0; i < invoiceLines.length; i++){
+
+                boolean sumarTotal = true;
 
                 MInvoiceLine invoiceLine = invoiceLines[i];
                 MTax tax = MTax.get(this.ctx, invoiceLine.getC_Tax_ID());
@@ -1230,6 +1234,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
                     // NO FACTURABLE
                     else if (indFactCFE.equalsIgnoreCase("6")){
                         totales.setTotMontoNF(totales.getTotMontoNF().add(amtSubtotal));
+                        sumarTotal = false;
                     }
                     else {
                         totales.setTotMntNetoIVAOtra(totales.getTotMntNetoIVAOtra().add(amtSubtotal));
@@ -1237,7 +1242,10 @@ public class HandlerCFEMigrate extends HandlerCFE {
                     }
                 }
 
-                amtTotal = amtTotal.add(amtSubtotal).add(taxAmt);
+                if (sumarTotal){
+                    amtTotal = amtTotal.add(amtSubtotal).add(taxAmt);
+                }
+                amtTotalaPagar = amtTotalaPagar.add(amtSubtotal).add(taxAmt);
             }
 
             BigDecimal amtRounding = (BigDecimal) invoice.get_Value("AmtRounding");
@@ -1246,12 +1254,11 @@ public class HandlerCFEMigrate extends HandlerCFE {
             totales.setTotIVATasaMin(ivaMinimo.getRate().setScale(3));
             totales.setTotIVATasaBasica(ivaBasico.getRate().setScale(3));
             totales.setTotMntTotal(amtTotal);
-            totales.setTotMntPagar(amtTotal.add(amtRounding));
+            totales.setTotMntPagar(amtTotalaPagar.add(amtRounding));
 
             // Redondeo
-            totales.setTotMontoNF(Env.ZERO);
             if (amtRounding.compareTo(Env.ZERO) != 0){
-                totales.setTotMontoNF(amtRounding);
+                totales.setTotMontoNF(totales.getTotMontoNF().add(amtRounding));
             }
 
             // Datos de Descuentos y Recargos Generales
