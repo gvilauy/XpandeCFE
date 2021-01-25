@@ -35,7 +35,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
           <root url="jar://$USER_HOME$/Desarrollo/xpande/ExternalJars/jaxrpc-api.jar!/" />
@@ -44,6 +44,5 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="lib5" level="project" />
   </component>
 </module>

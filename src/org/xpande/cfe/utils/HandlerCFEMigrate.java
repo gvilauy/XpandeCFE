@@ -981,10 +981,15 @@ public class HandlerCFEMigrate extends HandlerCFE {
                             cfeRespuesta.setCFE_Vencimiento_CAE(this.configDocSend.getDueDate());
                         }
 
-                        if (cfeRet.getCFEDatosAvanzados().getCFECAEId() > 0){
-                            cfeRespuesta.setCFE_CAE_ID(Long.toString(cfeRet.getCFEDatosAvanzados().getCFECAEId()));
+                        if (cfeRet.getCFEDatosAvanzados().getCFECAEId() != null){
+                            if (cfeRet.getCFEDatosAvanzados().getCFECAEId() > 0){
+                                cfeRespuesta.setCFE_CAE_ID(Long.toString(cfeRet.getCFEDatosAvanzados().getCFECAEId()));
+                            }
+                            else {
+                                cfeRespuesta.setCFE_CAE_ID(this.configDocSend.getNumeroCAE());
+                            }
                         }
-                        else {
+                        else{
                             cfeRespuesta.setCFE_CAE_ID(this.configDocSend.getNumeroCAE());
                         }
 
@@ -1411,6 +1416,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
                 }
             }
 
+            /*
             String payRuleType = invoice.getPaymentRule();
             if (payRuleType != null){
                 if ((payRuleType.equalsIgnoreCase(X_C_Invoice.PAYMENTRULE_Cash)) || (payRuleType.equalsIgnoreCase(X_C_Invoice.PAYMENTRULE_DirectDeposit))
@@ -1419,6 +1425,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
                     idDoc.setCFEFmaPago(BigInteger.valueOf(1)); // 2 = Credito, 1 = Contado
                 }
             }
+            */
 
             Timestamp dueDate = ProcesadorCFE.getPaymentTermDueDate(this.ctx, invoice.getC_PaymentTerm_ID(), invoice.getDateInvoiced(), null);
             if (dueDate != null) {
