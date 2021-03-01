@@ -29,6 +29,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.xml.sax.InputSource;
+import org.xpande.core.utils.CurrencyUtils;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -93,7 +94,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
             Emisor emisor = this.setEmisor(this.configDocSend.getAD_OrgTrx_ID());
 
             // Obtengo datos del Receptor
-            Receptor receptor = this.setReceptor();
+            Receptor receptor = this.setReceptorInvoice();
 
             // Obtengo totales
             Totales totales = this.setTotalesInvoice();
@@ -811,7 +812,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
             Emisor emisor = this.setEmisor(this.configDocSend.getAD_OrgTrx_ID());
 
             // Obtengo datos del Receptor
-            Receptor receptor = this.setReceptor();
+            Receptor receptor = this.setReceptorResguardo();
 
             // Obtengo totales
             Totales totales = this.setTotalesResguardo();
@@ -1278,13 +1279,12 @@ public class HandlerCFEMigrate extends HandlerCFE {
         return totales;
     }
 
-
     /***
-     * Obtiene y retorna información del Receptor para comprobantes CFE.
+     * Obtiene y retorna información del Receptor para comprobantes CFE del tipo Resguardo.
      * Xpande. Created by Gabriel Vila on 10/30/18.
      * @return
      */
-    private Receptor setReceptor() {
+    private Receptor setReceptorResguardo() {
 
         Receptor receptor = new Receptor();
 
@@ -1346,7 +1346,6 @@ public class HandlerCFEMigrate extends HandlerCFE {
                 receptor.setRcpDeptoRecep(location.getRegionName());
                 receptor.setRcpDirRecep(direccion);
             }
-
         }
         catch (Exception e){
             throw new AdempiereException(e);
@@ -1355,6 +1354,104 @@ public class HandlerCFEMigrate extends HandlerCFE {
         return receptor;
     }
 
+    /***
+     * Obtiene y retorna información del Receptor para comprobantes CFE.
+     * Xpande. Created by Gabriel Vila on 10/30/18.
+     * @return
+     */
+    private Receptor setReceptorInvoice() {
+
+        Receptor receptor = new Receptor();
+
+        try{
+
+            MBPartner partner =  new MBPartner(this.ctx, this.model.get_ValueAsInt("C_BPartner_ID"), null);
+            MBPartnerLocation partnerLocation = new MBPartnerLocation(this.ctx, this.model.get_ValueAsInt("C_BPartner_Location_ID"), null);
+            if ((partnerLocation == null) || (partnerLocation.get_ID() <= 0)){
+                MBPartnerLocation[] locations = partner.getLocations(false);
+                if ((locations == null) || (locations.length <= 0)){
+                    throw new AdempiereException("Falta indicar Localización del Socio de Negocio de este Documento.");
+                }
+                partnerLocation = locations[0];
+            }
+
+            receptor.setRcpCorreoRecep(partnerLocation.getEMail());
+
+            MLocation location = (MLocation) partnerLocation.getC_Location();
+            if ((location == null) || (location.get_ID() <= 0)){
+                throw new AdempiereException("Falta indicar Dirección en la Localización del Socio de Negocio de este Documento.");
+            }
+            MCountry country = (MCountry) location.getC_Country();
+            if ((country == null) || (country.get_ID() <= 0)){
+                throw new AdempiereException("Falta indicar País en la Localización del Socio de Negocio de este Documento.");
+            }
+
+            // 2 = RUT, 3 = CI, 4 = Otros
+            int tipoIdentificacion = 4;
+            X_C_TaxGroup taxGroup = (X_C_TaxGroup) partner.getC_TaxGroup();
+            if (taxGroup.getValue() != null){
+                if (taxGroup.getValue().equalsIgnoreCase("RUT")){
+                    tipoIdentificacion = 2;
+                }
+                else if (taxGroup.getValue().equalsIgnoreCase("CI")){
+                    tipoIdentificacion = 3;
+                }
+            }
+            String nroIdentificacion = partner.getTaxID();
+
+            boolean pasaTopeUnidadIndexada = false;
+            MCurrency currency = MCurrency.get(ctx, "UNI");
+            if ((currency != null) && (currency.get_ID() > 0)){
+                MInvoice invoice = (MInvoice) this.model;
+
+                BigDecimal rateUni = CurrencyUtils.getCurrencyRate(ctx, invoice.getAD_Client_ID(), 0, currency.get_ID(),
+                        142, 114, invoice.getDateInvoiced(), null);
+                if (rateUni == null) rateUni = Env.ZERO;
+                if (rateUni.compareTo(Env.ZERO) > 0){
+                    BigDecimal amtInvoice = invoice.getGrandTotal();
+                    if (invoice.getC_Currency_ID() != 142){
+                        BigDecimal rateInv = CurrencyUtils.getCurrencyRate(ctx, invoice.getAD_Client_ID(), 0, invoice.getC_Currency_ID(),
+                                142, 114, invoice.getDateInvoiced(), null);
+                        if (rateInv == null) rateInv = Env.ZERO;
+                        if (rateInv.compareTo(Env.ZERO) > 0){
+                            amtInvoice = invoice.getGrandTotal().multiply(rateInv).setScale(2, RoundingMode.HALF_UP);
+                        }
+                    }
+                    BigDecimal amtTope = new BigDecimal(10000).multiply(rateUni).setScale(2, RoundingMode.HALF_UP);
+
+                    if (amtInvoice.compareTo(amtTope) > 0){
+                        pasaTopeUnidadIndexada = true;
+                    }
+                }
+            }
+
+            // Si es un cliente con identificación (NO ES OTROS) o se pasa del monto tope en unidades indexadas
+            if ((tipoIdentificacion != 4) || (pasaTopeUnidadIndexada)){
+
+                receptor.setRcpTipoDocRecep(tipoIdentificacion);
+                receptor.setRcpDocRecep(nroIdentificacion);
+                receptor.setRcpRznSocRecep(partner.getName());
+
+                // Datos geográficos
+                String direccion = location.getAddress1();
+                if (direccion != null) {
+                    if (direccion.length() > 70){
+                        direccion = direccion.substring(0, 70);
+                    }
+                }
+
+                receptor.setRcpCodPaisRecep(country.getCountryCode());
+                receptor.setRcpCiudadRecep(location.getCity());
+                receptor.setRcpDeptoRecep(location.getRegionName());
+                receptor.setRcpDirRecep(direccion);
+            }
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+
+        return receptor;
+    }
 
     /***
      * Obtiene y setea información del Encabezado de documentos correspondientes a eFacturas para envío de CFE.
