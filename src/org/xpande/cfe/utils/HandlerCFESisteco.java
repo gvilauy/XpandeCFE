@@ -1247,6 +1247,7 @@ public class HandlerCFESisteco extends HandlerCFE {
                 }
             }
 
+            
             // Si es un cliente con identificación (NO ES OTROS) o se pasa del monto tope en unidades indexadas
             if ((tipoIdentificacion != 4) || (pasaTopeUnidadIndexada)){
 
