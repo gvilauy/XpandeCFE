@@ -13,6 +13,7 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.eevolution.model.X_C_TaxGroup;
 import org.xpande.cfe.model.*;
+import org.xpande.core.utils.CurrencyUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -1220,6 +1221,61 @@ public class HandlerCFESisteco extends HandlerCFE {
 
             String nroIdentificacion = partner.getTaxID();
 
+            boolean pasaTopeUnidadIndexada = false;
+            MCurrency currency = MCurrency.get(ctx, "UNI");
+            if ((currency != null) && (currency.get_ID() > 0)){
+                MInvoice invoice = (MInvoice) this.model;
+
+                BigDecimal rateUni = CurrencyUtils.getCurrencyRate(ctx, invoice.getAD_Client_ID(), 0, currency.get_ID(),
+                        142, 114, invoice.getDateInvoiced(), null);
+                if (rateUni == null) rateUni = Env.ZERO;
+                if (rateUni.compareTo(Env.ZERO) > 0){
+                    BigDecimal amtInvoice = invoice.getGrandTotal();
+                    if (invoice.getC_Currency_ID() != 142){
+                        BigDecimal rateInv = CurrencyUtils.getCurrencyRate(ctx, invoice.getAD_Client_ID(), 0, invoice.getC_Currency_ID(),
+                                142, 114, invoice.getDateInvoiced(), null);
+                        if (rateInv == null) rateInv = Env.ZERO;
+                        if (rateInv.compareTo(Env.ZERO) > 0){
+                            amtInvoice = invoice.getGrandTotal().multiply(rateInv).setScale(2, RoundingMode.HALF_UP);
+                        }
+                    }
+                    BigDecimal amtTope = new BigDecimal(10000).multiply(rateUni).setScale(2, RoundingMode.HALF_UP);
+
+                    if (amtInvoice.compareTo(amtTope) > 0){
+                        pasaTopeUnidadIndexada = true;
+                    }
+                }
+            }
+
+            // Si es un cliente con identificación (NO ES OTROS) o se pasa del monto tope en unidades indexadas
+            if ((tipoIdentificacion != 4) || (pasaTopeUnidadIndexada)){
+
+                receptor.setTipoDocRecep(tipoIdentificacion);
+                receptor.setRznSocRecep(partner.getName());
+
+                if (tipoIdentificacion == 4){
+                    receptor.setDocRecepExt(nroIdentificacion);
+                }
+                else{
+                    receptor.setDocRecep(nroIdentificacion);
+                    receptor.setPaisRecep(country.getName());
+                }
+
+                // Datos geográficos
+                String direccion = location.getAddress1();
+                if (direccion != null) {
+                    if (direccion.length() > 70){
+                        direccion = direccion.substring(0, 70);
+                    }
+                }
+
+                receptor.setCodPaisRecep(country.getCountryCode());
+                receptor.setCiudadRecep(location.getCity());
+                receptor.setDeptoRecep(location.getRegionName());
+                receptor.setDirRecep(direccion);
+            }
+
+            /*
             receptor.setTipoDocRecep(tipoIdentificacion);
 
             // Si es identificación OTRA
@@ -1245,8 +1301,7 @@ public class HandlerCFESisteco extends HandlerCFE {
             receptor.setCiudadRecep(location.getCity());
             receptor.setDeptoRecep(location.getRegionName());
             receptor.setDirRecep(direccion);
-
-
+            */
         }
         catch (Exception e){
             throw new AdempiereException(e);
