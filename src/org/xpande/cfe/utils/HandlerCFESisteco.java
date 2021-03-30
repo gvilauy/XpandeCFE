@@ -13,7 +13,6 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.eevolution.model.X_C_TaxGroup;
 import org.xpande.cfe.model.*;
-import org.xpande.core.utils.CurrencyUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
