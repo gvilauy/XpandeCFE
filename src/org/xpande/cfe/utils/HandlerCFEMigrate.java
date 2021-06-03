@@ -1802,7 +1802,7 @@ public class HandlerCFEMigrate extends HandlerCFE {
             if (currency.get_ID() != 142){
                 BigDecimal currencyRate = (BigDecimal) this.model.get_Value("DivideRate");
                 if (currencyRate == null){
-                    Timestamp dateInvoiced = (Timestamp) this.model.get_Value("DateInvoiced");
+                    Timestamp dateInvoiced = (Timestamp) this.model.get_Value("DateDoc");
                     if (dateInvoiced != null){
                         currencyRate = MConversionRate.getRate(currency.get_ID(), 142, dateInvoiced, 0, model.getAD_Client_ID(), 0);
                     }
