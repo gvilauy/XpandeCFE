@@ -328,8 +328,6 @@ public class HandlerCFEMigrate extends HandlerCFE {
         return message;
     }
 
-
-
     /***
      * Setea referencia de Nota de Credito de documentos de eFactura.
      * Xpande. Created by Gabriel Vila on 11/1/18.

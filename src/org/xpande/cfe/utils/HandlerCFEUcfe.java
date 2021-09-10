@@ -1,19 +1,35 @@
 package org.xpande.cfe.utils;
 
-import dto.sisteco.SistecoConvertResponse;
-import dto.sisteco.SistecoResponseDTO;
-import dto.sisteco.cfe.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.uruware.ucfe.inbox.webservice.*;
+import com.uruware.ucfe.inbox.webservice.ObjectFactory;
 import org.adempiere.exceptions.AdempiereException;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.encoding.XMLType;
+import org.apache.axis.message.SOAPHeaderElement;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.compiere.model.*;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.compiere.util.TimeUtil;
 import org.eevolution.model.X_C_TaxGroup;
+import org.json.simple.JSONObject;
 import org.xpande.cfe.model.*;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
@@ -25,13 +41,17 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.nio.charset.Charset;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Properties;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import uy.gub.dgi.cfe.*;
 
 /**
  * Product: Adempiere ERP & CRM Smart Business Solution. Localization : Uruguay - Xpande
@@ -1508,54 +1528,164 @@ public class HandlerCFEUcfe extends HandlerCFE {
         String message = null;
 
         try {
+            MZCFEConfigDocDGI docDGI = (MZCFEConfigDocDGI) this.configDocSend.getZ_CFE_ConfigDocDGI();
 
-            File file = File.createTempFile("XML_CFE_UCFE", ".xml");
+            // URL del Web Service de Testing:
+            // https://geocomtest.ucfe.com.uy/Inbox/CfeService.svc
+
+            /*
+            Código de Comercio: COV0001
+            Código de Terminal: COV-1
+            Usuario y clave para autenticación:
+            Usuario: 212334750012
+            Clave: H9OZrv46OHijtQiVgH5jag==
+             */
+
+            File file = File.createTempFile("CFE1_UCFE", ".xml");
             //file.deleteOnExit();
-            JAXBContext jaxbContext = JAXBContext.newInstance(CFEEmpresasType.class);
-
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            jaxbMarshaller.marshal(this.empresasType, file);
-
+            JAXBContext jaxbContext1 = JAXBContext.newInstance(CFEDefType.class);
+            Marshaller jaxbMarshaller1 = jaxbContext1.createMarshaller();
+            jaxbMarshaller1.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            jaxbMarshaller1.marshal(this.empresasType.getCFE(), file);
             FileReader fr = new FileReader(file);
             BufferedReader br = new BufferedReader(fr);
-
             String linea;
             String xml = "";
             while((linea=br.readLine())!=null) {
-                xml += linea + "\n";
+                //xml += linea + "\n";
+                xml += linea;
             }
 
+            // Modelos para WS
+            //com.uruware.ucfe.inbox.webservice.ObjectFactory factory = new ObjectFactory();
+            String codComercio = "COV0001";
+            String codTerminal = "COV-1";
 
-            xml = xml.replace("xmlns=","xmlns:ns0=");
+            RequerimientoParaUcfe reqUcfe = new RequerimientoParaUcfe();
+            //String dgiXml = "<![CDATA[" + xml + "]]>";
+            String adenda = "PRUEBA COVADONGA";
+
+            Timestamp fechaHoy = TimeUtil.trunc(new Timestamp(System.currentTimeMillis()), TimeUtil.TRUNC_DAY);
+            Date date = new Date();
+            date.setTime(fechaHoy.getTime());
+            String fechaReqStr = new SimpleDateFormat("yyyyMMdd").format(date);
+            String horaReqStr = new SimpleDateFormat("HHmmss").format(date);
+
+            String fechaReq = fechaReqStr;
+            String horaReq = horaReqStr;
+            String idReq = "1";
+            String tipoCFE = docDGI.getCodigoDGI();
+
+            //reqUcfe.setCfeXmlOTexto(dgiXml);
+            reqUcfe.setCfeXmlOTexto(xml);
+            reqUcfe.setAdenda(adenda);
+            reqUcfe.setCodComercio(codComercio);
+            reqUcfe.setCodTerminal(codTerminal);
+            reqUcfe.setFechaReq(fechaReq);
+            reqUcfe.setHoraReq(horaReq);
+            reqUcfe.setIdReq(idReq);
+            reqUcfe.setTipoCfe(tipoCFE);
+            reqUcfe.setTipoMensaje(300);
+
+            String jsonReqParaUcfe = new Gson().toJson(reqUcfe);
+
+            String jbxReqUcfe = jsonReqParaUcfe;
+            String requestDate = (Instant.now().toString());
+            ReqBody reqBody = new ReqBody();
+            reqBody.setCodComercio(codComercio);
+            reqBody.setCodTerminal(codTerminal);
+            reqBody.setReq(jbxReqUcfe);
+            reqBody.setRequestDate(requestDate);
+            reqBody.setTout(30000);
+
+            UUID uuid = UUID.randomUUID();
+            JSONObject jsonReqUcfe = new JSONObject();
+            jsonReqUcfe.put("Adenda", null);
+            jsonReqUcfe.put("Certificado", null);
+            jsonReqUcfe.put("CfeXmlOTexto", xml);
+            jsonReqUcfe.put("CodComercio", codComercio);
+            jsonReqUcfe.put("CodTerminal", codTerminal);
+            jsonReqUcfe.put("EmailEnvioPdfReceptor", null);
+            jsonReqUcfe.put("EstadoSituacion", null);
+            jsonReqUcfe.put("FechaReq", fechaReqStr);
+            jsonReqUcfe.put("HoraReq", horaReqStr);
+            jsonReqUcfe.put("IdReq", "1");
+            jsonReqUcfe.put("Impresora", null);
+            jsonReqUcfe.put("NumeroCfe", null);
+            jsonReqUcfe.put("RechCom", null);
+            jsonReqUcfe.put("RutEmisor", null);
+            jsonReqUcfe.put("Serie", null);
+            jsonReqUcfe.put("TipoCfe", tipoCFE);
+            jsonReqUcfe.put("TipoMensaje", 310);
+            jsonReqUcfe.put("Uuid", uuid.toString());
+
+
+            JSONObject jsonReqBody = new JSONObject();
+            jsonReqBody.put("HMAC", null);
+            jsonReqBody.put("Req", jsonReqUcfe);
+            jsonReqBody.put("RequestDate", requestDate);
+            jsonReqBody.put("Tout", 30000);
+            jsonReqBody.put("ReqEnc", null);
+            jsonReqBody.put("CodComercio", codComercio);
+            jsonReqBody.put("CodTerminal", codTerminal);
 
             /*
-            xml = xml
-                    .replace("<CFE version=\"1.0\" xmlns:ns0=\"http://cfe.dgi.gub.uy\">", "<ns0:CFE version=\"1.0\">")
-                    .replace("<CFE xmlns:ns0=\"http://cfe.dgi.gub.uy\" version=\"1.0\">", "<ns0:CFE version=\"1.0\">")
-                    .replace("</CFE>","</ns0:CFE>")
-                    .replace("<CFE_Adenda ", "<ns0:CFE_Adenda xmlns:ns0=\"http://cfe.dgi.gub.uy\"")
-                    .replace("</CFE_Adenda>", "</ns0:CFE_Adenda>")
-                    .replace(" xmlns:ns0=\"http://cfe.dgi.gub.uy\"xmlns:ns2=\"http://www.w3.org/2000/09/xmldsig#\"", " xmlns:ns0=\"http://cfe.dgi.gub.uy\" xmlns:ns2=\"http://www.w3.org/2000/09/xmldsig#\"")
-                    .replace(" xmlns:ns0=\"http://cfe.dgi.gub.uy\"xmlns:ns2=\"http://www.w3.org/2001/04/xmlenc#\"", " xmlns:ns0=\"http://cfe.dgi.gub.uy\" xmlns:ns2=\"http://www.w3.org/2001/04/xmldsig#\"")
-                    .replace("<Adenda", "<ns0:Adenda")
-                    .replace("</Adenda>", "</ns0:Adenda>");
-             */
+            ObjectMapper Obj = new ObjectMapper();
+            String jsonStr = Obj.writeValueAsString(reqBody);
+            */
 
-            PrintWriter pw = new PrintWriter(file);
-            pw.println(xml);
-            pw.close();
+            //String jsonStr = new Gson().toJson(reqBody);
+
+            String jsonStr = jsonReqBody.toString();
+
+
+            jsonStr = jsonStr.replace("cfeDefType", "CFE");
+
+            System.out.println(jsonStr);
+
+            CloseableHttpResponse response = this.executeHttpRequest(jsonStr);
+            HttpEntity entity = response.getEntity();
+            String responseString = EntityUtils.toString(entity, "UTF-8");
+            System.out.println(responseString);
+
+            /*
+            File file2 = File.createTempFile("CFE2_UCFE", ".xml");
+            //file.deleteOnExit();
+            JAXBContext jaxbContext = JAXBContext.newInstance(ReqBody.class);
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            jaxbMarshaller.marshal(reqBody, file2);
+
+            FileReader fr2 = new FileReader(file2);
+            BufferedReader br2 = new BufferedReader(fr2);
+
+            String linea2;
+            String xml2 = "";
+            while((linea2=br2.readLine())!=null) {
+                xml2 += linea2 + "\n";
+            }
+
+            PrintWriter pw2 = new PrintWriter(file2);
+            pw2.println(xml2);
+            pw2.close();
 
             Service service = new Service();
-
             Call call = (Call) service.createCall();
-            call.setTargetEndpointAddress(new java.net.URL(vendorOrg.getTargetEndpointAddress()));
-            call.setOperationName(new QName(vendorOrg.getnamespaceURL(), vendorOrg.getOperationName()));
-            call.setSOAPActionURI(vendorOrg.getSOAPActionURI());
+            call.setTargetEndpointAddress(new java.net.URL("https://geocomtest.ucfe.com.uy/Inbox/CfeService.svc"));
+            call.setOperationName(new QName("http://www.uruware.com/ucfe/inbox/webservice", "Invoke"));
+            call.setSOAPActionURI("https://geocomtest.ucfe.com.uy/Inbox/CfeService.svc");
             call.addParameter(new QName("entrada"), XMLType.XSD_STRING, ParameterMode.IN);
             call.setReturnType(XMLType.XSD_STRING);
 
-            String result = (String) call.invoke(vendorOrg.getnamespaceURL(), vendorOrg.getOperationName(), new Object[] { "<![CDATA[" + xml + "]]>" });
+            // Autenticación
+            SOAPHeaderElement authentication = new SOAPHeaderElement("http://www.uruware.com/ucfe/inbox/webservice","Authentication");
+            SOAPHeaderElement user = new SOAPHeaderElement("http://www.uruware.com/ucfe/inbox/webservice","User", "212334750012");
+            SOAPHeaderElement password = new SOAPHeaderElement("http://www.uruware.com/ucfe/inbox/webservice","Password", "H9OZrv46OHijtQiVgH5jag==");
+            authentication.addChild(user);
+            authentication.addChild(password);
+            call.addHeader(authentication);
+
+            String result = (String) call.invoke("http://www.uruware.com/ucfe/inbox/webservice", "Invoke", new Object[] {xml2});
 
             result = result.replaceAll("^<!\\[CDATA\\[", "").replaceAll("]]>$", "");
 
@@ -1609,6 +1739,7 @@ public class HandlerCFEUcfe extends HandlerCFE {
                 cfeRespuesta.setZ_CFE_Vendor_ID(this.configDocSend.getZ_CFE_Vendor_ID());
             }
             cfeRespuesta.saveEx();
+            */
 
         }
         catch (Exception e) {
@@ -1638,7 +1769,7 @@ public class HandlerCFEUcfe extends HandlerCFE {
             emisor.setCdgDGISucur(BigInteger.valueOf(1)); // 1 - Covadonga, 2 - Planeta.
 
             MWarehouse warehouse = MWarehouse.get(this.ctx, orgInfo.getM_Warehouse_ID());
-            emisor.setEmiSucursal(warehouse.getName());
+            //emisor.setEmiSucursal(warehouse.getName());
 
             MLocation location = (MLocation) orgInfo.getC_Location();
             emisor.setDomFiscal(location.getAddress1());
@@ -1691,8 +1822,7 @@ public class HandlerCFEUcfe extends HandlerCFE {
 
             this.defType.setVersion("1.0");
 
-            // Sisteco no requiere emisor.
-            //eFactEncabezado.setEmisor(emisor);
+            eFactEncabezado.setEmisor(emisor);
 
             eFactEncabezado.setReceptor(receptor);
             eFactEncabezado.setTotales(totales);
@@ -1858,6 +1988,71 @@ public class HandlerCFEUcfe extends HandlerCFE {
         } catch (DatatypeConfigurationException e) {
             throw new AdempiereException(e);
         }
+    }
+
+    /***
+     * Convierte string en formato yyyy-MM-dd a Timestamp
+     * Xpande. Created by Gabriel Vila on 11/20/19.
+     * @param str_date
+     * @param separador
+     * @return
+     */
+    private Timestamp convertStringToTimestamp_yyyyMMdd(String str_date, String separador) {
+
+        try {
+            DateFormat formatter;
+            formatter = new SimpleDateFormat("yyyy" + separador + "MM" + separador + "dd");
+            Date date = formatter.parse(str_date);
+            java.sql.Timestamp timeStampDate = new Timestamp(date.getTime());
+
+            return timeStampDate;
+
+        } catch (ParseException e) {
+            System.out.println("Exception :" + e);
+            return null;
+        }
+    }
+
+    /***
+     * Ejecuta el Http Request de interface POS según parametros recibidos.
+     * Xpande. Created by Gabriel Vila on 7/11/17.
+     * @param jsonObject
+     * @param configServ
+     * @return
+     */
+    private CloseableHttpResponse executeHttpRequest(String jsonStr) {
+
+        CloseableHttpResponse response = null;
+        try{
+            int timeout = 120;
+            String urlRequest = "https://geocomtest.ucfe.com.uy/Inbox/CfeService.svc/rest/Invoke";
+            String loginCredential = "212334750012:NgE6HPGiAZUgPxZwEi5zZQ==";
+
+            RequestConfig config = RequestConfig.custom()
+                    .setConnectTimeout(timeout * 1000)
+                    .setConnectionRequestTimeout(timeout * 1000)
+                    .setSocketTimeout(timeout * 1000).build();
+
+            CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+
+            HttpEntityEnclosingRequestBase request = null;
+            request = new HttpPost(urlRequest);
+
+            StringEntity params = new StringEntity(jsonStr, "UTF-8");
+            request.addHeader("Accept", "application/json");
+            request.addHeader("content-type", "application/json");
+            request.setEntity(params);
+
+            byte[] encodedAuth = org.apache.commons.codec.binary.Base64.encodeBase64(loginCredential.getBytes(Charset.forName("ISO-8859-1")));
+            String authHeader = "Basic " + new String(encodedAuth);
+            request.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
+
+            response = httpClient.execute(request);
+        }
+        catch (Exception e){
+            throw new AdempiereException(e);
+        }
+        return response;
     }
 
 }

@@ -36,6 +36,7 @@ import javax.xml.bind.annotation.*;
     "cfe",
     "adenda"
 })
+@XmlRootElement
 public class CFEEmpresasType {
 
     @XmlElement(name = "CFE", required = true)

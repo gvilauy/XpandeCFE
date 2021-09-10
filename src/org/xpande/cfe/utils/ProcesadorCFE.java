@@ -78,6 +78,9 @@ public class ProcesadorCFE {
             else if (cfeVendor.getValue().equalsIgnoreCase("MIGRATE")){
                 handlerCFE = new HandlerCFEMigrate(this.ctx, model, this.trxName, configDocSend);
             }
+            else if (cfeVendor.getValue().equalsIgnoreCase("UCFE")){
+                handlerCFE = new HandlerCFEUcfe(this.ctx, model, this.trxName, configDocSend);
+            }
 
             // Según tipo de entidad, construyo modelos de CFE en el manejador.
             if (configDocSend.getTipoEntidadCFE().equalsIgnoreCase(X_Z_CFE_ConfigDocSend.TIPOENTIDADCFE_INVOICE)){
