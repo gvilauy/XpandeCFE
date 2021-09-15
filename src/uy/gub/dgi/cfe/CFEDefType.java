@@ -357,6 +357,7 @@ import org.w3._2000._09.xmldsig_.SignatureType;
     "eBoleta",
     "signature"
 })
+@XmlRootElement
 public class CFEDefType {
 
     protected ETck eTck;
