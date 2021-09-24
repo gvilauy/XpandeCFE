@@ -2025,7 +2025,11 @@ public class HandlerCFEUcfe extends HandlerCFE {
         CloseableHttpResponse response = null;
         try{
             int timeout = 120;
-            String urlRequest = "https://geocomtest.ucfe.com.uy/Inbox/CfeService.svc/rest/Invoke";
+            //String urlRequest = "https://geocomtest.ucfe.com.uy/Inbox/CfeService.svc/rest/Invoke";
+            // http://172.23.8.12/Inbox/CfeService.svc?singleWsdl
+
+            //String urlRequest = "http://10.102.215.57:8502/Inbox/CfeService.svc/rest/Invoke";
+            String urlRequest = "http://10.102.215.57/Inbox/CfeService.svc/rest/Invoke";
             String loginCredential = "212334750012:NgE6HPGiAZUgPxZwEi5zZQ==";
 
             RequestConfig config = RequestConfig.custom()
@@ -2043,9 +2047,11 @@ public class HandlerCFEUcfe extends HandlerCFE {
             request.addHeader("content-type", "application/json");
             request.setEntity(params);
 
+            /*
             byte[] encodedAuth = org.apache.commons.codec.binary.Base64.encodeBase64(loginCredential.getBytes(Charset.forName("ISO-8859-1")));
             String authHeader = "Basic " + new String(encodedAuth);
             request.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
+            */
 
             response = httpClient.execute(request);
         }
