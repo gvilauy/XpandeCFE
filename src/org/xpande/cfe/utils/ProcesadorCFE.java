@@ -78,7 +78,7 @@ public class ProcesadorCFE {
             else if (cfeVendor.getValue().equalsIgnoreCase("MIGRATE")){
                 handlerCFE = new HandlerCFEMigrate(this.ctx, model, this.trxName, configDocSend);
             }
-            else if (cfeVendor.getValue().equalsIgnoreCase("UCFE")){
+            else if (cfeVendor.getValue().equalsIgnoreCase("GEOCOM")){
                 handlerCFE = new HandlerCFEUcfe(this.ctx, model, this.trxName, configDocSend);
             }
 
