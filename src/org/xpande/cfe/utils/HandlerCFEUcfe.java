@@ -1848,7 +1848,6 @@ public class HandlerCFEUcfe extends HandlerCFE {
             eFactura.setTmstFirma(TS_to_XmlGregorianCalendar_OnlyDate(invoice.getDateInvoiced(), true));
             eFactura.setTmstFirma(null);
 
-
             IdDocFact idDoc = new IdDocFact();
             eFactEncabezado.setIdDoc(idDoc);
             idDoc.setTipoCFE(BigInteger.valueOf(Long.parseLong(docDGI.getCodigoDGI())));
@@ -1946,8 +1945,7 @@ public class HandlerCFEUcfe extends HandlerCFE {
 
             this.defType.setVersion("1.0");
 
-            // Sisteco no requiere emisor.
-            //eFactEncabezado.setEmisor(emisor);
+            eTicketEncabezado.setEmisor(emisor);
 
             eTicketEncabezado.setReceptor(receptor);
             eTicketEncabezado.setTotales(totales);
