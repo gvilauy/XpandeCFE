@@ -2,32 +2,32 @@
 // Este archivo ha sido generado por la arquitectura JavaTM para la implantación de la referencia de enlace (JAXB) XML v2.3.0.1 
 // Visite <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Todas las modificaciones realizadas en este archivo se perderán si se vuelve a compilar el esquema de origen. 
-// Generado el: 2022.05.23 a las 05:37:24 PM UTC 
+// Generado el: 2022.05.23 a las 05:29:35 PM UTC 
 //
 
 
 package uy.gub.dgi.cfe;
 
-import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Clase Java para RsmnData_Fac_Cont complex type.
+ * <p>Clase Java para ParamConsultaType complex type.
  * 
  * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
  * 
  * <pre>
- * &lt;complexType name="RsmnData_Fac_Cont"&gt;
+ * &lt;complexType name="ParamConsultaType"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="Montos" type="{http://cfe.dgi.gub.uy}Montos_FyT" minOccurs="0"/&gt;
- *         &lt;element name="CantCFCEmi" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger"/&gt;
+ *         &lt;element name="Token" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/&gt;
+ *         &lt;element name="Fechahora" type="{http://cfe.dgi.gub.uy}FechaHoraType"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -37,64 +37,62 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "RsmnData_Fac_Cont", propOrder = {
-    "montos",
-    "cantCFCEmi"
+@XmlType(name = "ParamConsultaType", propOrder = {
+    "token",
+    "fechahora"
 })
-public class RsmnDataFacCont {
+public class ParamConsultaType {
 
-    @XmlElement(name = "Montos")
-    protected MontosFyT montos;
-    @XmlElement(name = "CantCFCEmi", required = true)
-    @XmlSchemaType(name = "nonNegativeInteger")
-    protected BigInteger cantCFCEmi;
+    @XmlElement(name = "Token", required = true)
+    protected byte[] token;
+    @XmlElement(name = "Fechahora", required = true)
+    @XmlSchemaType(name = "dateTime")
+    protected XMLGregorianCalendar fechahora;
 
     /**
-     * Obtiene el valor de la propiedad montos.
+     * Obtiene el valor de la propiedad token.
      * 
      * @return
      *     possible object is
-     *     {@link MontosFyT }
-     *     
+     *     byte[]
      */
-    public MontosFyT getMontos() {
-        return montos;
+    public byte[] getToken() {
+        return token;
     }
 
     /**
-     * Define el valor de la propiedad montos.
+     * Define el valor de la propiedad token.
      * 
      * @param value
      *     allowed object is
-     *     {@link MontosFyT }
-     *     
+     *     byte[]
      */
-    public void setMontos(MontosFyT value) {
-        this.montos = value;
+    public void setToken(byte[] value) {
+        this.token = value;
     }
 
     /**
-     * Obtiene el valor de la propiedad cantCFCEmi.
+     * Obtiene el valor de la propiedad fechahora.
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link XMLGregorianCalendar }
      *     
      */
-    public BigInteger getCantCFCEmi() {
-        return cantCFCEmi;
+    public XMLGregorianCalendar getFechahora() {
+        return fechahora;
     }
 
     /**
-     * Define el valor de la propiedad cantCFCEmi.
+     * Define el valor de la propiedad fechahora.
      * 
      * @param value
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link XMLGregorianCalendar }
      *     
      */
-    public void setCantCFCEmi(BigInteger value) {
-        this.cantCFCEmi = value;
+    public void setFechahora(XMLGregorianCalendar value) {
+        this.fechahora = value;
     }
 
 }

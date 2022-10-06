@@ -2,7 +2,7 @@
 // Este archivo ha sido generado por la arquitectura JavaTM para la implantación de la referencia de enlace (JAXB) XML v2.3.0.1 
 // Visite <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Todas las modificaciones realizadas en este archivo se perderán si se vuelve a compilar el esquema de origen. 
-// Generado el: 2022.05.23 a las 05:32:20 PM UTC 
+// Generado el: 2022.05.23 a las 05:29:35 PM UTC 
 //
 
 
@@ -22,12 +22,12 @@ import org.w3._2000._09.xmldsig_.SignatureType;
 
 
 /**
- * <p>Clase Java para CFEsAnuladosdefType complex type.
+ * <p>Clase Java para ACKSobredefType complex type.
  * 
  * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
  * 
  * <pre>
- * &lt;complexType name="CFEsAnuladosdefType"&gt;
+ * &lt;complexType name="ACKSobredefType"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
@@ -36,20 +36,25 @@ import org.w3._2000._09.xmldsig_.SignatureType;
  *             &lt;complexContent&gt;
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *                 &lt;sequence&gt;
- *                   &lt;element name="RUCEmisor" type="{http://cfe.dgi.gub.uy}RUCType"/&gt;
  *                   &lt;element name="RUCReceptor" type="{http://cfe.dgi.gub.uy}RUCType"/&gt;
- *                   &lt;element name="IDComunicacion" minOccurs="0"&gt;
+ *                   &lt;element name="RUCEmisor" type="{http://cfe.dgi.gub.uy}RUCType"/&gt;
+ *                   &lt;element name="IDRespuesta"&gt;
  *                     &lt;simpleType&gt;
  *                       &lt;restriction base="{http://www.w3.org/2001/XMLSchema}integer"&gt;
  *                         &lt;totalDigits value="10"/&gt;
  *                       &lt;/restriction&gt;
  *                     &lt;/simpleType&gt;
  *                   &lt;/element&gt;
- *                   &lt;element name="CantCFEAnulados"&gt;
+ *                   &lt;element name="NomArch" type="{http://cfe.dgi.gub.uy}NomArchType"/&gt;
+ *                   &lt;element name="FecHRecibido" type="{http://cfe.dgi.gub.uy}FechaHoraType"/&gt;
+ *                   &lt;element name="IDEmisor" type="{http://cfe.dgi.gub.uy}IDRecEmiType"/&gt;
+ *                   &lt;element name="IDReceptor" type="{http://cfe.dgi.gub.uy}IDRecEmiType"/&gt;
+ *                   &lt;element name="CantidadCFE"&gt;
  *                     &lt;simpleType&gt;
  *                       &lt;restriction base="{http://www.w3.org/2001/XMLSchema}integer"&gt;
  *                         &lt;totalDigits value="3"/&gt;
  *                         &lt;minInclusive value="0"/&gt;
+ *                         &lt;maxInclusive value="250"/&gt;
  *                       &lt;/restriction&gt;
  *                     &lt;/simpleType&gt;
  *                   &lt;/element&gt;
@@ -59,31 +64,14 @@ import org.w3._2000._09.xmldsig_.SignatureType;
  *             &lt;/complexContent&gt;
  *           &lt;/complexType&gt;
  *         &lt;/element&gt;
- *         &lt;element name="CFEAnulado" maxOccurs="250"&gt;
+ *         &lt;element name="Detalle"&gt;
  *           &lt;complexType&gt;
  *             &lt;complexContent&gt;
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *                 &lt;sequence&gt;
- *                   &lt;element name="TipoCFE" type="{http://cfe.dgi.gub.uy}CFEType"/&gt;
- *                   &lt;element name="Serie" type="{http://cfe.dgi.gub.uy}SerieType"/&gt;
- *                   &lt;element name="NroCFE" type="{http://cfe.dgi.gub.uy}NroCFEType"/&gt;
- *                   &lt;element name="FechaCFE" type="{http://cfe.dgi.gub.uy}FechaType"/&gt;
- *                   &lt;element name="Motivo_Cod"&gt;
- *                     &lt;simpleType&gt;
- *                       &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
- *                         &lt;length value="2"/&gt;
- *                         &lt;enumeration value="RD"/&gt;
- *                       &lt;/restriction&gt;
- *                     &lt;/simpleType&gt;
- *                   &lt;/element&gt;
- *                   &lt;element name="Motivo_Glosa"&gt;
- *                     &lt;simpleType&gt;
- *                       &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
- *                         &lt;maxLength value="40"/&gt;
- *                         &lt;enumeration value="Comprobante anulado por rechazo de DGI"/&gt;
- *                       &lt;/restriction&gt;
- *                     &lt;/simpleType&gt;
- *                   &lt;/element&gt;
+ *                   &lt;element name="Estado" type="{http://cfe.dgi.gub.uy}EstadoACKSobreType"/&gt;
+ *                   &lt;element name="MotivosRechazo" type="{http://cfe.dgi.gub.uy}RechazoSobreType" maxOccurs="30" minOccurs="0"/&gt;
+ *                   &lt;element name="ParamConsulta" type="{http://cfe.dgi.gub.uy}ParamConsultaType" minOccurs="0"/&gt;
  *                 &lt;/sequence&gt;
  *               &lt;/restriction&gt;
  *             &lt;/complexContent&gt;
@@ -106,17 +94,17 @@ import org.w3._2000._09.xmldsig_.SignatureType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "CFEsAnuladosdefType", propOrder = {
+@XmlType(name = "ACKSobredefType", propOrder = {
     "caratula",
-    "cfeAnulado",
+    "detalle",
     "signature"
 })
-public class CFEsAnuladosdefType {
+public class ACKSobredefType {
 
     @XmlElement(name = "Caratula", required = true)
     protected Caratula caratula;
-    @XmlElement(name = "CFEAnulado", required = true)
-    protected List<CFEAnulado> cfeAnulado;
+    @XmlElement(name = "Detalle", required = true)
+    protected Detalle detalle;
     @XmlElement(name = "Signature", namespace = "http://www.w3.org/2000/09/xmldsig#", required = true)
     protected SignatureType signature;
     @XmlAttribute(name = "version", required = true)
@@ -147,32 +135,27 @@ public class CFEsAnuladosdefType {
     }
 
     /**
-     * Gets the value of the cfeAnulado property.
+     * Obtiene el valor de la propiedad detalle.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the cfeAnulado property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getCFEAnulado().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link CFEAnulado }
-     * 
-     * 
+     * @return
+     *     possible object is
+     *     {@link Detalle }
+     *     
      */
-    public List<CFEAnulado> getCFEAnulado() {
-        if (cfeAnulado == null) {
-            cfeAnulado = new ArrayList<CFEAnulado>();
-        }
-        return this.cfeAnulado;
+    public Detalle getDetalle() {
+        return detalle;
+    }
+
+    /**
+     * Define el valor de la propiedad detalle.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Detalle }
+     *     
+     */
+    public void setDetalle(Detalle value) {
+        this.detalle = value;
     }
 
     /**
@@ -238,20 +221,25 @@ public class CFEsAnuladosdefType {
      *   &lt;complexContent&gt;
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
      *       &lt;sequence&gt;
-     *         &lt;element name="RUCEmisor" type="{http://cfe.dgi.gub.uy}RUCType"/&gt;
      *         &lt;element name="RUCReceptor" type="{http://cfe.dgi.gub.uy}RUCType"/&gt;
-     *         &lt;element name="IDComunicacion" minOccurs="0"&gt;
+     *         &lt;element name="RUCEmisor" type="{http://cfe.dgi.gub.uy}RUCType"/&gt;
+     *         &lt;element name="IDRespuesta"&gt;
      *           &lt;simpleType&gt;
      *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}integer"&gt;
      *               &lt;totalDigits value="10"/&gt;
      *             &lt;/restriction&gt;
      *           &lt;/simpleType&gt;
      *         &lt;/element&gt;
-     *         &lt;element name="CantCFEAnulados"&gt;
+     *         &lt;element name="NomArch" type="{http://cfe.dgi.gub.uy}NomArchType"/&gt;
+     *         &lt;element name="FecHRecibido" type="{http://cfe.dgi.gub.uy}FechaHoraType"/&gt;
+     *         &lt;element name="IDEmisor" type="{http://cfe.dgi.gub.uy}IDRecEmiType"/&gt;
+     *         &lt;element name="IDReceptor" type="{http://cfe.dgi.gub.uy}IDRecEmiType"/&gt;
+     *         &lt;element name="CantidadCFE"&gt;
      *           &lt;simpleType&gt;
      *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}integer"&gt;
      *               &lt;totalDigits value="3"/&gt;
      *               &lt;minInclusive value="0"/&gt;
+     *               &lt;maxInclusive value="250"/&gt;
      *             &lt;/restriction&gt;
      *           &lt;/simpleType&gt;
      *         &lt;/element&gt;
@@ -266,49 +254,38 @@ public class CFEsAnuladosdefType {
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "rucEmisor",
         "rucReceptor",
-        "idComunicacion",
-        "cantCFEAnulados",
+        "rucEmisor",
+        "idRespuesta",
+        "nomArch",
+        "fecHRecibido",
+        "idEmisor",
+        "idReceptor",
+        "cantidadCFE",
         "tmst"
     })
     public static class Caratula {
 
-        @XmlElement(name = "RUCEmisor", required = true)
-        protected String rucEmisor;
         @XmlElement(name = "RUCReceptor", required = true)
         protected String rucReceptor;
-        @XmlElement(name = "IDComunicacion")
-        protected BigInteger idComunicacion;
-        @XmlElement(name = "CantCFEAnulados", required = true)
-        protected BigInteger cantCFEAnulados;
+        @XmlElement(name = "RUCEmisor", required = true)
+        protected String rucEmisor;
+        @XmlElement(name = "IDRespuesta", required = true)
+        protected BigInteger idRespuesta;
+        @XmlElement(name = "NomArch", required = true)
+        protected String nomArch;
+        @XmlElement(name = "FecHRecibido", required = true)
+        @XmlSchemaType(name = "dateTime")
+        protected XMLGregorianCalendar fecHRecibido;
+        @XmlElement(name = "IDEmisor", required = true)
+        protected BigInteger idEmisor;
+        @XmlElement(name = "IDReceptor", required = true)
+        protected BigInteger idReceptor;
+        @XmlElement(name = "CantidadCFE")
+        protected int cantidadCFE;
         @XmlElement(name = "Tmst", required = true)
         @XmlSchemaType(name = "dateTime")
         protected XMLGregorianCalendar tmst;
-
-        /**
-         * Obtiene el valor de la propiedad rucEmisor.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getRUCEmisor() {
-            return rucEmisor;
-        }
-
-        /**
-         * Define el valor de la propiedad rucEmisor.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setRUCEmisor(String value) {
-            this.rucEmisor = value;
-        }
 
         /**
          * Obtiene el valor de la propiedad rucReceptor.
@@ -335,51 +312,163 @@ public class CFEsAnuladosdefType {
         }
 
         /**
-         * Obtiene el valor de la propiedad idComunicacion.
+         * Obtiene el valor de la propiedad rucEmisor.
+         * 
+         * @return
+         *     possible object is
+         *     {@link String }
+         *     
+         */
+        public String getRUCEmisor() {
+            return rucEmisor;
+        }
+
+        /**
+         * Define el valor de la propiedad rucEmisor.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *     
+         */
+        public void setRUCEmisor(String value) {
+            this.rucEmisor = value;
+        }
+
+        /**
+         * Obtiene el valor de la propiedad idRespuesta.
          * 
          * @return
          *     possible object is
          *     {@link BigInteger }
          *     
          */
-        public BigInteger getIDComunicacion() {
-            return idComunicacion;
+        public BigInteger getIDRespuesta() {
+            return idRespuesta;
         }
 
         /**
-         * Define el valor de la propiedad idComunicacion.
+         * Define el valor de la propiedad idRespuesta.
          * 
          * @param value
          *     allowed object is
          *     {@link BigInteger }
          *     
          */
-        public void setIDComunicacion(BigInteger value) {
-            this.idComunicacion = value;
+        public void setIDRespuesta(BigInteger value) {
+            this.idRespuesta = value;
         }
 
         /**
-         * Obtiene el valor de la propiedad cantCFEAnulados.
+         * Obtiene el valor de la propiedad nomArch.
+         * 
+         * @return
+         *     possible object is
+         *     {@link String }
+         *     
+         */
+        public String getNomArch() {
+            return nomArch;
+        }
+
+        /**
+         * Define el valor de la propiedad nomArch.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *     
+         */
+        public void setNomArch(String value) {
+            this.nomArch = value;
+        }
+
+        /**
+         * Obtiene el valor de la propiedad fecHRecibido.
+         * 
+         * @return
+         *     possible object is
+         *     {@link XMLGregorianCalendar }
+         *     
+         */
+        public XMLGregorianCalendar getFecHRecibido() {
+            return fecHRecibido;
+        }
+
+        /**
+         * Define el valor de la propiedad fecHRecibido.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link XMLGregorianCalendar }
+         *     
+         */
+        public void setFecHRecibido(XMLGregorianCalendar value) {
+            this.fecHRecibido = value;
+        }
+
+        /**
+         * Obtiene el valor de la propiedad idEmisor.
          * 
          * @return
          *     possible object is
          *     {@link BigInteger }
          *     
          */
-        public BigInteger getCantCFEAnulados() {
-            return cantCFEAnulados;
+        public BigInteger getIDEmisor() {
+            return idEmisor;
         }
 
         /**
-         * Define el valor de la propiedad cantCFEAnulados.
+         * Define el valor de la propiedad idEmisor.
          * 
          * @param value
          *     allowed object is
          *     {@link BigInteger }
          *     
          */
-        public void setCantCFEAnulados(BigInteger value) {
-            this.cantCFEAnulados = value;
+        public void setIDEmisor(BigInteger value) {
+            this.idEmisor = value;
+        }
+
+        /**
+         * Obtiene el valor de la propiedad idReceptor.
+         * 
+         * @return
+         *     possible object is
+         *     {@link BigInteger }
+         *     
+         */
+        public BigInteger getIDReceptor() {
+            return idReceptor;
+        }
+
+        /**
+         * Define el valor de la propiedad idReceptor.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link BigInteger }
+         *     
+         */
+        public void setIDReceptor(BigInteger value) {
+            this.idReceptor = value;
+        }
+
+        /**
+         * Obtiene el valor de la propiedad cantidadCFE.
+         * 
+         */
+        public int getCantidadCFE() {
+            return cantidadCFE;
+        }
+
+        /**
+         * Define el valor de la propiedad cantidadCFE.
+         * 
+         */
+        public void setCantidadCFE(int value) {
+            this.cantidadCFE = value;
         }
 
         /**
@@ -419,26 +508,9 @@ public class CFEsAnuladosdefType {
      *   &lt;complexContent&gt;
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
      *       &lt;sequence&gt;
-     *         &lt;element name="TipoCFE" type="{http://cfe.dgi.gub.uy}CFEType"/&gt;
-     *         &lt;element name="Serie" type="{http://cfe.dgi.gub.uy}SerieType"/&gt;
-     *         &lt;element name="NroCFE" type="{http://cfe.dgi.gub.uy}NroCFEType"/&gt;
-     *         &lt;element name="FechaCFE" type="{http://cfe.dgi.gub.uy}FechaType"/&gt;
-     *         &lt;element name="Motivo_Cod"&gt;
-     *           &lt;simpleType&gt;
-     *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
-     *               &lt;length value="2"/&gt;
-     *               &lt;enumeration value="RD"/&gt;
-     *             &lt;/restriction&gt;
-     *           &lt;/simpleType&gt;
-     *         &lt;/element&gt;
-     *         &lt;element name="Motivo_Glosa"&gt;
-     *           &lt;simpleType&gt;
-     *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
-     *               &lt;maxLength value="40"/&gt;
-     *               &lt;enumeration value="Comprobante anulado por rechazo de DGI"/&gt;
-     *             &lt;/restriction&gt;
-     *           &lt;/simpleType&gt;
-     *         &lt;/element&gt;
+     *         &lt;element name="Estado" type="{http://cfe.dgi.gub.uy}EstadoACKSobreType"/&gt;
+     *         &lt;element name="MotivosRechazo" type="{http://cfe.dgi.gub.uy}RechazoSobreType" maxOccurs="30" minOccurs="0"/&gt;
+     *         &lt;element name="ParamConsulta" type="{http://cfe.dgi.gub.uy}ParamConsultaType" minOccurs="0"/&gt;
      *       &lt;/sequence&gt;
      *     &lt;/restriction&gt;
      *   &lt;/complexContent&gt;
@@ -449,171 +521,95 @@ public class CFEsAnuladosdefType {
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "tipoCFE",
-        "serie",
-        "nroCFE",
-        "fechaCFE",
-        "motivoCod",
-        "motivoGlosa"
+        "estado",
+        "motivosRechazo",
+        "paramConsulta"
     })
-    public static class CFEAnulado {
+    public static class Detalle {
 
-        @XmlElement(name = "TipoCFE", required = true)
-        protected BigInteger tipoCFE;
-        @XmlElement(name = "Serie", required = true)
-        protected String serie;
-        @XmlElement(name = "NroCFE", required = true)
-        protected BigInteger nroCFE;
-        @XmlElement(name = "FechaCFE", required = true)
-        @XmlSchemaType(name = "date")
-        protected XMLGregorianCalendar fechaCFE;
-        @XmlElement(name = "Motivo_Cod", required = true)
-        protected String motivoCod;
-        @XmlElement(name = "Motivo_Glosa", required = true)
-        protected String motivoGlosa;
+        @XmlElement(name = "Estado", required = true)
+        @XmlSchemaType(name = "string")
+        protected EstadoACKSobreType estado;
+        @XmlElement(name = "MotivosRechazo")
+        protected List<RechazoSobreType> motivosRechazo;
+        @XmlElement(name = "ParamConsulta")
+        protected ParamConsultaType paramConsulta;
 
         /**
-         * Obtiene el valor de la propiedad tipoCFE.
+         * Obtiene el valor de la propiedad estado.
          * 
          * @return
          *     possible object is
-         *     {@link BigInteger }
+         *     {@link EstadoACKSobreType }
          *     
          */
-        public BigInteger getTipoCFE() {
-            return tipoCFE;
+        public EstadoACKSobreType getEstado() {
+            return estado;
         }
 
         /**
-         * Define el valor de la propiedad tipoCFE.
+         * Define el valor de la propiedad estado.
          * 
          * @param value
          *     allowed object is
-         *     {@link BigInteger }
+         *     {@link EstadoACKSobreType }
          *     
          */
-        public void setTipoCFE(BigInteger value) {
-            this.tipoCFE = value;
+        public void setEstado(EstadoACKSobreType value) {
+            this.estado = value;
         }
 
         /**
-         * Obtiene el valor de la propiedad serie.
+         * Gets the value of the motivosRechazo property.
+         * 
+         * <p>
+         * This accessor method returns a reference to the live list,
+         * not a snapshot. Therefore any modification you make to the
+         * returned list will be present inside the JAXB object.
+         * This is why there is not a <CODE>set</CODE> method for the motivosRechazo property.
+         * 
+         * <p>
+         * For example, to add a new item, do as follows:
+         * <pre>
+         *    getMotivosRechazo().add(newItem);
+         * </pre>
+         * 
+         * 
+         * <p>
+         * Objects of the following type(s) are allowed in the list
+         * {@link RechazoSobreType }
+         * 
+         * 
+         */
+        public List<RechazoSobreType> getMotivosRechazo() {
+            if (motivosRechazo == null) {
+                motivosRechazo = new ArrayList<RechazoSobreType>();
+            }
+            return this.motivosRechazo;
+        }
+
+        /**
+         * Obtiene el valor de la propiedad paramConsulta.
          * 
          * @return
          *     possible object is
-         *     {@link String }
+         *     {@link ParamConsultaType }
          *     
          */
-        public String getSerie() {
-            return serie;
+        public ParamConsultaType getParamConsulta() {
+            return paramConsulta;
         }
 
         /**
-         * Define el valor de la propiedad serie.
+         * Define el valor de la propiedad paramConsulta.
          * 
          * @param value
          *     allowed object is
-         *     {@link String }
+         *     {@link ParamConsultaType }
          *     
          */
-        public void setSerie(String value) {
-            this.serie = value;
-        }
-
-        /**
-         * Obtiene el valor de la propiedad nroCFE.
-         * 
-         * @return
-         *     possible object is
-         *     {@link BigInteger }
-         *     
-         */
-        public BigInteger getNroCFE() {
-            return nroCFE;
-        }
-
-        /**
-         * Define el valor de la propiedad nroCFE.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link BigInteger }
-         *     
-         */
-        public void setNroCFE(BigInteger value) {
-            this.nroCFE = value;
-        }
-
-        /**
-         * Obtiene el valor de la propiedad fechaCFE.
-         * 
-         * @return
-         *     possible object is
-         *     {@link XMLGregorianCalendar }
-         *     
-         */
-        public XMLGregorianCalendar getFechaCFE() {
-            return fechaCFE;
-        }
-
-        /**
-         * Define el valor de la propiedad fechaCFE.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link XMLGregorianCalendar }
-         *     
-         */
-        public void setFechaCFE(XMLGregorianCalendar value) {
-            this.fechaCFE = value;
-        }
-
-        /**
-         * Obtiene el valor de la propiedad motivoCod.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getMotivoCod() {
-            return motivoCod;
-        }
-
-        /**
-         * Define el valor de la propiedad motivoCod.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setMotivoCod(String value) {
-            this.motivoCod = value;
-        }
-
-        /**
-         * Obtiene el valor de la propiedad motivoGlosa.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getMotivoGlosa() {
-            return motivoGlosa;
-        }
-
-        /**
-         * Define el valor de la propiedad motivoGlosa.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setMotivoGlosa(String value) {
-            this.motivoGlosa = value;
+        public void setParamConsulta(ParamConsultaType value) {
+            this.paramConsulta = value;
         }
 
     }
