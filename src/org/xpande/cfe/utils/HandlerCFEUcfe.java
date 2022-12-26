@@ -1558,8 +1558,8 @@ public class HandlerCFEUcfe extends HandlerCFE {
 
             // Modelos para WS
             //com.uruware.ucfe.inbox.webservice.ObjectFactory factory = new ObjectFactory();
-            String codComercio = "COV0001";
-            String codTerminal = "COV-1";
+            String codComercio = "PLA0001";
+            String codTerminal = "ERP-P";
 
             //RequerimientoParaUcfe reqUcfe = new RequerimientoParaUcfe();
 
@@ -2065,7 +2065,13 @@ public class HandlerCFEUcfe extends HandlerCFE {
             // http://172.23.8.12/Inbox/CfeService.svc?singleWsdl
 
             //String urlRequest = "http://172.23.8.12/Inbox/CfeService.svc/rest/Invoke";
-            String urlRequest = "http://10.102.215.57/Inbox/CfeService.svc/rest/Invoke";
+
+            // COVADONGA
+            //String urlRequest = "http://10.102.215.57/Inbox/CfeService.svc/rest/Invoke";
+
+            // PLANETA
+            String urlRequest = "http://10.102.211.169/Inbox/CfeService.svc/rest/Invoke";
+
             String loginCredential = "212334750012:NgE6HPGiAZUgPxZwEi5zZQ==";
 
             RequestConfig config = RequestConfig.custom()
