@@ -1530,17 +1530,6 @@ public class HandlerCFEUcfe extends HandlerCFE {
         try {
             MZCFEConfigDocDGI docDGI = (MZCFEConfigDocDGI) this.configDocSend.getZ_CFE_ConfigDocDGI();
 
-            // URL del Web Service de Testing:
-            // https://geocomtest.ucfe.com.uy/Inbox/CfeService.svc
-
-            /*
-            Código de Comercio: COV0001
-            Código de Terminal: COV-1
-            Usuario y clave para autenticación:
-            Usuario: 212334750012
-            Clave: H9OZrv46OHijtQiVgH5jag==
-             */
-
             File file = File.createTempFile("CFE1_UCFE", ".xml");
             //file.deleteOnExit();
             JAXBContext jaxbContext1 = JAXBContext.newInstance(CFEDefType.class);
@@ -1557,15 +1546,10 @@ public class HandlerCFEUcfe extends HandlerCFE {
             }
 
             // Modelos para WS
-            //com.uruware.ucfe.inbox.webservice.ObjectFactory factory = new ObjectFactory();
-            String codComercio = "PLA0001";
-            String codTerminal = "ERP-P";
+            String codComercio = vendorOrg.get_ValueAsString("ShopCode").trim();
+            String codTerminal = vendorOrg.get_ValueAsString("TerminalCode").trim();
 
-            //RequerimientoParaUcfe reqUcfe = new RequerimientoParaUcfe();
-
-            //String dgiXml = "<![CDATA[" + xml + "]]>";
             String adenda = "";
-
             Timestamp fechaHoy = TimeUtil.trunc(new Timestamp(System.currentTimeMillis()), TimeUtil.TRUNC_DAY);
             Date date = new Date();
             date.setTime(fechaHoy.getTime());
@@ -1577,42 +1561,6 @@ public class HandlerCFEUcfe extends HandlerCFE {
             String idReq = "1";
             String tipoCFE = docDGI.getCodigoDGI();
             String requestDate = (Instant.now().toString());
-
-            /*
-            String respuestaAux = "{\"ErrorCode\":0,\"ErrorMessage\":null,\"Resp\":{\"Adenda\":null,\"CaeNroDesde\":null,\"CaeNroHasta\":null,\"Certificado\":null,\"CertificadoParaFirmarCfe\":null,\"ClaveCertificadoFirma\":null,\"CodComercio\":\"COV0001\",\"CodRta\":\"31\",\"CodTerminal\":\"COV-1\",\"CodigoSeguridad\":null,\"DatosQr\":null,\"EstadoEnDgiCfeRecibido\":null,\"EstadoSituacion\":null,\"Etiquetas\":null,\"FechaFirma\":null,\"FechaReq\":\"20220221\",\"HoraReq\":\"000000\",\"IdCae\":null,\"IdReq\":\"1\",\"ImagenQr\":null,\"MensajeRta\":\"No se ha encontrado un rango CAE que corresponda al CFE\",\"NumeroCfe\":null,\"RangoDesde\":null,\"RangoHasta\":null,\"RutEmisor\":null,\"Serie\":null,\"TipoCfe\":\"182\",\"TipoMensaje\":311,\"Uuid\":\"58d0e731-07d3-40e9-8324-db2f742a6eeb\",\"VencimientoCae\":null,\"XmlCfeFirmado\":null},\"RespEnc\":null}";
-            org.json.JSONObject jsonRespAux = new org.json.JSONObject(respuestaAux);
-            org.json.JSONObject jsonDetRespAux = (org.json.JSONObject) jsonRespAux.get("Resp");
-
-            if (!jsonDetRespAux.get("MensajeRta").equals(org.json.JSONObject.NULL)){
-                String mensajeRta = jsonDetRespAux.get("MensajeRta").toString().trim();
-                throw new AdempiereException("Error al enviar CFE : " + mensajeRta);
-            }
-             */
-
-
-            /*
-            //reqUcfe.setCfeXmlOTexto(dgiXml);
-            reqUcfe.setCfeXmlOTexto(xml);
-            reqUcfe.setAdenda(adenda);
-            reqUcfe.setCodComercio(codComercio);
-            reqUcfe.setCodTerminal(codTerminal);
-            reqUcfe.setFechaReq(fechaReq);
-            reqUcfe.setHoraReq(horaReq);
-            reqUcfe.setIdReq(idReq);
-            reqUcfe.setTipoCfe(tipoCFE);
-            reqUcfe.setTipoMensaje(300);
-
-            String jsonReqParaUcfe = new Gson().toJson(reqUcfe);
-
-            String jbxReqUcfe = jsonReqParaUcfe;
-
-            ReqBody reqBody = new ReqBody();
-            reqBody.setCodComercio(codComercio);
-            reqBody.setCodTerminal(codTerminal);
-            reqBody.setReq(jbxReqUcfe);
-            reqBody.setRequestDate(requestDate);
-            reqBody.setTout(30000);
-            */
 
             UUID uuid = UUID.randomUUID();
             JSONObject jsonReqUcfe = new JSONObject();
@@ -1645,21 +1593,11 @@ public class HandlerCFEUcfe extends HandlerCFE {
             jsonReqBody.put("CodComercio", codComercio);
             jsonReqBody.put("CodTerminal", codTerminal);
 
-            /*
-            ObjectMapper Obj = new ObjectMapper();
-            String jsonStr = Obj.writeValueAsString(reqBody);
-            */
-
-            //String jsonStr = new Gson().toJson(reqBody);
-
             String jsonStr = jsonReqBody.toString();
-
-
             jsonStr = jsonStr.replace("cfeDefType", "CFE");
-
             System.out.println(jsonStr);
 
-            CloseableHttpResponse response = this.executeHttpRequest(jsonStr);
+            CloseableHttpResponse response = this.executeHttpRequest(jsonStr, vendorOrg);
             HttpEntity entity = response.getEntity();
             String responseString = EntityUtils.toString(entity, "UTF-8");
             System.out.println(responseString);
@@ -1684,22 +1622,11 @@ public class HandlerCFEUcfe extends HandlerCFE {
                 throw new AdempiereException("Error al enviar CFE : " + mensajeRta);
             }
 
-
             MZCFERespuestaProvider cfeRespuesta = new MZCFERespuestaProvider(this.ctx, 0, this.trxName);
             cfeRespuesta.setAD_Table_ID(this.model.get_Table_ID());
             cfeRespuesta.setRecord_ID(this.model.get_ID());
             cfeRespuesta.setC_DocType_ID(cDocType);
             cfeRespuesta.setDocumentNoRef(documentNo);
-
-            /*
-            if (!jsonMovimiento.get("numeroMov").equals(org.json.JSONObject.NULL)){
-                String numeroMov = jsonMovimiento.get("numeroMov").toString().trim();
-                int idMov = MZStechTMPMov.getIDByNumeroMov(getCtx(), numeroMov, get_TrxName());
-                if (idMov > 0){
-                    continue;
-                }
-            }
-            */
             String cfeStatus = "";
             if (!jsonDetResp.get("CodRta").equals(org.json.JSONObject.NULL)){
                 cfeStatus = jsonDetResp.get("CodRta").toString().trim();
@@ -1750,35 +1677,6 @@ public class HandlerCFEUcfe extends HandlerCFE {
             cfeRespuesta.setZ_CFE_Vendor_ID(this.configDocSend.getZ_CFE_Vendor_ID());
             cfeRespuesta.setCFE_Vencimiento_CAE(this.configDocSend.getDueDate());
             cfeRespuesta.saveEx();
-
-            /*
-            cfeRespuesta.setCFE_Status(String.valueOf(cfeDtoSisteco.getStatus()));
-            cfeRespuesta.setCFE_Descripcion(cfeDtoSisteco.getDescripcion());
-            if (cfeRespuesta.getCFE_Status().equalsIgnoreCase("0")){
-                cfeRespuesta.setCFE_Tipo(BigDecimal.valueOf(cfeDtoSisteco.getTipoCFE()));
-                cfeRespuesta.setCFE_Serie(cfeDtoSisteco.getSerie());
-                cfeRespuesta.setCFE_Numero(cfeDtoSisteco.getMro());
-                cfeRespuesta.setCFE_DigitoVerificador(cfeDtoSisteco.getDigestValue());
-                cfeRespuesta.setCFE_Resolucion(String.valueOf(cfeDtoSisteco.getResolucion()));
-                cfeRespuesta.setCFE_AnioResolucion(cfeDtoSisteco.getAnioResolucion());
-                cfeRespuesta.setCFE_URL_DGI(cfeDtoSisteco.getUrlDocumentoDGI());
-                cfeRespuesta.setCFE_CAE_ID(cfeDtoSisteco.getCaeId());
-                cfeRespuesta.setCFE_NroInicial_CAE(cfeDtoSisteco.getdNro());
-                cfeRespuesta.setCFE_NroFinal_CAE(cfeDtoSisteco.gethNro());
-                cfeRespuesta.setAD_OrgTrx_ID(this.model.getAD_Org_ID());
-
-                if (cfeDtoSisteco.getFecVenc() != null){
-                    //cfeRespuesta.setCFE_Vencimiento_CAE(cfeDtoSisteco.getFecVenc());
-                }
-                else {
-                    //cfeRespuesta.setCFE_Vencimiento_CAE(this.configDocSend.getDueDate());
-                }
-
-                cfeRespuesta.setZ_CFE_Vendor_ID(this.configDocSend.getZ_CFE_Vendor_ID());
-            }
-            cfeRespuesta.saveEx();
-            */
-
         }
         catch (Exception e) {
             throw new AdempiereException(e);
@@ -2057,21 +1955,14 @@ public class HandlerCFEUcfe extends HandlerCFE {
      * @param configServ
      * @return
      */
-    private CloseableHttpResponse executeHttpRequest(String jsonStr) {
+    private CloseableHttpResponse executeHttpRequest(String jsonStr, MZCFEVendorOrg vendorOrg) {
 
         CloseableHttpResponse response = null;
         try{
             int timeout = 120;
-            //String urlRequest = "https://geocomtest.ucfe.com.uy/Inbox/CfeService.svc/rest/Invoke";
-            // http://172.23.8.12/Inbox/CfeService.svc?singleWsdl
-
-            //String urlRequest = "http://172.23.8.12/Inbox/CfeService.svc/rest/Invoke";
-
-            // COVADONGA
-            //String urlRequest = "http://10.102.215.57/Inbox/CfeService.svc/rest/Invoke";
 
             // PLANETA
-            String urlRequest = "http://10.102.211.169/Inbox/CfeService.svc/rest/Invoke";
+            String urlRequest = vendorOrg.getTargetEndpointAddress().trim();
 
             String loginCredential = "212334750012:NgE6HPGiAZUgPxZwEi5zZQ==";
 
@@ -2089,13 +1980,6 @@ public class HandlerCFEUcfe extends HandlerCFE {
             request.addHeader("Accept", "application/json");
             request.addHeader("content-type", "application/json");
             request.setEntity(params);
-
-            /*
-            byte[] encodedAuth = org.apache.commons.codec.binary.Base64.encodeBase64(loginCredential.getBytes(Charset.forName("ISO-8859-1")));
-            String authHeader = "Basic " + new String(encodedAuth);
-            request.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
-            */
-
             response = httpClient.execute(request);
         }
         catch (Exception e){
