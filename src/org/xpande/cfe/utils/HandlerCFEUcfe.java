@@ -1702,8 +1702,9 @@ public class HandlerCFEUcfe extends HandlerCFE {
             emisor.setRznSoc(org.getDescription());
             emisor.setRUCEmisor(orgInfo.getTaxID());
             emisor.setCorreoEmisor(orgInfo.getEMail());
+
             //emisor.setCdgDGISucur(BigInteger.valueOf(1)); // 1 - Covadonga, 2 - Planeta.
-            emisor.setCdgDGISucur(BigInteger.valueOf(2)); // 1 - Covadonga, 2 - Planeta.
+            emisor.setCdgDGISucur(BigInteger.valueOf(Integer.valueOf(org.getValue()))); // 1 - Covadonga, 2 - Planeta.
 
             MWarehouse warehouse = MWarehouse.get(this.ctx, orgInfo.getM_Warehouse_ID());
             //emisor.setEmiSucursal(warehouse.getName());
